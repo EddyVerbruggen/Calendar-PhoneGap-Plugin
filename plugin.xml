@@ -33,16 +33,9 @@
 
   <!-- android -->
   <platform name="android">
-    <config-file target="AndroidManifest.xml" parent="/manifest/application">
-      <activity android:name="nl.x-services.plugins.Calendar" android:label="@string/app_name">
-        <intent-filter/>
-      </activity>
-    </config-file>
-
     <config-file target="res/xml/config.xml" parent="plugins">
-      <plugin name="Calendar" value="nl.x-services.plugins.Calendar"/>
+      <plugin name="Calendar" value="nl.xservices.plugins.Calendar"/>
     </config-file>
-
     <source-file src="src/android/nl/xservices/plugins/Calendar.java" target-dir="src/android/nl/xservices/plugins"/>
   </platform>
 
