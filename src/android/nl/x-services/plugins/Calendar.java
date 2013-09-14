@@ -22,7 +22,7 @@ public class Calendar extends CordovaPlugin {
 	public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
 		try {
 			if (ACTION_CREATE_EVENT.equals(action)) {
-				JSONObject arg_object = args.getJSONObject(0);
+//				JSONObject arg_object = args.getJSONObject(0);
 				callback = callbackContext;
 				Intent calIntent = new Intent(Intent.ACTION_EDIT)
 					.setType("vnd.android.cursor.item/event")

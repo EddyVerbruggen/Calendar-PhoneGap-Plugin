@@ -141,52 +141,27 @@
     NSString* message    = [arguments objectAtIndex:2];
     NSString *startDate  = [arguments objectAtIndex:3];
     NSString *endDate    = [arguments objectAtIndex:4];
-    bool delAll = [arguments objectAtIndex:5];
 
-    NSDateFormatter *df = [[NSDateFormatter alloc] init];
-    [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-    NSDate *myStartDate = [df dateFromString:startDate];
-    NSDate *myEndDate = [df dateFromString:endDate];
+    NSTimeInterval _startInterval = [startDate doubleValue] / 1000; // strip millis
+    NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
+    
+    NSTimeInterval _endInterval = [endDate doubleValue] / 1000; // strip millis
+    NSDate *myEndDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
 
     NSArray *matchingEvents = [self findEKEventsWithTitle:title location:location message:message startDate:myStartDate endDate:myEndDate];
 
-
-    if (delAll || matchingEvents.count == 1) {
-        // Definitive single match - delete it!
-        NSError *error = NULL;
-        bool hadErrors = false;
-        if (delAll) {
-            for (EKEvent * event in matchingEvents) {
-                [self.eventStore removeEvent:event span:EKSpanThisEvent error:&error];
-                // Check for error codes and return result
-                if (error) {
-                    hadErrors = true;
-                }
-            }
-        }
-        else {
-            [self.eventStore removeEvent:[matchingEvents lastObject] span:EKSpanThisEvent error:&error];
-        }
-        // Check for error codes and return result
-        if (error || hadErrors) {
-            NSString *messageString;
-            if (hadErrors) {
-                messageString = @"Error deleting events";
-            }
-            else {
-                messageString = error.userInfo.description;
-            }
-            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
-                                                               messageAsString:messageString];
-            [self writeJavascript:[pluginResult toErrorCallbackString:callbackId]];
-
-        }
-        else {
-            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-            [self writeJavascript:[pluginResult toSuccessCallbackString:callbackId]];
-        }
+    NSError *error = NULL;
+    for (EKEvent * event in matchingEvents) {
+        [self.eventStore removeEvent:event span:EKSpanThisEvent error:&error];
     }
-
+    // Check for error codes and return result
+    if (error) {
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.userInfo.description];
+        [self writeJavascript:[pluginResult toErrorCallbackString:callbackId]];
+    } else {
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self writeJavascript:[pluginResult toSuccessCallbackString:callbackId]];
+    }
 }
 
 -(void)findEvent:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
@@ -200,10 +175,14 @@
     NSString *startDate  = [arguments objectAtIndex:3];
     NSString *endDate    = [arguments objectAtIndex:4];
 
+    NSTimeInterval _startInterval = [startDate doubleValue] / 1000; // strip millis
+    NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
+
+    NSTimeInterval _endInterval = [endDate doubleValue] / 1000; // strip millis
+    NSDate *myEndDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
+
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
     [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-    NSDate *myStartDate = [df dateFromString:startDate];
-    NSDate *myEndDate = [df dateFromString:endDate];
 
     NSArray *matchingEvents = [self findEKEventsWithTitle:title location:location message:message startDate:myStartDate endDate:myEndDate];
 
@@ -254,11 +233,14 @@
     NSString *nstartDate  = [arguments objectAtIndex:8];
     NSString *nendDate    = [arguments objectAtIndex:9];
 
-    // Make NSDates from our strings
+    NSTimeInterval _startInterval = [startDate doubleValue] / 1000; // strip millis
+    NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
+    
+    NSTimeInterval _endInterval = [endDate doubleValue] / 1000; // strip millis
+    NSDate *myEndDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
+
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
     [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-    NSDate *myStartDate = [df dateFromString:startDate];
-    NSDate *myEndDate = [df dateFromString:endDate];
 
     // Find matches
     NSArray *matchingEvents = [self findEKEventsWithTitle:title location:location message:message startDate:myStartDate endDate:myEndDate];
@@ -277,12 +259,12 @@
             theEvent.notes = nmessage;
         }
         if (nstartDate) {
-            NSDate *newMyStartDate = [df dateFromString:nstartDate];
-            theEvent.startDate = newMyStartDate;
+            NSTimeInterval _nstartInterval = [nstartDate doubleValue] / 1000; // strip millis
+            theEvent.startDate = [NSDate dateWithTimeIntervalSince1970:_nstartInterval];
         }
         if (nendDate) {
-            NSDate *newMyEndDate = [df dateFromString:nendDate];
-            theEvent.endDate = newMyEndDate;
+            NSTimeInterval _nendInterval = [nendDate doubleValue] / 1000; // strip millis
+            theEvent.endDate = [NSDate dateWithTimeIntervalSince1970:_nendInterval];
         }
 
         // Now save the new details back to the store
@@ -291,22 +273,17 @@
 
         // Check error code + return result
         if (error) {
-            CDVPluginResult * pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
-                                                               messageAsString:error.userInfo.description];
+            CDVPluginResult * pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.userInfo.description];
             [self writeJavascript:[pluginResult toErrorCallbackString:callbackId]];
-
-        }
-        else {
+        } else {
             CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
             [self writeJavascript:[pluginResult toSuccessCallbackString:callbackId]];
         }
-    }
-    else {
+    } else {
         // Otherwise return a no result error
         CDVPluginResult * pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_NO_RESULT];
         [self writeJavascript:[pluginResult toErrorCallbackString:callbackId]];
     }
-
 }
 
 @end
