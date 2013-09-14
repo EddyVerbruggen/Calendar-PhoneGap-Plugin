@@ -8,9 +8,8 @@ for iOS and Android, by [Eddy Verbruggen](http://www.x-services.nl)
 	2. [Manually](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#manually)
 	2. [PhoneGap Build](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#phonegap-build)
 3. [Usage](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#3-usage)
-	3. [iOS](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#ios)
-	3. [Android](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#android)
-4. [License](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#5-license)
+4. [Credits](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#4-credits)
+5. [License](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#5-license)
 
 ## 1. Description
 
