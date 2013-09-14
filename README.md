@@ -1,4 +1,5 @@
-# PhoneGap Calendar plugin (iOS and Android)
+# PhoneGap Calendar plugin
+## for iOS and Android
 
 by [Eddy Verbruggen](http://www.x-services.nl)
 
@@ -16,10 +17,18 @@ by [Eddy Verbruggen](http://www.x-services.nl)
 
 This plugin allows you to add events to the Calendar of the mobile device.
 
-* Supported methods on iOS: find, create, modify, delete
-* Supported methods on Android: create (more may come, if people request it)
 * Compatible with [Cordova Plugman](https://github.com/apache/cordova-plugman) and ready for PhoneGap 3.0
 * Submitted and waiting for approval at PhoneGap Build ([more information](https://build.phonegap.com/plugins))
+
+### iOS specifics
+* Supported methods: `find`, `create`, `modify`, `delete`.
+* All methods work without showing the native calendar. Your app never looses control.
+* Tested on iOS 6 and 7.
+
+### Android specifics
+* Only the `create` method is supported (more may come, if people request it, but creating is the most important thing, right?)
+* When the `create` method is called, the use is presented a prefilled calendar item. Pressing the hardware back button will give control back to your app.
+* Tested on Android 4.
 
 ## 2. Installation
 
@@ -40,7 +49,7 @@ $ cordova build
 
 ### Manually
 
-1\. Add the following xml to your `config.xml` in the root directory of your `www` folder:
+1\. Add the following xml to your `config.xml`:
 ```xml
 <!-- for iOS -->
 <feature name="Calendar">
@@ -69,7 +78,7 @@ $ cordova build
 
 iOS: Copy `Calendar.h` and `Calendar.h` to `platforms/ios/<ProjectName>/Plugins`
 
-Android: Copy Calendar.java to platforms/android/src/nl/xservices/plugins (create the folders)
+Android: Copy `Calendar.java` to `platforms/android/src/nl/xservices/plugins` (create the folders)
 
 ### PhoneGap Build
 

@@ -14,7 +14,6 @@
 
   <engines>
     <engine name="cordova" version=">=2.3.0"/>
-    <!-- TODO was 3.0.. does it work on 2.9? -->
   </engines>
 
   <asset src="www/Calendar.js" target="js/plugins/Calendar.js"/>
