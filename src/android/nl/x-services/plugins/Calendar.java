@@ -1,13 +1,13 @@
-package com.tenforwardconsulting.phonegap.plugins;
-
-import org.apache.cordova.api.CallbackContext;
-import org.apache.cordova.api.CordovaPlugin;
-import org.json.JSONObject;
-import org.json.JSONArray;
-import org.json.JSONException;
+package nl.xservices.plugins;
 
 import android.app.Activity;
 import android.content.Intent;
+import org.apache.cordova.api.CallbackContext;
+import org.apache.cordova.api.CordovaPlugin;
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.util.Date;
 
 public class Calendar extends CordovaPlugin {
 	public static final String ACTION_CREATE_EVENT = "createEvent";
@@ -22,25 +22,16 @@ public class Calendar extends CordovaPlugin {
 	public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
 		try {
 			if (ACTION_CREATE_EVENT.equals(action)) {
-//				JSONObject arg_object = args.getJSONObject(0);
-				callback = callbackContext;
-				Intent calIntent = new Intent(Intent.ACTION_EDIT)
-					.setType("vnd.android.cursor.item/event")
-          .putExtra("title", args.getString(0))
-          .putExtra("eventLocation", args.getString(1))
-          .putExtra("description", args.getString(2))
-					.putExtra("beginTime", args.getLong(3))
-					.putExtra("endTime", args.getLong(4))
-//					.putExtra("allDay", args.getBoolean(5)); // TODO compute here, don't pass in
-          // TODO wtf we need allDay for in Android? native code can compute this as well..
-        /* old JS code:
-    var allDay = (startDate.getHours() == 0
-                  && startDate.getMinutes() == 0
-                  && startDate.getSeconds() == 0
-                  && endDate.getHours() == 0
-                  && endDate.getMinutes() == 0
-                  && endDate.getSeconds() == 0);
-    */
+        callback = callbackContext;
+
+				final Intent calIntent = new Intent(Intent.ACTION_EDIT)
+            .setType("vnd.android.cursor.item/event")
+            .putExtra("title", args.getString(0))
+            .putExtra("eventLocation", args.getString(1))
+            .putExtra("description", args.getString(2))
+            .putExtra("beginTime", args.getLong(3))
+            .putExtra("endTime", args.getLong(4))
+            .putExtra("allDay", isAllDayEvent(new Date(args.getLong(3)), new Date(args.getLong(4))));
 
 				this.cordova.startActivityForResult(this, calIntent, RESULT_CODE_CREATE);
 				return true;
@@ -60,7 +51,7 @@ public class Calendar extends CordovaPlugin {
 		}     
 		return false;
 	}
-	
+
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == RESULT_CODE_CREATE) {
 			if (resultCode == Activity.RESULT_OK || resultCode == Activity.RESULT_CANCELED) {
@@ -70,4 +61,13 @@ public class Calendar extends CordovaPlugin {
 			}
 		} 
 	}
+
+  private boolean isAllDayEvent(final Date startDate, final Date endDate) {
+    return startDate.getHours() == 0 &&
+        startDate.getMinutes() == 0 &&
+        startDate.getSeconds() == 0 &&
+        endDate.getHours() == 0 &&
+        endDate.getMinutes() == 0 &&
+        endDate.getSeconds() == 0;
+  }
 }

@@ -1,8 +1,7 @@
 "use strict";
 function Calendar() {}
 
-// TODO: pass calendarname and reminderMinutes
-Calendar.prototype.createEvent = function (title, location, notes, startDate, endDate, successCallback, errorCallback, calendarName, reminderMinutes) {
+Calendar.prototype.createEvent = function (title, location, notes, startDate, endDate, successCallback, errorCallback) {
     if (typeof errorCallback != "function") {
         console.log("Calendar.createEvent failure: errorCallback parameter must be a function");
         return
