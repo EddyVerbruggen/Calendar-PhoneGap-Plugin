@@ -35,21 +35,14 @@ public class Calendar extends CordovaPlugin {
 
 				this.cordova.startActivityForResult(this, calIntent, RESULT_CODE_CREATE);
 				return true;
-			} else if (ACTION_DELETE_EVENT.equals(action)) {
-        // TODO implement
-        return false;
-			} else if (ACTION_FIND_EVENT.equals(action)) {
-        // TODO implement
-        return false;
-			} else if (ACTION_MODIFY_EVENT.equals(action)) {
-        // TODO implement
+			} else  {
+        callbackContext.error("calendar." + action + " is not (yet) supported on Android.");
         return false;
       }
 		} catch(Exception e) {
 			System.err.println("Exception: " + e.getMessage());
 			return false;
 		}     
-		return false;
 	}
 
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -59,7 +52,7 @@ public class Calendar extends CordovaPlugin {
 			} else {
 				callback.error("Unable to add event (" + resultCode + ").");
 			}
-		} 
+    }
 	}
 
   private boolean isAllDayEvent(final Date startDate, final Date endDate) {

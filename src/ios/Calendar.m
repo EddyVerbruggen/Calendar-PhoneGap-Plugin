@@ -33,7 +33,7 @@
     } else { // we're on iOS 5 or older
         accessGranted = YES;
     }
-
+    
     if (accessGranted) {
         self.eventStore = eventStore;
     }
@@ -58,15 +58,15 @@
     if (message.length > 0) {
         [predicateString appendString:[NSString stringWithFormat:@" AND notes == '%@'" , message]];
     }
-
+    
     NSPredicate *matches = [NSPredicate predicateWithFormat:predicateString];
-
+    
     NSArray *datedEvents = [self.eventStore eventsMatchingPredicate:[eventStore predicateForEventsWithStartDate:startDate endDate:endDate calendars:nil]];
-
-
+    
+    
     NSArray *matchingEvents = [datedEvents filteredArrayUsingPredicate:matches];
-
-
+    
+    
     return matchingEvents;
 }
 
@@ -74,56 +74,46 @@
 
 - (void)createEvent:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
     // Import arguments
-
+    
     NSString *callbackId = [arguments pop];
-
+    
     NSString* title      = [arguments objectAtIndex:0];
     NSString* location   = [arguments objectAtIndex:1];
     NSString* message    = [arguments objectAtIndex:2];
     NSString *startDate  = [arguments objectAtIndex:3];
     NSString *endDate    = [arguments objectAtIndex:4];
-
+    
     NSTimeInterval _startInterval = [startDate doubleValue] / 1000; // strip millis
     NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
-
+    
     NSTimeInterval _endInterval = [endDate doubleValue] / 1000; // strip millis
-    NSDate *myEndDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
-
+    
     EKEvent *myEvent = [EKEvent eventWithEventStore: self.eventStore];
     myEvent.title = title;
     myEvent.location = location;
     myEvent.notes = message;
     myEvent.startDate = myStartDate;
-    myEvent.endDate = myEndDate;
+    
+    int duration = _endInterval - _startInterval;
+    int moduloDay = duration % (60*60*24);
+    if (moduloDay == 0) {
+        myEvent.allDay = YES;
+        myEvent.endDate = [NSDate dateWithTimeIntervalSince1970:_endInterval-1];
+    } else {
+        myEvent.endDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
+    }
     myEvent.calendar = self.eventStore.defaultCalendarForNewEvents;
-
-
+    
     EKAlarm *reminder = [EKAlarm alarmWithRelativeOffset:-2*60*60];
-
+    
     [myEvent addAlarm:reminder];
-
+    
     NSError *error = nil;
     [self.eventStore saveEvent:myEvent span:EKSpanThisEvent error:&error];
 
-    //BOOL saved =
-    [self.eventStore saveEvent:myEvent span:EKSpanThisEvent error:&error];
-    /*
-    if (saved) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title
-                                                        message:@"Saved to Calendar" delegate:self
-                                              cancelButtonTitle:@"Thank you!"
-                                              otherButtonTitles:nil];
-        [alert show];
-    }
-     */
-
-    // Check error code + return result
     if (error) {
-        CDVPluginResult * pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
-                                                           messageAsString:error.userInfo.description];
-
+        CDVPluginResult * pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.userInfo.description];
         [self writeJavascript:[pluginResult toErrorCallbackString:callbackId]];
-
     } else {
         NSLog(@"Reached Success");
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
@@ -133,23 +123,23 @@
 
 -(void)deleteEvent:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
     // Import arguments
-
+    
     NSString *callbackId = [arguments pop];
-
+    
     NSString* title      = [arguments objectAtIndex:0];
     NSString* location   = [arguments objectAtIndex:1];
     NSString* message    = [arguments objectAtIndex:2];
     NSString *startDate  = [arguments objectAtIndex:3];
     NSString *endDate    = [arguments objectAtIndex:4];
-
+    
     NSTimeInterval _startInterval = [startDate doubleValue] / 1000; // strip millis
     NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
     
     NSTimeInterval _endInterval = [endDate doubleValue] / 1000; // strip millis
     NSDate *myEndDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
-
+    
     NSArray *matchingEvents = [self findEKEventsWithTitle:title location:location message:message startDate:myStartDate endDate:myEndDate];
-
+    
     NSError *error = NULL;
     for (EKEvent * event in matchingEvents) {
         [self.eventStore removeEvent:event span:EKSpanThisEvent error:&error];
@@ -166,40 +156,40 @@
 
 -(void)findEvent:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
     // Import arguments
-
+    
     NSString *callbackId = [arguments pop];
-
+    
     NSString* title      = [arguments objectAtIndex:0];
     NSString* location   = [arguments objectAtIndex:1];
     NSString* message    = [arguments objectAtIndex:2];
     NSString *startDate  = [arguments objectAtIndex:3];
     NSString *endDate    = [arguments objectAtIndex:4];
-
+    
     NSTimeInterval _startInterval = [startDate doubleValue] / 1000; // strip millis
     NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
-
+    
     NSTimeInterval _endInterval = [endDate doubleValue] / 1000; // strip millis
     NSDate *myEndDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
-
+    
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
     [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-
+    
     NSArray *matchingEvents = [self findEKEventsWithTitle:title location:location message:message startDate:myStartDate endDate:myEndDate];
-
+    
     NSMutableArray *finalResults = [[NSMutableArray alloc] initWithCapacity:matchingEvents.count];
-
-
+    
+    
     // Stringify the results - Cordova can't deal with Obj-C objects
     for (EKEvent * event in matchingEvents) {
         NSMutableDictionary *entry = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-        event.title, @"title",
-        event.location, @"location",
-        event.notes, @"message",
-        [df stringFromDate:event.startDate], @"startDate",
-        [df stringFromDate:event.endDate], @"endDate", nil];
+                                      event.title, @"title",
+                                      event.location, @"location",
+                                      event.notes, @"message",
+                                      [df stringFromDate:event.startDate], @"startDate",
+                                      [df stringFromDate:event.endDate], @"endDate", nil];
         [finalResults addObject:entry];
     }
-
+    
     if (finalResults.count > 0) {
         // Return the results we got
         CDVPluginResult* result = [CDVPluginResult
@@ -212,39 +202,39 @@
         CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_NO_RESULT];
         [self writeJavascript:[result toErrorCallbackString:callbackId]];
     }
-
+    
 }
 
 
 -(void)modifyEvent:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
     // Import arguments
-
+    
     NSString *callbackId = [arguments pop];
-
+    
     NSString* title      = [arguments objectAtIndex:0];
     NSString* location   = [arguments objectAtIndex:1];
     NSString* message    = [arguments objectAtIndex:2];
     NSString *startDate  = [arguments objectAtIndex:3];
     NSString *endDate    = [arguments objectAtIndex:4];
-
+    
     NSString* ntitle      = [arguments objectAtIndex:5];
     NSString* nlocation   = [arguments objectAtIndex:6];
     NSString* nmessage    = [arguments objectAtIndex:7];
     NSString *nstartDate  = [arguments objectAtIndex:8];
     NSString *nendDate    = [arguments objectAtIndex:9];
-
+    
     NSTimeInterval _startInterval = [startDate doubleValue] / 1000; // strip millis
     NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
     
     NSTimeInterval _endInterval = [endDate doubleValue] / 1000; // strip millis
     NSDate *myEndDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
-
+    
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
     [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-
+    
     // Find matches
     NSArray *matchingEvents = [self findEKEventsWithTitle:title location:location message:message startDate:myStartDate endDate:myEndDate];
-
+    
     if (matchingEvents.count == 1) {
         // Presume we have to have an exact match to modify it!
         // Need to load this event from an EKEventStore so we can edit it
@@ -266,11 +256,11 @@
             NSTimeInterval _nendInterval = [nendDate doubleValue] / 1000; // strip millis
             theEvent.endDate = [NSDate dateWithTimeIntervalSince1970:_nendInterval];
         }
-
+        
         // Now save the new details back to the store
         NSError *error = nil;
         [self.eventStore saveEvent:theEvent span:EKSpanThisEvent error:&error];
-
+        
         // Check error code + return result
         if (error) {
             CDVPluginResult * pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.userInfo.description];
