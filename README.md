@@ -1,5 +1,4 @@
-# PhoneGap Calendar plugin
-## for iOS and Android
+# PhoneGap Calendar plugin (iOS & Android)
 
 by [Eddy Verbruggen](http://www.x-services.nl)
 
@@ -26,7 +25,7 @@ This plugin allows you to add events to the Calendar of the mobile device.
 * Tested on iOS 6 and 7.
 
 ### Android specifics
-* Only the `create` method is supported (more may come, if people request it, but creating is the most important thing, right?)
+* Only the `create` method is supported (more may come, if people request it, but creating is the most important thing, right?).
 * When the `create` method is called, the use is presented a prefilled calendar item. Pressing the hardware back button will give control back to your app.
 * Tested on Android 4.
 
@@ -118,7 +117,7 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   window.plugins.calendar.createEvent(title,location,notes,startDate,endDate,success,error);
 
   // find (iOS only for now)
-  window.plugins.calendar.findEvent(title,location,notes,startDate,endDate, success, error);
+  window.plugins.calendar.findEvent(title,location,notes,startDate,endDate,success,error);
 
   // change the title of the event (iOS only for now)
   var newTitle = "New title!";
@@ -126,7 +125,7 @@ Basic operations, you'll want to copy-paste this for testing purposes:
 
   // delete (iOS only for now)
   // note that it deletes all matching events, which are duplicates anyway
-  window.plugins.calendar.deleteEvent(newTitle,location,notes,startDate,endDate, success, error);
+  window.plugins.calendar.deleteEvent(newTitle,location,notes,startDate,endDate,success,error);
 ```
 
 Creating an all day event:
@@ -149,9 +148,8 @@ Creating an event for 3 full days
 ## 4. CREDITS ##
 
 This plugin was enhanced for Plugman / PhoneGap Build by [Eddy Verbruggen](http://www.x-services.nl). I fixed some issues in the native code (mainly for iOS) and changed the JS-Native functions a little in order to make a universal JS API for both platforms.
-
-Credits for the original iOS code go to [Felix Montanez](https://github.com/felixactv8/Phonegap-Calendar-Plugin-ios).
-Credits for the original Android code go to [Ten Forward Consulting](https://github.com/tenforwardconsulting/Phonegap-Calendar-Plugin-android).
+* Credits for the original iOS code go to [Felix Montanez](https://github.com/felixactv8/Phonegap-Calendar-Plugin-ios).
+* Credits for the original Android code go to [Ten Forward Consulting](https://github.com/tenforwardconsulting/Phonegap-Calendar-Plugin-android).
 
 ## 5. License
 
