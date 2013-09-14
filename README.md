@@ -1,6 +1,6 @@
-# PhoneGap Calendar plugin (iOS & Android)
+# PhoneGap Calendar plugin
 
-by [Eddy Verbruggen](http://www.x-services.nl)
+for iOS and Android, by [Eddy Verbruggen](http://www.x-services.nl)
 
 1. [Description](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#1-description)
 2. [Installation](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#2-installation)
