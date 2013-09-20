@@ -74,7 +74,7 @@ $ cordova build
 
 3\. Download the source files for iOS and/or Android and copy them to your project.
 
-iOS: Copy `Calendar.h` and `Calendar.h` to `platforms/ios/<ProjectName>/Plugins`
+iOS: Copy `Calendar.h` and `Calendar.m` to `platforms/ios/<ProjectName>/Plugins`
 
 Android: Copy `Calendar.java` to `platforms/android/src/nl/xservices/plugins` (create the folders)
 
