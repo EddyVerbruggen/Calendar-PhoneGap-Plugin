@@ -36,7 +36,7 @@
     <config-file target="res/xml/config.xml" parent="plugins">
       <plugin name="Calendar" value="nl.xservices.plugins.Calendar"/>
     </config-file>
-    <source-file src="src/android/nl/xservices/plugins/Calendar.java" target-dir="src/android/nl/xservices/plugins"/>
+    <source-file src="src/android/nl/xservices/plugins/Calendar.java" target-dir="src/nl/xservices/plugins"/>
   </platform>
 
 </plugin>
