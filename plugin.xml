@@ -33,8 +33,10 @@
 
   <!-- android -->
   <platform name="android">
-    <config-file target="res/xml/config.xml" parent="plugins">
-      <plugin name="Calendar" value="nl.xservices.plugins.Calendar"/>
+    <config-file target="res/xml/config.xml" parent="widget">
+      <feature name="Calendar">
+        <param name="android-package" value="nl.xservices.plugins.Calendar" />
+      </feature>
     </config-file>
     <source-file src="src/android/nl/xservices/plugins/Calendar.java" target-dir="src/nl/xservices/plugins"/>
   </platform>
