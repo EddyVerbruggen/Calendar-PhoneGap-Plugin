@@ -2,8 +2,8 @@ package nl.xservices.plugins;
 
 import android.app.Activity;
 import android.content.Intent;
-import org.apache.cordova.api.CallbackContext;
-import org.apache.cordova.api.CordovaPlugin;
+import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
 

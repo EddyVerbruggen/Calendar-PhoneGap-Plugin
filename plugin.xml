@@ -2,7 +2,7 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
       	xmlns:android="http://schemas.android.com/apk/res/android"
         id="nl.x-services.plugins.calendar"
-        version="1.0">
+        version="3.0">
 
   <name>Calendar</name>
 
@@ -13,7 +13,7 @@
   <license>MIT</license>
 
   <engines>
-    <engine name="cordova" version=">=2.3.0"/>
+    <engine name="cordova" version=">=3.0.0"/>
   </engines>
 
   <asset src="www/Calendar.js" target="js/plugins/Calendar.js"/>

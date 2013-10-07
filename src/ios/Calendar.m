@@ -10,8 +10,7 @@
 
 #pragma mark Initialisation functions
 
-- (CDVPlugin*) initWithWebView:(UIWebView*)theWebView
-{
+- (CDVPlugin*) initWithWebView:(UIWebView*)theWebView {
     self = (Calendar*)[super initWithWebView:theWebView];
     if (self) {
 		//[self setup];
@@ -72,16 +71,16 @@
 
 #pragma mark Cordova functions
 
-- (void)createEvent:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+- (void)createEvent:(CDVInvokedUrlCommand*)command {
     // Import arguments
     
-    NSString *callbackId = [arguments pop];
+    NSString *callbackId = command.callbackId;
     
-    NSString* title      = [arguments objectAtIndex:0];
-    NSString* location   = [arguments objectAtIndex:1];
-    NSString* message    = [arguments objectAtIndex:2];
-    NSString *startDate  = [arguments objectAtIndex:3];
-    NSString *endDate    = [arguments objectAtIndex:4];
+    NSString* title      = [command.arguments objectAtIndex:0];
+    NSString* location   = [command.arguments objectAtIndex:1];
+    NSString* message    = [command.arguments objectAtIndex:2];
+    NSString *startDate  = [command.arguments objectAtIndex:3];
+    NSString *endDate    = [command.arguments objectAtIndex:4];
     
     NSTimeInterval _startInterval = [startDate doubleValue] / 1000; // strip millis
     NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
@@ -121,16 +120,16 @@
     }
 }
 
--(void)deleteEvent:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+-(void)deleteEvent:(CDVInvokedUrlCommand*)command {
     // Import arguments
     
-    NSString *callbackId = [arguments pop];
+    NSString *callbackId = command.callbackId;
     
-    NSString* title      = [arguments objectAtIndex:0];
-    NSString* location   = [arguments objectAtIndex:1];
-    NSString* message    = [arguments objectAtIndex:2];
-    NSString *startDate  = [arguments objectAtIndex:3];
-    NSString *endDate    = [arguments objectAtIndex:4];
+    NSString* title      = [command.arguments objectAtIndex:0];
+    NSString* location   = [command.arguments objectAtIndex:1];
+    NSString* message    = [command.arguments objectAtIndex:2];
+    NSString *startDate  = [command.arguments objectAtIndex:3];
+    NSString *endDate    = [command.arguments objectAtIndex:4];
     
     NSTimeInterval _startInterval = [startDate doubleValue] / 1000; // strip millis
     NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
@@ -154,16 +153,16 @@
     }
 }
 
--(void)findEvent:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+-(void)findEvent:(CDVInvokedUrlCommand*)command {
     // Import arguments
     
-    NSString *callbackId = [arguments pop];
+    NSString *callbackId = command.callbackId;
     
-    NSString* title      = [arguments objectAtIndex:0];
-    NSString* location   = [arguments objectAtIndex:1];
-    NSString* message    = [arguments objectAtIndex:2];
-    NSString *startDate  = [arguments objectAtIndex:3];
-    NSString *endDate    = [arguments objectAtIndex:4];
+    NSString* title      = [command.arguments objectAtIndex:0];
+    NSString* location   = [command.arguments objectAtIndex:1];
+    NSString* message    = [command.arguments objectAtIndex:2];
+    NSString *startDate  = [command.arguments objectAtIndex:3];
+    NSString *endDate    = [command.arguments objectAtIndex:4];
     
     NSTimeInterval _startInterval = [startDate doubleValue] / 1000; // strip millis
     NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
@@ -206,22 +205,22 @@
 }
 
 
--(void)modifyEvent:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+-(void)modifyEvent:(CDVInvokedUrlCommand*)command {
     // Import arguments
     
-    NSString *callbackId = [arguments pop];
+    NSString *callbackId = command.callbackId;
     
-    NSString* title      = [arguments objectAtIndex:0];
-    NSString* location   = [arguments objectAtIndex:1];
-    NSString* message    = [arguments objectAtIndex:2];
-    NSString *startDate  = [arguments objectAtIndex:3];
-    NSString *endDate    = [arguments objectAtIndex:4];
+    NSString* title      = [command.arguments objectAtIndex:0];
+    NSString* location   = [command.arguments objectAtIndex:1];
+    NSString* message    = [command.arguments objectAtIndex:2];
+    NSString *startDate  = [command.arguments objectAtIndex:3];
+    NSString *endDate    = [command.arguments objectAtIndex:4];
     
-    NSString* ntitle      = [arguments objectAtIndex:5];
-    NSString* nlocation   = [arguments objectAtIndex:6];
-    NSString* nmessage    = [arguments objectAtIndex:7];
-    NSString *nstartDate  = [arguments objectAtIndex:8];
-    NSString *nendDate    = [arguments objectAtIndex:9];
+    NSString* ntitle      = [command.arguments objectAtIndex:5];
+    NSString* nlocation   = [command.arguments objectAtIndex:6];
+    NSString* nmessage    = [command.arguments objectAtIndex:7];
+    NSString *nstartDate  = [command.arguments objectAtIndex:8];
+    NSString *nendDate    = [command.arguments objectAtIndex:9];
     
     NSTimeInterval _startInterval = [startDate doubleValue] / 1000; // strip millis
     NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];

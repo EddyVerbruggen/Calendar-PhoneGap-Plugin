@@ -17,9 +17,9 @@
 
 // Calendar Instance methods
 
-- (void)createEvent:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
-- (void)modifyEvent:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
-- (void)findEvent:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
-- (void)deleteEvent:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
+- (void)createEvent:(CDVInvokedUrlCommand*)command;
+- (void)modifyEvent:(CDVInvokedUrlCommand*)command;
+- (void)findEvent:(CDVInvokedUrlCommand*)command;
+- (void)deleteEvent:(CDVInvokedUrlCommand*)command;
 
 @end
