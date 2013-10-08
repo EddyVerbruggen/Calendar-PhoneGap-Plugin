@@ -58,12 +58,7 @@ $ cordova build
 ```
 
 ```xml
-<!-- for Android as plugin (deprecated) -->
-<plugin name="Calendar" value="nl.xservices.plugins.Calendar"/>
-```
-
-```xml
-<!-- for Android as feature -->
+<!-- for Android -->
 <feature name="Calendar">
   <param name="android-package" value="nl.xservices.plugins.Calendar" />
 </feature>
