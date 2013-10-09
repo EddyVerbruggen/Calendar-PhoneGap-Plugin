@@ -109,13 +109,19 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   var success = function(message) { alert("Success: " + JSON.stringify(message)); };
   var error = function(message) { alert("Error: " + message); };
 
-  // create
+  // create a calendar (iOS only for now)
+  window.plugins.calendar.createCalendar(calendarName,success,error);
+
+  // delete a calendar (iOS only for now)
+  window.plugins.calendar.deleteCalendar(calendarName,success,error);
+
+  // create (the only function also supported on Android for now)
   window.plugins.calendar.createEvent(title,location,notes,startDate,endDate,success,error);
 
   // find (iOS only for now)
   window.plugins.calendar.findEvent(title,location,notes,startDate,endDate,success,error);
 
-  // change the title of the event (iOS only for now)
+  // change an event (iOS only for now)
   var newTitle = "New title!";
   window.plugins.calendar.modifyEvent(title,location,notes,startDate,endDate,newTitle,location,notes,startDate,endDate,success,error);
 

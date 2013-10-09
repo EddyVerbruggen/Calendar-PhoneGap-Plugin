@@ -15,7 +15,8 @@
                        startDate: (NSDate *)startDate
                          endDate: (NSDate *)endDate;
 
-// Calendar Instance methods
+- (void)createCalendar:(CDVInvokedUrlCommand*)command;
+- (void)deleteCalendar:(CDVInvokedUrlCommand*)command;
 
 - (void)createEvent:(CDVInvokedUrlCommand*)command;
 - (void)modifyEvent:(CDVInvokedUrlCommand*)command;

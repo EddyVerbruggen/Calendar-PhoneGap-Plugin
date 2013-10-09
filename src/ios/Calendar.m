@@ -69,6 +69,34 @@
     return matchingEvents;
 }
 
+-(EKCalendar*)findEKCalendar: (NSString *)calendarName {
+    for (EKCalendar *thisCalendar in self.eventStore.calendars){
+        NSLog(@"Calendar: %@", thisCalendar.title);
+        if ([thisCalendar.title isEqualToString:calendarName]) {
+            return thisCalendar;
+        }
+    }
+    NSLog(@"No match found for calendar with name: %@", calendarName);
+    return nil;
+}
+
+-(EKSource*)findEKSource {
+    // if iCloud is on, it hides the local calendars, so check for iCloud first
+    for (EKSource *source in self.eventStore.sources) {
+        if (source.sourceType == EKSourceTypeCalDAV && [source.title isEqualToString:@"iCloud"]) {
+            return source;
+        }
+    }
+
+    // ok, not found.. so it's a local calendar
+    for (EKSource *source in self.eventStore.sources) {
+        if (source.sourceType == EKSourceTypeLocal) {
+            return source;
+        }
+    }
+    return nil;
+}
+
 #pragma mark Cordova functions
 
 - (void)createEvent:(CDVInvokedUrlCommand*)command {
@@ -272,6 +300,50 @@
         // Otherwise return a no result error
         CDVPluginResult * pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_NO_RESULT];
         [self writeJavascript:[pluginResult toErrorCallbackString:callbackId]];
+    }
+}
+
+-(void)createCalendar:(CDVInvokedUrlCommand*)command {
+    NSString *callbackId = command.callbackId;
+    NSString* calendarName = [command.arguments objectAtIndex:0];
+
+    EKCalendar *cal = [self findEKCalendar:calendarName];
+    if (cal == nil) {
+        cal = [EKCalendar calendarWithEventStore:self.eventStore];
+        cal.title = calendarName;
+        cal.source = [self findEKSource];
+        [self.eventStore saveCalendar:cal commit:YES error:nil];
+        NSLog(@"created calendar: %@", cal.title);
+        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self writeJavascript:[result toSuccessCallbackString:callbackId]];
+    } else {
+        // ok, it already exists
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsString:@"OK, Calendar already exists"];
+        [self writeJavascript:[result toSuccessCallbackString:callbackId]];
+    }
+}
+
+-(void)deleteCalendar:(CDVInvokedUrlCommand*)command {
+    NSString *callbackId = command.callbackId;
+    NSString* calendarName = [command.arguments objectAtIndex:0];
+
+    EKCalendar *thisCalendar = [self findEKCalendar:calendarName];
+
+    if (thisCalendar == nil) {
+        CDVPluginResult * pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_NO_RESULT];
+        [self writeJavascript:[pluginResult toErrorCallbackString:callbackId]];
+    } else {
+        NSError *error;
+        [eventStore removeCalendar:thisCalendar commit:YES error:&error];
+        if (error) {
+            NSLog(@"Error in deleteCalendar: %@", error.localizedDescription);
+            CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.userInfo.description];
+            [self writeJavascript:[result toErrorCallbackString:callbackId]];
+        } else {
+            NSLog(@"Deleted calendar: %@", thisCalendar.title);
+            CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+            [self writeJavascript:[result toSuccessCallbackString:callbackId]];
+        }
     }
 }
 
