@@ -118,8 +118,14 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   // create (the only function also supported on Android for now)
   window.plugins.calendar.createEvent(title,location,notes,startDate,endDate,success,error);
 
+  // create in a named calendar (iOS only for now)
+  window.plugins.calendar.createEventInNamedCalendar(title,location,notes,startDate,endDate,calendarName,success,error);
+
   // find (iOS only for now)
   window.plugins.calendar.findEvent(title,location,notes,startDate,endDate,success,error);
+
+  // find all events in a named calendar (iOS only for now)
+  window.plugins.calendar.findAllEventsInNamedCalendar(calendarName,success,error);
 
   // change an event (iOS only for now)
   var newTitle = "New title!";
