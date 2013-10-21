@@ -5,7 +5,7 @@
    <license>MIT</license>
 
    <engines>
-      <engine name="cordova" version="&gt;=3.1" />
+      <engine name="cordova" version=">=3.0.0" />
    </engines>
 
    <js-module src="www/Calendar.js" name="Calendar">
