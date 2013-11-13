@@ -1,44 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-      	xmlns:android="http://schemas.android.com/apk/res/android"
-        id="nl.x-services.plugins.calendar"
-        version="3.2">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" id="nl.x-services.plugins.calendar" version="3.2">
+   <name>Calendar</name>
+   <description>This plugin allows allows you to manipulate the native calendar.</description>
+   <license>MIT</license>
 
-  <name>Calendar</name>
+   <engines>
+      <engine name="cordova" version=">=3.0.0" />
+   </engines>
 
-  <description>
-    This plugin allows allows you to manipulate the native calendar.
-  </description>
+   <js-module src="www/Calendar.js" name="Calendar">
+      <clobbers target="Calendar" />
+   </js-module>
 
-  <license>MIT</license>
-
-  <engines>
-    <engine name="cordova" version=">=3.0.0"/>
-  </engines>
-
-  <asset src="www/Calendar.js" target="js/plugins/Calendar.js"/>
-
-  <!-- ios -->
- 	<platform name="ios">
- 		<config-file target="config.xml" parent="/*">
- 			<feature name="Calendar">
- 				<param name="ios-package" value="Calendar" />
- 			</feature>
- 		</config-file>
- 		<header-file src="src/ios/Calendar.h" />
- 		<source-file src="src/ios/Calendar.m" />
-		<framework src="EventKit.framework" />
-		<framework src="EventKitUI.framework" />
- 	</platform>
-
-  <!-- android -->
-  <platform name="android">
-    <config-file target="res/xml/config.xml" parent="/*">
-      <feature name="Calendar">
-        <param name="android-package" value="nl.xservices.plugins.Calendar" />
-      </feature>
-    </config-file>
-    <source-file src="src/android/nl/xservices/plugins/Calendar.java" target-dir="src/nl/xservices/plugins"/>
-  </platform>
-
+   <!-- ios -->
+   <platform name="ios">
+      <config-file target="config.xml" parent="/*">
+         <feature name="Calendar">
+            <param name="ios-package" value="Calendar" />
+         </feature>
+      </config-file>
+      <header-file src="src/ios/Calendar.h" />
+      <source-file src="src/ios/Calendar.m" />
+      <framework src="EventKit.framework" />
+      <framework src="EventKitUI.framework" />
+   </platform>
+   
+   <!-- android -->
+   <platform name="android">
+      <config-file target="config.xml" parent="/*">
+         <feature name="Calendar">
+            <param name="android-package" value="nl.xservices.plugins.Calendar" />
+         </feature>
+      </config-file>
+      <source-file src="src/android/nl/xservices/plugins/Calendar.java" target-dir="src/nl/xservices/plugins" />
+   </platform>
 </plugin>
