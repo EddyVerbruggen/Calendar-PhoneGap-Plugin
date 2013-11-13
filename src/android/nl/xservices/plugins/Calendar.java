@@ -47,8 +47,10 @@ public class Calendar extends CordovaPlugin {
 
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == RESULT_CODE_CREATE) {
-			if (resultCode == Activity.RESULT_OK || resultCode == Activity.RESULT_CANCELED) {
+			if (resultCode == Activity.RESULT_OK) {
 				callback.success();
+			} else if (resultCode == Activity.RESULT_CANCELED) {
+        callback.error("User cancelled");
 			} else {
 				callback.error("Unable to add event (" + resultCode + ").");
 			}
