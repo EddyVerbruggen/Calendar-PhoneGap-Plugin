@@ -75,6 +75,8 @@ iOS: Copy `Calendar.h` and `Calendar.m` to `platforms/ios/<ProjectName>/Plugins`
 
 Android: Copy `Calendar.java` to `platforms/android/src/nl/xservices/plugins` (create the folders)
 
+4\. For iOS click your project, Build Phases, Link Binary With Libraries, search for and add `EventKit.framework` and `EventKitUI.framework`.
+
 ### PhoneGap Build
 
 Using Calendar with PhoneGap Build requires these simple steps:
