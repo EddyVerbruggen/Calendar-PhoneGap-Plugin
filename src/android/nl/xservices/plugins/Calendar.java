@@ -47,6 +47,7 @@ public class Calendar extends CordovaPlugin {
 
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == RESULT_CODE_CREATE) {
+      // Hmm, resultCode and requestCode are always 0.. so this doesn't help
 			if (resultCode == Activity.RESULT_OK) {
 				callback.success();
 			} else if (resultCode == Activity.RESULT_CANCELED) {
