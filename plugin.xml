@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" id="nl.x-services.plugins.calendar" version="3.2">
+<plugin
+    xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    id="nl.x-services.plugins.calendar"
+    version="4.0">
+
    <name>Calendar</name>
-   <description>This plugin allows allows you to manipulate the native calendar.</description>
+
+   <description>
+     This plugin allows allows you to manipulate the native calendar.
+   </description>
+
    <license>MIT</license>
 
    <engines>
@@ -32,6 +41,13 @@
             <param name="android-package" value="nl.xservices.plugins.Calendar" />
          </feature>
       </config-file>
+     <config-file target="AndroidManifest.xml" parent="/manifest">
+       <uses-permission android:name="android.permission.READ_CALENDAR"/>
+       <uses-permission android:name="android.permission.WRITE_CALENDAR"/>
+     </config-file>
       <source-file src="src/android/nl/xservices/plugins/Calendar.java" target-dir="src/nl/xservices/plugins" />
+      <source-file src="src/android/nl/xservices/plugins/accessor/AbstractCalendarAccessor.java" target-dir="src/nl/xservices/plugins/accessor" />
+      <source-file src="src/android/nl/xservices/plugins/accessor/CalendarProviderAccessor.java" target-dir="src/nl/xservices/plugins/accessor" />
+      <source-file src="src/android/nl/xservices/plugins/accessor/LegacyCalendarAccessor.java" target-dir="src/nl/xservices/plugins/accessor" />
    </platform>
 </plugin>

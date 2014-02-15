@@ -6,10 +6,10 @@
 #define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
 
 @implementation Calendar
-    @synthesize eventStore;
-    
+@synthesize eventStore;
+
 #pragma mark Initialisation functions
-    
+
 - (CDVPlugin*) initWithWebView:(UIWebView*)theWebView {
     self = (Calendar*)[super initWithWebView:theWebView];
     if (self) {
@@ -17,7 +17,7 @@
     }
     return self;
 }
-    
+
 - (void)initEventStoreWithCalendarCapabilities {
     __block BOOL accessGranted = NO;
     eventStore= [[EKEventStore alloc] init];
@@ -36,30 +36,31 @@
         self.eventStore = eventStore;
     }
 }
-    
+
 #pragma mark Helper Functions
-    
+
 - (void)createEventWithCalendar:(CDVInvokedUrlCommand*)command
                        calendar: (EKCalendar *) calendar {
     NSString *callbackId = command.callbackId;
+    NSDictionary* options = [command.arguments objectAtIndex:0];
+
+    NSString* title      = [options objectForKey:@"title"];
+    NSString* location   = [options objectForKey:@"location"];
+    NSString* notes      = [options objectForKey:@"notes"];
+    NSNumber* startTime  = [options objectForKey:@"startTime"];
+    NSNumber* endTime    = [options objectForKey:@"endTime"];
     
-    NSString* title      = [command.arguments objectAtIndex:0];
-    NSString* location   = [command.arguments objectAtIndex:1];
-    NSString* message    = [command.arguments objectAtIndex:2];
-    NSString *startDate  = [command.arguments objectAtIndex:3];
-    NSString *endDate    = [command.arguments objectAtIndex:4];
-    
-    NSTimeInterval _startInterval = [startDate doubleValue] / 1000; // strip millis
+    NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
     NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
     
-    NSTimeInterval _endInterval = [endDate doubleValue] / 1000; // strip millis
+    NSTimeInterval _endInterval = [endTime doubleValue] / 1000; // strip millis
     
     EKEvent *myEvent = [EKEvent eventWithEventStore: self.eventStore];
     myEvent.title = title;
     myEvent.location = location;
-    myEvent.notes = message;
+    myEvent.notes = notes;
     myEvent.startDate = myStartDate;
-    
+
     int duration = _endInterval - _startInterval;
     int moduloDay = duration % (60*60*24);
     if (moduloDay == 0) {
@@ -70,8 +71,8 @@
     }
     myEvent.calendar = calendar;
     
-    EKAlarm *reminder = [EKAlarm alarmWithRelativeOffset:-2*60*60];
-    
+    // TODO base on passed alarm with a decent default (1 hour)
+    EKAlarm *reminder = [EKAlarm alarmWithRelativeOffset:-1*60*60];
     [myEvent addAlarm:reminder];
     
     NSError *error = nil;
@@ -91,29 +92,31 @@
                       calendar: (EKCalendar *) calendar {
     NSString *callbackId = command.callbackId;
     
-    NSString* title      = [command.arguments objectAtIndex:0];
-    NSString* location   = [command.arguments objectAtIndex:1];
-    NSString* message    = [command.arguments objectAtIndex:2];
-    NSString *startDate  = [command.arguments objectAtIndex:3];
-    NSString *endDate    = [command.arguments objectAtIndex:4];
+    NSDictionary* options = [command.arguments objectAtIndex:0];
     
-    NSString* ntitle      = [command.arguments objectAtIndex:5];
-    NSString* nlocation   = [command.arguments objectAtIndex:6];
-    NSString* nmessage    = [command.arguments objectAtIndex:7];
-    NSString *nstartDate  = [command.arguments objectAtIndex:8];
-    NSString *nendDate    = [command.arguments objectAtIndex:9];
+    NSString* title      = [options objectForKey:@"title"];
+    NSString* location   = [options objectForKey:@"location"];
+    NSString* notes      = [options objectForKey:@"notes"];
+    NSNumber* startTime  = [options objectForKey:@"startTime"];
+    NSNumber* endTime    = [options objectForKey:@"endTime"];
+
+    NSString* ntitle     = [options objectForKey:@"newTitle"];
+    NSString* nlocation  = [options objectForKey:@"newLocation"];
+    NSString* nnotes     = [options objectForKey:@"newNotes"];
+    NSNumber* nstartTime = [options objectForKey:@"newStartTime"];
+    NSNumber* nendTime   = [options objectForKey:@"newEndTime"];
     
-    NSTimeInterval _startInterval = [startDate doubleValue] / 1000; // strip millis
+    NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
     NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
     
-    NSTimeInterval _endInterval = [endDate doubleValue] / 1000; // strip millis
+    NSTimeInterval _endInterval = [endTime doubleValue] / 1000; // strip millis
     NSDate *myEndDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
     
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
     [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
     
     // Find matches
-    NSArray *matchingEvents = [self findEKEventsWithTitle:title location:location message:message startDate:myStartDate endDate:myEndDate calendar:calendar];
+    NSArray *matchingEvents = [self findEKEventsWithTitle:title location:location notes:notes startDate:myStartDate endDate:myEndDate calendar:calendar];
     
     if (matchingEvents.count == 1) {
         // Presume we have to have an exact match to modify it!
@@ -125,15 +128,15 @@
         if (nlocation) {
             theEvent.location = nlocation;
         }
-        if (nmessage) {
-            theEvent.notes = nmessage;
+        if (nnotes) {
+            theEvent.notes = nnotes;
         }
-        if (nstartDate) {
-            NSTimeInterval _nstartInterval = [nstartDate doubleValue] / 1000; // strip millis
+        if (nstartTime) {
+            NSTimeInterval _nstartInterval = [nstartTime doubleValue] / 1000; // strip millis
             theEvent.startDate = [NSDate dateWithTimeIntervalSince1970:_nstartInterval];
         }
-        if (nendDate) {
-            NSTimeInterval _nendInterval = [nendDate doubleValue] / 1000; // strip millis
+        if (nendTime) {
+            NSTimeInterval _nendInterval = [nendTime doubleValue] / 1000; // strip millis
             theEvent.endDate = [NSDate dateWithTimeIntervalSince1970:_nendInterval];
         }
         
@@ -150,31 +153,32 @@
             [self writeJavascript:[pluginResult toSuccessCallbackString:callbackId]];
         }
     } else {
-        // Otherwise return a no result error
+        // Otherwise return a no result error (could be more than 1, but not a biggie)
         CDVPluginResult * pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_NO_RESULT];
         [self writeJavascript:[pluginResult toErrorCallbackString:callbackId]];
     }
 }
-    
+
 
 - (void)deleteEventFromCalendar:(CDVInvokedUrlCommand*)command
                        calendar: (EKCalendar *) calendar {
     
     NSString *callbackId = command.callbackId;
+    NSDictionary* options = [command.arguments objectAtIndex:0];
     
-    NSString* title      = [command.arguments objectAtIndex:0];
-    NSString* location   = [command.arguments objectAtIndex:1];
-    NSString* message    = [command.arguments objectAtIndex:2];
-    NSString *startDate  = [command.arguments objectAtIndex:3];
-    NSString *endDate    = [command.arguments objectAtIndex:4];
+    NSString* title      = [options objectForKey:@"title"];
+    NSString* location   = [options objectForKey:@"location"];
+    NSString* notes      = [options objectForKey:@"notes"];
+    NSNumber* startTime  = [options objectForKey:@"startTime"];
+    NSNumber* endTime    = [options objectForKey:@"endTime"];
     
-    NSTimeInterval _startInterval = [startDate doubleValue] / 1000; // strip millis
+    NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
     NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
     
-    NSTimeInterval _endInterval = [endDate doubleValue] / 1000; // strip millis
+    NSTimeInterval _endInterval = [endTime doubleValue] / 1000; // strip millis
     NSDate *myEndDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
     
-    NSArray *matchingEvents = [self findEKEventsWithTitle:title location:location message:message startDate:myStartDate endDate:myEndDate calendar:calendar];
+    NSArray *matchingEvents = [self findEKEventsWithTitle:title location:location notes:notes startDate:myStartDate endDate:myEndDate calendar:calendar];
     
     NSError *error = NULL;
     for (EKEvent * event in matchingEvents) {
@@ -189,10 +193,10 @@
         [self writeJavascript:[pluginResult toSuccessCallbackString:callbackId]];
     }
 }
-    
+
 -(NSArray*)findEKEventsWithTitle: (NSString *)title
                         location: (NSString *)location
-                         message: (NSString *)message
+                           notes: (NSString *)notes
                        startDate: (NSDate *)startDate
                          endDate: (NSDate *)endDate
                         calendar: (EKCalendar *) calendar {
@@ -200,13 +204,13 @@
     // Build up a predicateString - this means we only query a parameter if we actually had a value in it
     NSMutableString *predicateString= [[NSMutableString alloc] initWithString:@""];
     if (title.length > 0) {
-        [predicateString appendString:[NSString stringWithFormat:@"title == '%@'" , title]];
+      [predicateString appendString:[NSString stringWithFormat:@"title == '%@'", title]];
     }
     if (location.length > 0) {
-        [predicateString appendString:[NSString stringWithFormat:@" AND location == '%@'" , location]];
+      [predicateString appendString:[NSString stringWithFormat:@" AND location == '%@'", location]];
     }
-    if (message.length > 0) {
-        [predicateString appendString:[NSString stringWithFormat:@" AND notes == '%@'" , message]];
+    if (notes.length > 0) {
+      [predicateString appendString:[NSString stringWithFormat:@" AND notes == '%@'", notes]];
     }
     
     NSPredicate *matches = [NSPredicate predicateWithFormat:predicateString];
@@ -219,7 +223,7 @@
     
     return matchingEvents;
 }
-    
+
 -(EKCalendar*)findEKCalendar: (NSString *)calendarName {
     for (EKCalendar *thisCalendar in self.eventStore.calendars){
         NSLog(@"Calendar: %@", thisCalendar.title);
@@ -230,7 +234,7 @@
     NSLog(@"No match found for calendar with name: %@", calendarName);
     return nil;
 }
-    
+
 -(EKSource*)findEKSource {
     // if iCloud is on, it hides the local calendars, so check for iCloud first
     for (EKSource *source in self.eventStore.sources) {
@@ -247,11 +251,12 @@
     }
     return nil;
 }
-    
+
 #pragma mark Cordova functions
-    
+
 - (void)createEventInNamedCalendar:(CDVInvokedUrlCommand*)command {
-    NSString* calendarName = [command.arguments objectAtIndex:5];
+    NSDictionary* options = [command.arguments objectAtIndex:0];
+    NSString* calendarName = [options objectForKey:@"calendarName"];
     EKCalendar* calendar = [self findEKCalendar:calendarName];
     if (calendar == nil) {
         NSString *callbackId = command.callbackId;
@@ -262,15 +267,20 @@
     }
 }
 
-
 - (void)createEvent:(CDVInvokedUrlCommand*)command {
     EKCalendar* calendar = self.eventStore.defaultCalendarForNewEvents;
     [self createEventWithCalendar:command calendar:calendar];
 }
 
+- (void)createEventInteractively:(CDVInvokedUrlCommand*)command {
+    NSString *callbackId = command.callbackId;
+    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Method not supported on iOS"];
+    [self writeJavascript:[result toErrorCallbackString:callbackId]];
+}
 
 -(void)deleteEventFromNamedCalendar:(CDVInvokedUrlCommand*)command {
-    NSString* calendarName = [command.arguments objectAtIndex:5];
+    NSDictionary* options = [command.arguments objectAtIndex:0];
+    NSString* calendarName = [options objectForKey:@"calendarName"];
     EKCalendar* calendar = [self findEKCalendar:calendarName];
     if (calendar == nil) {
         NSString *callbackId = command.callbackId;
@@ -289,7 +299,8 @@
 
 
 -(void)modifyEventInNamedCalendar:(CDVInvokedUrlCommand*)command {
-    NSString* calendarName = [command.arguments objectAtIndex:10];
+    NSDictionary* options = [command.arguments objectAtIndex:0];
+    NSString* calendarName = [options objectForKey:@"calendarName"];
     EKCalendar* calendar = [self findEKCalendar:calendarName];
     if (calendar == nil) {
         NSString *callbackId = command.callbackId;
@@ -309,7 +320,8 @@
 
 -(void)findAllEventsInNamedCalendar:(CDVInvokedUrlCommand*)command {
     NSString *callbackId = command.callbackId;
-    NSString* calendarName = [command.arguments objectAtIndex:0];
+    NSDictionary* options = [command.arguments objectAtIndex:0];
+    NSString* calendarName = [options objectForKey:@"calendarName"];
     EKCalendar* calendar = [self findEKCalendar:calendarName];
     if (calendar == nil) {
         NSString *callbackId = command.callbackId;
@@ -346,22 +358,24 @@
 -(void)findEvent:(CDVInvokedUrlCommand*)command {
     NSString *callbackId = command.callbackId;
     
-    NSString* title      = [command.arguments objectAtIndex:0];
-    NSString* location   = [command.arguments objectAtIndex:1];
-    NSString* message    = [command.arguments objectAtIndex:2];
-    NSString *startDate  = [command.arguments objectAtIndex:3];
-    NSString *endDate    = [command.arguments objectAtIndex:4];
+    NSDictionary* options = [command.arguments objectAtIndex:0];
     
-    NSTimeInterval _startInterval = [startDate doubleValue] / 1000; // strip millis
+    NSString* title      = [options objectForKey:@"title"];
+    NSString* location   = [options objectForKey:@"location"];
+    NSString* notes      = [options objectForKey:@"notes"];
+    NSNumber* startTime  = [options objectForKey:@"startTime"];
+    NSNumber* endTime    = [options objectForKey:@"endTime"];
+    
+    NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
     NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
-    
-    NSTimeInterval _endInterval = [endDate doubleValue] / 1000; // strip millis
+
+    NSTimeInterval _endInterval = [endTime doubleValue] / 1000; // strip millis
     NSDate *myEndDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
     
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
     [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
     
-    NSArray *matchingEvents = [self findEKEventsWithTitle:title location:location message:message startDate:myStartDate endDate:myEndDate calendar:self.eventStore.defaultCalendarForNewEvents];
+    NSArray *matchingEvents = [self findEKEventsWithTitle:title location:location notes:notes startDate:myStartDate endDate:myEndDate calendar:self.eventStore.defaultCalendarForNewEvents];
     
     NSMutableArray *finalResults = [[NSMutableArray alloc] initWithCapacity:matchingEvents.count];
     
@@ -380,10 +394,11 @@
     [self writeJavascript:[result toSuccessCallbackString:callbackId]];
 }
 
-    
+
 -(void)createCalendar:(CDVInvokedUrlCommand*)command {
     NSString *callbackId = command.callbackId;
-    NSString* calendarName = [command.arguments objectAtIndex:0];
+    NSDictionary* options = [command.arguments objectAtIndex:0];
+    NSString* calendarName = [options objectForKey:@"calendarName"];
     
     EKCalendar *cal = [self findEKCalendar:calendarName];
     if (cal == nil) {
@@ -400,11 +415,11 @@
         [self writeJavascript:[result toSuccessCallbackString:callbackId]];
     }
 }
-    
-    
+
 -(void)deleteCalendar:(CDVInvokedUrlCommand*)command {
     NSString *callbackId = command.callbackId;
-    NSString* calendarName = [command.arguments objectAtIndex:0];
+    NSDictionary* options = [command.arguments objectAtIndex:0];
+    NSString* calendarName = [options objectForKey:@"calendarName"];
     
     EKCalendar *thisCalendar = [self findEKCalendar:calendarName];
     
@@ -425,5 +440,5 @@
         }
     }
 }
-    
+
 @end

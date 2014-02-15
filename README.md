@@ -16,9 +16,9 @@ for iOS and Android, by [Eddy Verbruggen](http://www.x-services.nl)
 This plugin allows you to add events to the Calendar of the mobile device.
 
 * Works with PhoneGap >= 3.0.
-* For pre-3.0, see [the pre-3.0 branch]( (https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin/tree/pre-3.0).
+* For PhoneGap 2.x, see [the pre-3.0 branch]( (https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin/tree/pre-3.0).
 * Compatible with [Cordova Plugman](https://github.com/apache/cordova-plugman).
-* [Officially supported by PhoneGap Build](https://build.phonegap.com/plugins/100).
+* [Officially supported by PhoneGap Build](https://build.phonegap.com/plugins).
 
 ### iOS specifics
 * Supported methods: `find`, `create`, `modify`, `delete`.
@@ -26,9 +26,8 @@ This plugin allows you to add events to the Calendar of the mobile device.
 * Tested on iOS 6 and 7.
 
 ### Android specifics
-* Only the `create` method is supported (more may come, if people request it, but creating is the most important thing, right?).
-* When the `create` method is called, the use is presented a prefilled calendar item. Pressing the hardware back button will give control back to your app.
-* Tested on Android 4.
+* Supported methods on Android 4: `find`, `create` (silent and interactive), `delete`.
+* Supported methods on Android 2 and 3: `create`, interactive only: the user is presented a prefilled Calendar event. Pressing the hardware back button will give control back to your app.
 
 ## 2. Installation
 
@@ -42,12 +41,14 @@ or
 ```
 $ cordova plugin add https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin.git
 ```
-don't forget to run this command afterwards:
+and run this command afterwards:
 ```
 $ cordova build
 ```
 
 ### Manually
+
+#### iOS
 
 1\. Add the following xml to your `config.xml`:
 ```xml
@@ -57,6 +58,20 @@ $ cordova build
 </feature>
 ```
 
+2\. Grab a copy of Calendar.js, add it to your project and reference it in `index.html`:
+```html
+<script type="text/javascript" src="js/Calendar.js"></script>
+```
+
+3\. Download the source files for iOS and copy them to your project.
+
+Copy `Calendar.h` and `Calendar.m` to `platforms/ios/<ProjectName>/Plugins`
+
+4\. Click your project in XCode, Build Phases, Link Binary With Libraries, search for and add `EventKit.framework` and `EventKitUI.framework`.
+
+#### Android
+
+1\. Add the following xml to your `config.xml`:
 ```xml
 <!-- for Android -->
 <feature name="Calendar">
@@ -69,31 +84,30 @@ $ cordova build
 <script type="text/javascript" src="js/Calendar.js"></script>
 ```
 
-3\. Download the source files for iOS and/or Android and copy them to your project.
+3\. Download the source files for Android and copy them to your project.
 
-iOS: Copy `Calendar.h` and `Calendar.m` to `platforms/ios/<ProjectName>/Plugins`
+Android: Copy `Calendar.java` to `platforms/android/src/nl/xservices/plugins` (create the folders/packages).
+Then create a package called `accessor` and copy other 3 java Classes into it.
 
-Android: Copy `Calendar.java` to `platforms/android/src/nl/xservices/plugins` (create the folders)
+4\. Add these permissions to your AndroidManifest.xml:
+```xml
+<uses-permission android:name="android.permission.READ_CALENDAR"/>
+<uses-permission android:name="android.permission.WRITE_CALENDAR"/>
+```
 
-4\. For iOS click your project, Build Phases, Link Binary With Libraries, search for and add `EventKit.framework` and `EventKitUI.framework`.
+Note that if you don't want your app to ask for these permissions, you can leave them out, but you'll only be able to
+use one function of this plugin: `createEventInteractively`.
+
 
 ### PhoneGap Build
 
-Using Calendar with PhoneGap Build requires these simple steps:
-
-1\. Add the following xml to your `config.xml` to always use the latest version of this plugin:
+Add the following xml to your `config.xml` to always use the latest version of this plugin:
 ```xml
 <gap:plugin name="nl.x-services.plugins.calendar" />
 ```
 or to use this exact version:
 ```xml
-<gap:plugin name="nl.x-services.plugins.calendar" version="1.0" />
-```
-
-2\. Reference the JavaScript code in your `index.html`:
-```html
-<!-- below <script src="phonegap.js"></script> -->
-<script src="js/plugins/Calendar.js"></script>
+<gap:plugin name="nl.x-services.plugins.calendar" version="4.0" />
 ```
 
 
@@ -103,8 +117,8 @@ Basic operations, you'll want to copy-paste this for testing purposes:
 
 ```javascript
   // prep some variables
-  var startDate = new Date("September 24, 2013 13:00:00");
-  var endDate = new Date("September 24, 2013 14:30:00");
+  var startDate = new Date(2014,2,15,18,30,0,0,0); // beware: month 0 = january, 11 = december
+  var endDate = new Date(2014,2,15,19,30,0,0,0);
   var title = "My nice event";
   var location = "Home";
   var notes = "Some notes about this event.";
@@ -117,13 +131,16 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   // delete a calendar (iOS only for now)
   window.plugins.calendar.deleteCalendar(calendarName,success,error);
 
-  // create (the only function also supported on Android for now)
+  // create an event silently (on Android < 4 an interactive dialog is shown)
   window.plugins.calendar.createEvent(title,location,notes,startDate,endDate,success,error);
 
-  // create in a named calendar (iOS only for now)
+  // create an event interactively (only supported on Android)
+  window.plugins.calendar.createEventInteractively(title,location,notes,startDate,endDate,success,error);
+
+  // create an event in a named calendar (iOS only for now)
   window.plugins.calendar.createEventInNamedCalendar(title,location,notes,startDate,endDate,calendarName,success,error);
 
-  // find (iOS only for now)
+  // find events
   window.plugins.calendar.findEvent(title,location,notes,startDate,endDate,success,error);
 
   // find all events in a named calendar (iOS only for now)
@@ -133,8 +150,7 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   var newTitle = "New title!";
   window.plugins.calendar.modifyEvent(title,location,notes,startDate,endDate,newTitle,location,notes,startDate,endDate,success,error);
 
-  // delete (iOS only for now)
-  // note that it deletes all matching events, which are duplicates anyway
+  // delete an event (you can pass nulls for irrelevant parameters, note that on Android `notes` is ignored)
   window.plugins.calendar.deleteEvent(newTitle,location,notes,startDate,endDate,success,error);
 ```
 
@@ -142,16 +158,16 @@ Creating an all day event:
 
 ```javascript
   // set the startdate to midnight and set the enddate to midnight the next day
-  var startDate = new Date("September 24, 2013 00:00:00");
-  var endDate = new Date("September 25, 2013 00:00:00");
+  var startDate = new Date(2014,2,15,0,0,0,0,0);
+  var endDate = new Date(2014,2,16,0,0,0,0,0);
 ```
 
 Creating an event for 3 full days
 
 ```javascript
   // set the startdate to midnight and set the enddate to midnight 3 days later
-  var startDate = new Date("September 24, 2013 00:00:00");
-  var endDate = new Date("September 27, 2013 00:00:00");
+  var startDate = new Date(2014,2,24,0,0,0,0,0);
+  var endDate = new Date(2014,2,27,0,0,0,0,0);
 ```
 
 
@@ -160,7 +176,7 @@ Creating an event for 3 full days
 This plugin was enhanced for Plugman / PhoneGap Build by [Eddy Verbruggen](http://www.x-services.nl). I fixed some issues in the native code (mainly for iOS) and changed the JS-Native functions a little in order to make a universal JS API for both platforms.
 * Inspired by [this nice blog of Devgirl](http://devgirl.org/2013/07/17/tutorial-how-to-write-a-phonegap-plugin-for-android/).
 * Credits for the original iOS code go to [Felix Montanez](https://github.com/felixactv8/Phonegap-Calendar-Plugin-ios).
-* Credits for the original Android code go to [Ten Forward Consulting](https://github.com/tenforwardconsulting/Phonegap-Calendar-Plugin-android).
+* Credits for the original Android code go to [Ten Forward Consulting](https://github.com/tenforwardconsulting/Phonegap-Calendar-Plugin-android) and [twistandshout](https://github.com/twistandshout/phonegap-calendar-plugin).
 * Special thanks to [four32c.com](http://four32c.com) for sponsoring part of the implementation, while keeping the plugin opensource.
 
 ## 5. License
@@ -187,4 +203,3 @@ THE SOFTWARE.
 
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/EddyVerbruggen/calendar-phonegap-plugin/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
