@@ -16,7 +16,7 @@ for iOS and Android, by [Eddy Verbruggen](http://www.x-services.nl)
 This plugin allows you to add events to the Calendar of the mobile device.
 
 * Works with PhoneGap >= 3.0.
-* For PhoneGap 2.x, see [the pre-3.0 branch]( (https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin/tree/pre-3.0).
+* For PhoneGap 2.x, see [the pre-3.0 branch](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin/tree/pre-3.0).
 * Compatible with [Cordova Plugman](https://github.com/apache/cordova-plugman).
 * [Officially supported by PhoneGap Build](https://build.phonegap.com/plugins).
 
