@@ -1,12 +1,16 @@
 package nl.xservices.plugins;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
 import nl.xservices.plugins.accessor.AbstractCalendarAccessor;
 import nl.xservices.plugins.accessor.CalendarProviderAccessor;
 import nl.xservices.plugins.accessor.LegacyCalendarAccessor;
+import android.database.Cursor;
+import android.net.Uri;
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
@@ -16,11 +20,13 @@ import org.json.JSONObject;
 
 import java.util.Date;
 
+
 public class Calendar extends CordovaPlugin {
   public static final String ACTION_CREATE_EVENT = "createEvent";
   public static final String ACTION_CREATE_EVENT_INTERACTIVELY = "createEventInteractively";
   public static final String ACTION_DELETE_EVENT = "deleteEvent";
   public static final String ACTION_FIND_EVENT = "findEvent";
+  public static final String ACTION_LIST_EVENTS_IN_RANGE = "listEventsInRange";
 
   public static final Integer RESULT_CODE_CREATE = 0;
 
@@ -42,7 +48,9 @@ public class Calendar extends CordovaPlugin {
       }
     } else if (ACTION_CREATE_EVENT_INTERACTIVELY.equals(action)) {
       return createEventInteractively(args);
-    } else if (!hasLimitedSupport && ACTION_FIND_EVENT.equals(action)) {
+    } else if(ACTION_LIST_EVENTS_IN_RANGE.equals(action)){
+      return listEventsInRange(args);
+  }else if (!hasLimitedSupport && ACTION_FIND_EVENT.equals(action)) {
       return findEvents(args);
     } else if (!hasLimitedSupport && ACTION_DELETE_EVENT.equals(action)) {
       return deleteEvent(args);
@@ -138,6 +146,49 @@ public class Calendar extends CordovaPlugin {
       callback.success("" + status);
       return true;
     } catch (Exception e) {
+      System.err.println("Exception: " + e.getMessage());
+    }
+    return false;
+  }
+  
+  private boolean listEventsInRange(JSONArray args){
+    try {
+    Uri l_eventUri;
+      if (Build.VERSION.SDK_INT >= 8) {
+          l_eventUri = Uri.parse("content://com.android.calendar/events");
+      } else {
+          l_eventUri = Uri.parse("content://calendar/events");
+      }
+      ContentResolver contentResolver = this.cordova.getActivity().getContentResolver();
+      JSONObject jsonFilter = args.getJSONObject(0);
+    JSONArray result = new JSONArray();
+      long input_start_date = jsonFilter.optLong("startTime");
+      long input_end_date = jsonFilter.optLong("endTime");
+      
+      //prepare start date
+      java.util.Calendar calendar_start = java.util.Calendar.getInstance();         
+      Date date_start = new Date(input_start_date);
+      calendar_start.setTime(date_start);         
+
+      //prepare end date
+      java.util.Calendar calendar_end = java.util.Calendar.getInstance();
+      Date date_end = new Date(input_end_date);
+      calendar_end.setTime(date_end);
+      
+      //projection of DB columns
+      String[] l_projection = new String[] { "title", "dtstart", "dtend", "eventLocation", "allDay" };      
+      
+      //actual query
+      Cursor cursor= contentResolver.query(l_eventUri, l_projection, "( dtstart >" + calendar_start.getTimeInMillis() + " AND dtend <" + calendar_end.getTimeInMillis() + ")", null,
+              "dtstart ASC");
+
+      int i=0;
+      while(cursor.moveToNext()){
+        result.put(i++, new JSONObject().put("title", cursor.getString(0)).put("dtstart", cursor.getLong(1)).put("dtend", cursor.getLong(2)).put("eventLocation", cursor.getString(3) != null ? cursor.getString(3) : "").put("allDay", cursor.getInt(4)));
+      }
+      callback.success("" + result);
+    return true;
+    } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
     }
     return false;
