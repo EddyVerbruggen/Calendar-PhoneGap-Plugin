@@ -25,7 +25,7 @@ This plugin allows you to add events to the Calendar of the mobile device.
 * Tested on iOS 6 and 7.
 
 ### Android specifics
-* Only the `create` method is supported (more may come, if people request it, but creating is the most important thing, right?).
+* Only the `create` and `delete` methods are supported.
 * When the `create` method is called, the use is presented a prefilled calendar item. Pressing the hardware back button will give control back to your app.
 * Tested on Android 4.
 
@@ -89,7 +89,7 @@ Using Calendar with PhoneGap Build requires these simple steps:
 ```
 or to use this exact version:
 ```xml
-<gap:plugin name="nl.x-services.plugins.calendar" version="1.0" />
+<gap:plugin name="nl.x-services.plugins.calendar" version="1.1" />
 ```
 
 2\. Reference the JavaScript code in your `index.html`:
@@ -123,7 +123,7 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   var newTitle = "New title!";
   window.plugins.calendar.modifyEvent(title,location,notes,startDate,endDate,newTitle,location,notes,startDate,endDate,success,error);
 
-  // delete (iOS only for now)
+  // delete
   // note that it deletes all matching events, which are duplicates anyway
   window.plugins.calendar.deleteEvent(newTitle,location,notes,startDate,endDate,success,error);
 ```
