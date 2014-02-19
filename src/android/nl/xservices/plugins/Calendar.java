@@ -20,6 +20,8 @@ public class Calendar extends CordovaPlugin {
 	
 	@Override
 	public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+    // TODO part of this plugin may work fine on 3.0 devices, but have not tested it yet, so to be sure:
+    final boolean hasLimitedSupport = Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH;
 		try {
 			if (ACTION_CREATE_EVENT.equals(action)) {
         callback = callbackContext;
@@ -35,6 +37,8 @@ public class Calendar extends CordovaPlugin {
 
 				this.cordova.startActivityForResult(this, calIntent, RESULT_CODE_CREATE);
 				return true;
+      } else if (!hasLimitedSupport && ACTION_DELETE_EVENT.equals(action)) {
+        return deleteEvent(args);
 			} else  {
         callbackContext.error("calendar." + action + " is not (yet) supported on Android.");
         return false;
@@ -54,6 +58,44 @@ public class Calendar extends CordovaPlugin {
 			}
     }
 	}
+
+  private boolean deleteEvent(JSONArray args) {
+    if (args.length() == 0) {
+      System.err.println("Exception: No Arguments passed");
+    } else {
+      try {
+        boolean deleteResult = getCalendarAccessor().deleteEvent(
+            null,
+            args.getLong(3),
+            args.getLong(4),
+            args.getString(0),
+            args.getString(1));
+        PluginResult res = new PluginResult(PluginResult.Status.OK, deleteResult);
+        res.setKeepCallback(true);
+        callback.sendPluginResult(res);
+        return true;
+      } catch (JSONException e) {
+        System.err.println("Exception: " + e.getMessage());
+      }
+    }
+    return false;
+  }
+
+  private AbstractCalendarAccessor calendarAccessor;
+
+  private AbstractCalendarAccessor getCalendarAccessor() {
+    if (this.calendarAccessor == null) {
+      // Note: currently LegacyCalendarAccessor is never used, see the TODO at the top of this class
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+        Log.d(LOG_TAG, "Initializing calendar plugin");
+        this.calendarAccessor = new CalendarProviderAccessor(this.cordova);
+      } else {
+        Log.d(LOG_TAG, "Initializing legacy calendar plugin");
+        this.calendarAccessor = new LegacyCalendarAccessor(this.cordova);
+      }
+    }
+    return this.calendarAccessor;
+  }
 
   private boolean isAllDayEvent(final Date startDate, final Date endDate) {
     return startDate.getHours() == 0 &&

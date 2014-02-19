@@ -2,7 +2,7 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
       	xmlns:android="http://schemas.android.com/apk/res/android"
         id="nl.x-services.plugins.calendar"
-        version="1.0">
+        version="1.1">
 
   <name>Calendar</name>
 
@@ -36,7 +36,14 @@
     <config-file target="res/xml/config.xml" parent="plugins">
       <plugin name="Calendar" value="nl.xservices.plugins.Calendar"/>
     </config-file>
-    <source-file src="src/android/nl/xservices/plugins/Calendar.java" target-dir="src/nl/xservices/plugins"/>
+    <config-file target="AndroidManifest.xml" parent="/manifest">
+      <uses-permission android:name="android.permission.READ_CALENDAR"/>
+      <uses-permission android:name="android.permission.WRITE_CALENDAR"/>
+    </config-file>
+    <source-file src="src/android/nl/xservices/plugins/Calendar.java" target-dir="src/nl/xservices/plugins" />
+    <source-file src="src/android/nl/xservices/plugins/accessor/AbstractCalendarAccessor.java" target-dir="src/nl/xservices/plugins/accessor" />
+    <source-file src="src/android/nl/xservices/plugins/accessor/CalendarProviderAccessor.java" target-dir="src/nl/xservices/plugins/accessor" />
+    <source-file src="src/android/nl/xservices/plugins/accessor/LegacyCalendarAccessor.java" target-dir="src/nl/xservices/plugins/accessor" />
   </platform>
 
 </plugin>
