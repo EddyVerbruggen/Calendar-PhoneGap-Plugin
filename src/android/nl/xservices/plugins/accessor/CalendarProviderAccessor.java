@@ -39,7 +39,7 @@ import android.provider.CalendarContract.Attendees;
 import android.provider.CalendarContract.Calendars;
 import android.provider.CalendarContract.Events;
 import android.provider.CalendarContract.Instances;
-import org.apache.cordova.CordovaInterface;
+import org.apache.cordova.api.CordovaInterface;
 
 import java.util.EnumMap;
 

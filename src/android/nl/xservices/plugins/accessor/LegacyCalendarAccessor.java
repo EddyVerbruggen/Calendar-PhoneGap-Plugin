@@ -35,7 +35,7 @@ package nl.xservices.plugins.accessor;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
-import org.apache.cordova.CordovaInterface;
+import org.apache.cordova.api.CordovaInterface;
 
 import java.util.EnumMap;
 

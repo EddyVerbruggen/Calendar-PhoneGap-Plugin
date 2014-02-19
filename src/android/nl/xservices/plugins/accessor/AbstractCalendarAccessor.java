@@ -33,13 +33,12 @@
 package nl.xservices.plugins.accessor;
 
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
-import org.apache.cordova.CordovaInterface;
+import org.apache.cordova.api.CordovaInterface;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
