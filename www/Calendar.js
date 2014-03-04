@@ -113,6 +113,13 @@ Calendar.prototype.modifyEventInNamedCalendar = function (title, location, notes
   }])
 };
 
+Calendar.prototype.listEventsInRange = function (startDate, endDate, successCallback, errorCallback) {
+  cordova.exec(successCallback, errorCallback, "Calendar", "listEventsInRange", [{
+    "startTime": startDate instanceof Date ? startDate.getTime() : null,
+    "endTime": endDate instanceof Date ? endDate.getTime() : null
+  }])
+};
+
 Calendar.install = function () {
   if (!window.plugins) {
     window.plugins = {};
