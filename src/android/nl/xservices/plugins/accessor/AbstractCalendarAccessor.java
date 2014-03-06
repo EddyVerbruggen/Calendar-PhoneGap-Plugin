@@ -447,7 +447,7 @@ public abstract class AbstractCalendarAccessor {
 
       ContentValues reminderValues = new ContentValues();
       reminderValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
-      reminderValues.put("minutes", 5);
+      reminderValues.put("minutes", 60);
       reminderValues.put("method", 1);
       Uri reminderUri = cr.insert(Uri.parse(CONTENT_PROVIDER + CONTENT_PROVIDER_PATH_REMINDERS), reminderValues);
     } catch (Exception e) {
