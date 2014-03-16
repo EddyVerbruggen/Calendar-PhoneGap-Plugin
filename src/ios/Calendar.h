@@ -11,7 +11,7 @@
 
 -(NSArray*)findEKEventsWithTitle: (NSString *)title
                         location: (NSString *)location
-                         message: (NSString *)message
+                           notes: (NSString *)notes
                        startDate: (NSDate *)startDate
                          endDate: (NSDate *)endDate
                         calendar: (EKCalendar *) calendar;
