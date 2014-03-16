@@ -124,7 +124,7 @@
     myEvent.calendar = calendar;
     
     // added by Vt
-    EKAlarm *reminder = [EKAlarm alarmWithRelativeOffset:-1*alarmTime*60];
+    EKAlarm *reminder = [EKAlarm alarmWithRelativeOffset:-1*alarmTime.intValue*60];
     [myEvent addAlarm:reminder];
     
     NSError *error = nil;
