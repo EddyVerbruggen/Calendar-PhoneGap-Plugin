@@ -425,42 +425,7 @@ public abstract class AbstractCalendarAccessor {
     return nrDeletedRecords > 0;
   }
 
-  public boolean createEvent(Uri eventsUri, String title, long startTime, long endTime, String description, String location) {
-    try {
-      ContentResolver cr = this.cordova.getActivity().getContentResolver();
-      ContentValues values = new ContentValues();
-      final boolean allDayEvent = isAllDayEvent(new Date(startTime), new Date(endTime));
-      values.put(Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
-      values.put(Events.ALL_DAY, allDayEvent ? 1 : 0);
-      values.put(Events.DTSTART, allDayEvent ? startTime+(1000*60*60*24) : startTime);
-      values.put(Events.DTEND, endTime);
-      values.put(Events.TITLE, title);
-      values.put(Events.DESCRIPTION, description);
-      values.put(Events.HAS_ALARM, 1);
-      values.put(Events.CALENDAR_ID, 1);
-      values.put(Events.EVENT_LOCATION, location);
-      Uri uri = cr.insert(eventsUri, values);
-
-      Log.d(LOG_TAG, "Added to ContentResolver");
-
-      getActiveCalendarIds();
-
-      ContentValues reminderValues = new ContentValues();
-      reminderValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
-      reminderValues.put("minutes", 60);
-      reminderValues.put("method", 1);
-      Uri reminderUri = cr.insert(Uri.parse(CONTENT_PROVIDER + CONTENT_PROVIDER_PATH_REMINDERS), reminderValues);
-    } catch (Exception e) {
-      Log.e("Calendar", e.getMessage());
-      return false;
-    }
-
-    return true;
-  }
-
-  //createEventWithAlarm -- Extra Parameter : alarmTime [In Minutes] added by Vt starts here..
-
-  public boolean createEventWithAlarm(Uri eventsUri, String title, long startTime, long endTime, String description, String location, long alarmTime) {
+  public boolean createEvent(Uri eventsUri, String title, long startTime, long endTime, String description, String location, long alarmTime) {
     try {
       ContentResolver cr = this.cordova.getActivity().getContentResolver();
       ContentValues values = new ContentValues();
@@ -484,17 +449,15 @@ public abstract class AbstractCalendarAccessor {
       reminderValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
       reminderValues.put("minutes", alarmTime);
       reminderValues.put("method", 1);
-      Uri reminderUri = cr.insert(Uri.parse(CONTENT_PROVIDER + CONTENT_PROVIDER_PATH_REMINDERS), reminderValues);
+      cr.insert(Uri.parse(CONTENT_PROVIDER + CONTENT_PROVIDER_PATH_REMINDERS), reminderValues);
     } catch (Exception e) {
-      Log.e("Calendar", e.getMessage());
+      Log.e("Calendar", e.getMessage(), e);
       return false;
     }
 
     return true;
   }
-
-  //createEventWithAlarm -- Extra Parameter : alarmTime [In Minutes] added by Vt ends here..
-
+  
   public static boolean isAllDayEvent(final Date startDate, final Date endDate) {
     return
         endDate.getTime() - startDate.getTime() == (24*60*60*1000) &&

@@ -29,6 +29,7 @@ public class Calendar extends CordovaPlugin {
   public static final String ACTION_LIST_EVENTS_IN_RANGE = "listEventsInRange";
 
   public static final Integer RESULT_CODE_CREATE = 0;
+  private static final long REMINDER_DEFAULT = 60;
 
   private CallbackContext callback;
 
@@ -139,10 +140,10 @@ public class Calendar extends CordovaPlugin {
   private boolean createEvent(JSONArray args) {
     try {
       JSONObject arg_object = args.getJSONObject(0);
-      boolean status = getCalendarAccessor().createEventWithAlarm(null, arg_object.getString("title"),
+      boolean status = getCalendarAccessor().createEvent(null, arg_object.getString("title"),
           arg_object.getLong("startTime"), arg_object.getLong("endTime"),
           arg_object.getString("notes"), arg_object.getString("location"),
-          arg_object.getLong("alarmTime"));
+          arg_object.has("alarmTime") ? arg_object.getLong("alarmTime") : REMINDER_DEFAULT);
 
       callback.success("" + status);
       return true;
