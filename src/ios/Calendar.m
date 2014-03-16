@@ -88,6 +88,60 @@
     }
 }
 
+//createEventWithAlarm -- Extra Parameter : alarmTime [In Minutes] added by Vt starts here..
+
+- (void)createEventWithCalendarAlarm:(CDVInvokedUrlCommand*)command
+                       calendar: (EKCalendar *) calendar {
+    NSString *callbackId = command.callbackId;
+    NSDictionary* options = [command.arguments objectAtIndex:0];
+
+    NSString* title      = [options objectForKey:@"title"];
+    NSString* location   = [options objectForKey:@"location"];
+    NSString* notes      = [options objectForKey:@"notes"];
+    NSNumber* startTime  = [options objectForKey:@"startTime"];
+    NSNumber* endTime    = [options objectForKey:@"endTime"];
+    NSNumber* alarmTime  = [options objectForKey:@"alarmTime"]; //should be set in mins -- added by Vt
+    
+    NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
+    NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
+    
+    NSTimeInterval _endInterval = [endTime doubleValue] / 1000; // strip millis
+    
+    EKEvent *myEvent = [EKEvent eventWithEventStore: self.eventStore];
+    myEvent.title = title;
+    myEvent.location = location;
+    myEvent.notes = notes;
+    myEvent.startDate = myStartDate;
+
+    int duration = _endInterval - _startInterval;
+    int moduloDay = duration % (60*60*24);
+    if (moduloDay == 0) {
+        myEvent.allDay = YES;
+        myEvent.endDate = [NSDate dateWithTimeIntervalSince1970:_endInterval-1];
+    } else {
+        myEvent.endDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
+    }
+    myEvent.calendar = calendar;
+    
+    // added by Vt
+    EKAlarm *reminder = [EKAlarm alarmWithRelativeOffset:-1*alarmTime*60];
+    [myEvent addAlarm:reminder];
+    
+    NSError *error = nil;
+    [self.eventStore saveEvent:myEvent span:EKSpanThisEvent error:&error];
+    
+    if (error) {
+        CDVPluginResult * pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.userInfo.description];
+        [self writeJavascript:[pluginResult toErrorCallbackString:callbackId]];
+    } else {
+        NSLog(@"Reached Success");
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self writeJavascript:[pluginResult toSuccessCallbackString:callbackId]];
+    }
+}
+
+//createEventWithAlarm -- Extra Parameter : alarmTime [In Minutes] added by Vt ends here..
+
 -(void)modifyEventWithCalendar:(CDVInvokedUrlCommand*)command
                       calendar: (EKCalendar *) calendar {
     NSString *callbackId = command.callbackId;
@@ -271,6 +325,13 @@
     EKCalendar* calendar = self.eventStore.defaultCalendarForNewEvents;
     [self createEventWithCalendar:command calendar:calendar];
 }
+
+//createEventWithAlarm -- Extra Parameter : alarmTime [In Minutes] added by Vt starts here..
+- (void)createEventWithAlarm:(CDVInvokedUrlCommand*)command {
+    EKCalendar* calendar = self.eventStore.defaultCalendarForNewEvents;
+    [self createEventWithCalendarAlarm:command calendar:calendar];
+}
+//createEventWithAlarm -- Extra Parameter : alarmTime [In Minutes] added by Vt ends here..
 
 - (void)createEventInteractively:(CDVInvokedUrlCommand*)command {
     NSString *callbackId = command.callbackId;
