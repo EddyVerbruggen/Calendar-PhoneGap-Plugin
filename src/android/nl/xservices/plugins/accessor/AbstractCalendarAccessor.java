@@ -457,9 +457,9 @@ public abstract class AbstractCalendarAccessor {
 
     return true;
   }
-  
+
   //createEventWithAlarm -- Extra Parameter : alarmTime [In Minutes] added by Vt starts here..
-  
+
   public boolean createEventWithAlarm(Uri eventsUri, String title, long startTime, long endTime, String description, String location, long alarmTime) {
     try {
       ContentResolver cr = this.cordova.getActivity().getContentResolver();
@@ -492,7 +492,7 @@ public abstract class AbstractCalendarAccessor {
 
     return true;
   }
-  
+
   //createEventWithAlarm -- Extra Parameter : alarmTime [In Minutes] added by Vt ends here..
 
   public static boolean isAllDayEvent(final Date startDate, final Date endDate) {
