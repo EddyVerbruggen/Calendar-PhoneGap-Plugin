@@ -119,7 +119,6 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   // prep some variables
   var startDate = new Date(2014,2,15,18,30,0,0,0); // beware: month 0 = january, 11 = december
   var endDate = new Date(2014,2,15,19,30,0,0,0);
-  var alarmTime = 15; //Sets the reminder time to 15 mins
   var title = "My nice event";
   var location = "Home";
   var notes = "Some notes about this event.";
@@ -136,7 +135,7 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   window.plugins.calendar.createEvent(title,location,notes,startDate,endDate,success,error);
   
   // create an event with Alarm support - added by Vt - new parameter alarmTime (In Minutes)
-  window.plugins.calendar.createEvent(title,location,notes,startDate,endDate,alarmTime,success,error);
+  window.plugins.calendar.createEventWithAlarm(title,location,notes,startDate,endDate,alarmTime,success,error);
 
   // create an event interactively (only supported on Android)
   window.plugins.calendar.createEventInteractively(title,location,notes,startDate,endDate,success,error);

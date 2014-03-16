@@ -25,7 +25,7 @@ Calendar.prototype.createEvent = function (title, location, notes, startDate, en
 };
 
 //createEventWithAlarm -- Extra Parameter : alarmTime [In Minutes] added by Vt starts here..
-Calendar.prototype.createEventWithAlarm = function (title, location, notes, startDate, endDate,alarmTime, successCallback, errorCallback) {
+Calendar.prototype.createEventWithAlarm = function (title, location, notes, startDate, endDate, alarmTime, successCallback, errorCallback) {
   cordova.exec(successCallback, errorCallback, "Calendar", "createEventWithAlarm", [{
     "title": title,
     "location": location,
