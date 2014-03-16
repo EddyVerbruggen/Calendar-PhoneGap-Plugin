@@ -141,7 +141,7 @@ public class Calendar extends CordovaPlugin {
       JSONObject arg_object = args.getJSONObject(0);
       boolean status = getCalendarAccessor().createEvent(null, arg_object.getString("title"),
           arg_object.getLong("startTime"), arg_object.getLong("endTime"),
-          arg_object.getString("notes"), arg_object.getString("location"));
+          arg_object.getString("notes"), arg_object.getString("location"), arg_object.getString("alarmTime"));
 
       callback.success("" + status);
       return true;
