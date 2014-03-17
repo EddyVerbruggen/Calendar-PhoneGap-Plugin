@@ -24,18 +24,29 @@ Calendar.prototype.createEvent = function (title, location, notes, startDate, en
   }])
 };
 
-//createEventWithAlarm -- Extra Parameter : alarmTime [In Minutes] added by Vt starts here..
-Calendar.prototype.createEventWithAlarm = function (title, location, notes, startDate, endDate, alarmTime, successCallback, errorCallback) {
-  cordova.exec(successCallback, errorCallback, "Calendar", "createEventWithAlarm", [{
+/**
+ * This method was added to not break backwards compatibility with current usages of createEvent.
+ * The options JS object can have these values (others are ignored):
+ * TODO: expose options object, with defaults
+ *
+ * options {
+ *   'calendarName: 'testcal',   // planned
+ *   'firstReminderMinutes': 60, // supported
+ *   'secondReminderMinutes': 5, // planned
+ *   'recurs': 'weekly'          // planned
+ * }
+ */
+Calendar.prototype.createEventWithOptions = function (title, location, notes, startDate, endDate, options, successCallback, errorCallback) {
+  cordova.exec(successCallback, errorCallback, "Calendar", "createEventWithOptions", [{
     "title": title,
     "location": location,
     "notes": notes,
     "startTime": startDate instanceof Date ? startDate.getTime() : null,
     "endTime": endDate instanceof Date ? endDate.getTime() : null,
-    "alarmTime": alarmTime
+    // TODO pass options object later, but for a quick API change, just pass the param
+    "firstReminderMinutes": options.firstReminderMinutes
   }])
 };
-//createEventWithAlarm -- Extra Parameter : alarmTime [In Minutes] added by Vt ends here..
 
 Calendar.prototype.createEventInteractively = function (title, location, notes, startDate, endDate, successCallback, errorCallback) {
   cordova.exec(successCallback, errorCallback, "Calendar", "createEventInteractively", [{

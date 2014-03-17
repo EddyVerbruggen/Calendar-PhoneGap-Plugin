@@ -20,7 +20,7 @@
 - (void)deleteCalendar:(CDVInvokedUrlCommand*)command;
 
 - (void)createEvent:(CDVInvokedUrlCommand*)command;
-- (void)createEventWithAlarm:(CDVInvokedUrlCommand*)command;
+- (void)createEventWithOptions:(CDVInvokedUrlCommand*)command;
 - (void)createEventInteractively:(CDVInvokedUrlCommand*)command;
 - (void)createEventInNamedCalendar:(CDVInvokedUrlCommand*)command;
 

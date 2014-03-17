@@ -120,10 +120,10 @@ public class CalendarProviderAccessor extends AbstractCalendarAccessor {
 
   @Override
   public boolean createEvent(Uri eventsUri, String title, long startTime, long endTime,
-                             String description, String location, long alarmTime) {
+                             String description, String location, long firstReminderMinutes) {
 
     eventsUri = eventsUri == null ? Uri.parse(CONTENT_PROVIDER + CONTENT_PROVIDER_PATH_EVENTS) : eventsUri;
     return super.createEvent(eventsUri, title, startTime, endTime,
-        description, location, alarmTime);
+        description, location, firstReminderMinutes);
   }
 }

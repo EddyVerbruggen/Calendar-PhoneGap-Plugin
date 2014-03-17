@@ -134,8 +134,12 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   // create an event silently (on Android < 4 an interactive dialog is shown)
   window.plugins.calendar.createEvent(title,location,notes,startDate,endDate,success,error);
   
-  // create an event with Alarm support - added by Vt - new parameter alarmTime (In Minutes)
-  window.plugins.calendar.createEventWithAlarm(title,location,notes,startDate,endDate,alarmTime,success,error);
+  // create an event silently (on Android < 4 an interactive dialog is shown) with options.
+  // The options support one option for now, but I will add more in the future:
+  var **options** {
+    'firstReminderMinutes': 60
+  }
+  window.plugins.calendar.createEventWithOptions(title,location,notes,startDate,endDate,**options**,success,error);
 
   // create an event interactively (only supported on Android)
   window.plugins.calendar.createEventInteractively(title,location,notes,startDate,endDate,success,error);

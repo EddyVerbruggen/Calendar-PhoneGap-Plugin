@@ -88,9 +88,7 @@
     }
 }
 
-//createEventWithAlarm -- Extra Parameter : alarmTime [In Minutes] added by Vt starts here..
-
-- (void)createEventWithCalendarAlarm:(CDVInvokedUrlCommand*)command
+- (void)createEventWithCalendarOptions:(CDVInvokedUrlCommand*)command
                        calendar: (EKCalendar *) calendar {
     NSString *callbackId = command.callbackId;
     NSDictionary* options = [command.arguments objectAtIndex:0];
@@ -100,8 +98,8 @@
     NSString* notes      = [options objectForKey:@"notes"];
     NSNumber* startTime  = [options objectForKey:@"startTime"];
     NSNumber* endTime    = [options objectForKey:@"endTime"];
-    NSNumber* alarmTime  = [options objectForKey:@"alarmTime"]; //should be set in mins -- added by Vt
-    
+    NSNumber* firstReminderMinutes = [options objectForKey:@"firstReminderMinutes"];
+
     NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
     NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
     
@@ -124,7 +122,7 @@
     myEvent.calendar = calendar;
     
     // added by Vt
-    EKAlarm *reminder = [EKAlarm alarmWithRelativeOffset:-1*alarmTime.intValue*60];
+    EKAlarm *reminder = [EKAlarm alarmWithRelativeOffset:-1*firstReminderMinutes.intValue*60];
     [myEvent addAlarm:reminder];
     
     NSError *error = nil;
@@ -139,8 +137,6 @@
         [self writeJavascript:[pluginResult toSuccessCallbackString:callbackId]];
     }
 }
-
-//createEventWithAlarm -- Extra Parameter : alarmTime [In Minutes] added by Vt ends here..
 
 -(void)modifyEventWithCalendar:(CDVInvokedUrlCommand*)command
                       calendar: (EKCalendar *) calendar {
@@ -326,12 +322,10 @@
     [self createEventWithCalendar:command calendar:calendar];
 }
 
-//createEventWithAlarm -- Extra Parameter : alarmTime [In Minutes] added by Vt starts here..
-- (void)createEventWithAlarm:(CDVInvokedUrlCommand*)command {
+- (void)createEventWithOptions:(CDVInvokedUrlCommand*)command {
     EKCalendar* calendar = self.eventStore.defaultCalendarForNewEvents;
-    [self createEventWithCalendarAlarm:command calendar:calendar];
+    [self createEventWithCalendarOptions:command calendar:calendar];
 }
-//createEventWithAlarm -- Extra Parameter : alarmTime [In Minutes] added by Vt ends here..
 
 - (void)createEventInteractively:(CDVInvokedUrlCommand*)command {
     NSString *callbackId = command.callbackId;
