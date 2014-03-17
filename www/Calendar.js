@@ -144,6 +144,10 @@ Calendar.prototype.listEventsInRange = function (startDate, endDate, successCall
   }])
 };
 
+Calendar.prototype.listCalendars = function (successCallback, errorCallback) {
+  cordova.exec(successCallback, errorCallback, "Calendar", "listCalendars", []);
+};
+
 Calendar.install = function () {
   if (!window.plugins) {
     window.plugins = {};

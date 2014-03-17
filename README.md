@@ -21,13 +21,13 @@ This plugin allows you to add events to the Calendar of the mobile device.
 * [Officially supported by PhoneGap Build](https://build.phonegap.com/plugins).
 
 ### iOS specifics
-* Supported methods: `find`, `create`, `modify`, `delete`.
+* Supported methods: `find`, `create`, `modify`, `delete`, ..
 * All methods work without showing the native calendar. Your app never looses control.
 * Tested on iOS 6 and 7.
 
 ### Android specifics
-* Supported methods on Android 4: `find`, `create` (silent and interactive), `delete`.
-* Supported methods on Android 2 and 3: `create`, interactive only: the user is presented a prefilled Calendar event. Pressing the hardware back button will give control back to your app.
+* Supported methods on Android 4: `find`, `create` (silent and interactive), `delete`, ..
+* Supported methods on Android 2 and 3: `create` interactive only: the user is presented a prefilled Calendar event. Pressing the hardware back button will give control back to your app.
 
 ## 2. Installation
 
@@ -107,7 +107,7 @@ Add the following xml to your `config.xml` to always use the latest version of t
 ```
 or to use this exact version:
 ```xml
-<gap:plugin name="nl.x-services.plugins.calendar" version="4.0" />
+<gap:plugin name="nl.x-services.plugins.calendar" version="4.2" />
 ```
 
 
@@ -149,6 +149,12 @@ Basic operations, you'll want to copy-paste this for testing purposes:
 
   // find events
   window.plugins.calendar.findEvent(title,location,notes,startDate,endDate,success,error);
+
+  // list all events in a date range (only supported on Android for now)
+  window.plugins.calendar.listEventsInRange(startDate,endDate,success,error);
+
+  // list all calendar names - returns this JS Object to the success callback: [{"id":"1", "name":"first"}, ..]
+  window.plugins.calendar.listCalendars(success,error);
 
   // find all events in a named calendar (iOS only for now)
   window.plugins.calendar.findAllEventsInNamedCalendar(calendarName,success,error);

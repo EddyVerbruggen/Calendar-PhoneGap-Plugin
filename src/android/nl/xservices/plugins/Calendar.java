@@ -27,6 +27,7 @@ public class Calendar extends CordovaPlugin {
   public static final String ACTION_DELETE_EVENT = "deleteEvent";
   public static final String ACTION_FIND_EVENT = "findEvent";
   public static final String ACTION_LIST_EVENTS_IN_RANGE = "listEventsInRange";
+  public static final String ACTION_LIST_CALENDARS = "listCalendars";
 
   public static final Integer RESULT_CODE_CREATE = 0;
   private static final long REMINDER_DEFAULT = 60;
@@ -55,8 +56,17 @@ public class Calendar extends CordovaPlugin {
       return findEvents(args);
     } else if (!hasLimitedSupport && ACTION_DELETE_EVENT.equals(action)) {
       return deleteEvent(args);
+    } else if (!hasLimitedSupport && ACTION_LIST_CALENDARS.equals(action)) {
+      return listCalendars();
     }
     return false;
+  }
+
+  private boolean listCalendars() throws JSONException {
+    final JSONArray jsonObject = getCalendarAccessor().getActiveCalendars();
+    PluginResult res = new PluginResult(PluginResult.Status.OK, jsonObject);
+    callback.sendPluginResult(res);
+    return true;
   }
 
   private boolean createEventInteractively(JSONArray args) throws JSONException {

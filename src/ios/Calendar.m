@@ -304,6 +304,23 @@
 
 #pragma mark Cordova functions
 
+- (void)listCalendars:(CDVInvokedUrlCommand*)command {
+    NSString *callbackId = command.callbackId;
+    NSArray * calendars = self.eventStore.calendars;
+
+    NSMutableArray *finalResults = [[NSMutableArray alloc] initWithCapacity:calendars.count];
+    for (EKCalendar *thisCalendar in calendars){
+        NSMutableDictionary *entry = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                                      thisCalendar.calendarIdentifier, @"id",
+                                      thisCalendar.title, @"name",
+                                      nil];
+        [finalResults addObject:entry];
+    }
+
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:finalResults];
+    [self writeJavascript:[result toSuccessCallbackString:callbackId]];
+}
+
 - (void)createEventInNamedCalendar:(CDVInvokedUrlCommand*)command {
     NSDictionary* options = [command.arguments objectAtIndex:0];
     NSString* calendarName = [options objectForKey:@"calendarName"];

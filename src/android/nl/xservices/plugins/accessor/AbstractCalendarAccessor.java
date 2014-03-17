@@ -33,7 +33,6 @@
 package nl.xservices.plugins.accessor;
 
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
@@ -139,6 +138,7 @@ public abstract class AbstractCalendarAccessor {
 
   protected enum KeyIndex {
     CALENDARS_ID,
+    CALENDARS_NAME,
     CALENDARS_VISIBLE,
     EVENTS_ID,
     EVENTS_CALENDAR_ID,
@@ -233,9 +233,9 @@ public abstract class AbstractCalendarAccessor {
   }
 
   private String[] getActiveCalendarIds() {
-    // Get only active calendars.
-    Cursor cursor = queryCalendars(new String[]{this.getKey(
-        KeyIndex.CALENDARS_ID)},
+    Cursor cursor = queryCalendars(new String[]{
+        this.getKey(KeyIndex.CALENDARS_ID)
+    },
         this.getKey(KeyIndex.CALENDARS_VISIBLE) + "=1", null, null);
     String[] calendarIds = null;
     if (cursor.moveToFirst()) {
@@ -248,6 +248,24 @@ public abstract class AbstractCalendarAccessor {
       } while (cursor.moveToNext());
     }
     return calendarIds;
+  }
+
+  public JSONArray getActiveCalendars() throws JSONException {
+    Cursor cursor = queryCalendars(new String[]{
+        this.getKey(KeyIndex.CALENDARS_ID),
+        this.getKey(KeyIndex.CALENDARS_NAME)
+    },
+        this.getKey(KeyIndex.CALENDARS_VISIBLE) + "=1", null, null);
+    JSONArray calendarsWrapper = new JSONArray();
+    if (cursor.moveToFirst()) {
+      do {
+        JSONObject calendar = new JSONObject();
+        calendar.put("id", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_ID))));
+        calendar.put("name", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_NAME))));
+        calendarsWrapper.put(calendar);
+      } while (cursor.moveToNext());
+    }
+    return calendarsWrapper;
   }
 
   private Map<String, Event> fetchEventsAsMap(Event[] instances) {
@@ -457,7 +475,7 @@ public abstract class AbstractCalendarAccessor {
 
     return true;
   }
-
+  
   public static boolean isAllDayEvent(final Date startDate, final Date endDate) {
     return
         endDate.getTime() - startDate.getTime() == (24*60*60*1000) &&
