@@ -30,7 +30,6 @@ public class Calendar extends CordovaPlugin {
   public static final String ACTION_LIST_CALENDARS = "listCalendars";
 
   public static final Integer RESULT_CODE_CREATE = 0;
-  private static final long REMINDER_DEFAULT = 60;
 
   private CallbackContext callback;
 
@@ -79,7 +78,9 @@ public class Calendar extends CordovaPlugin {
         .putExtra("description", jsonFilter.optString("notes"))
         .putExtra("beginTime", jsonFilter.optLong("startTime"))
         .putExtra("endTime", jsonFilter.optLong("endTime"))
+        .putExtra("hasAlarm", 1)
         .putExtra("allDay", AbstractCalendarAccessor.isAllDayEvent(new Date(jsonFilter.optLong("startTime")), new Date(jsonFilter.optLong("endTime"))));
+        // TODO can we pass a reminder here?
 
     this.cordova.startActivityForResult(this, calIntent, RESULT_CODE_CREATE);
     return true;
@@ -149,11 +150,13 @@ public class Calendar extends CordovaPlugin {
 
   private boolean createEvent(JSONArray args) {
     try {
-      JSONObject arg_object = args.getJSONObject(0);
-      boolean status = getCalendarAccessor().createEvent(null, arg_object.getString("title"),
-          arg_object.getLong("startTime"), arg_object.getLong("endTime"),
-          arg_object.getString("notes"), arg_object.getString("location"),
-          arg_object.has("firstReminderMinutes") ? arg_object.getLong("firstReminderMinutes") : REMINDER_DEFAULT);
+      final JSONObject argObject = args.getJSONObject(0);
+      final JSONObject argOptionsObject = argObject.getJSONObject("options");
+
+      boolean status = getCalendarAccessor().createEvent(null, argObject.getString("title"),
+          argObject.getLong("startTime"), argObject.getLong("endTime"),
+          argObject.getString("notes"), argObject.getString("location"),
+          argOptionsObject.isNull("firstReminderMinutes") ? null : argOptionsObject.getLong("firstReminderMinutes"));
 
       callback.success("" + status);
       return true;

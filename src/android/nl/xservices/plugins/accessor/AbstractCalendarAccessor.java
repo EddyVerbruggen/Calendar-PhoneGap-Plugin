@@ -443,7 +443,7 @@ public abstract class AbstractCalendarAccessor {
     return nrDeletedRecords > 0;
   }
 
-  public boolean createEvent(Uri eventsUri, String title, long startTime, long endTime, String description, String location, long firstReminderMinutes) {
+  public boolean createEvent(Uri eventsUri, String title, long startTime, long endTime, String description, String location, Long firstReminderMinutes) {
     try {
       ContentResolver cr = this.cordova.getActivity().getContentResolver();
       ContentValues values = new ContentValues();
@@ -463,11 +463,13 @@ public abstract class AbstractCalendarAccessor {
 
       getActiveCalendarIds();
 
-      ContentValues reminderValues = new ContentValues();
-      reminderValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
-      reminderValues.put("minutes", firstReminderMinutes);
-      reminderValues.put("method", 1);
-      cr.insert(Uri.parse(CONTENT_PROVIDER + CONTENT_PROVIDER_PATH_REMINDERS), reminderValues);
+      if (firstReminderMinutes != null) {
+        ContentValues reminderValues = new ContentValues();
+        reminderValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
+        reminderValues.put("minutes", firstReminderMinutes);
+        reminderValues.put("method", 1);
+        cr.insert(Uri.parse(CONTENT_PROVIDER + CONTENT_PROVIDER_PATH_REMINDERS), reminderValues);
+      }
     } catch (Exception e) {
       Log.e("Calendar", e.getMessage(), e);
       return false;

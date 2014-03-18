@@ -43,7 +43,7 @@
                        calendar: (EKCalendar *) calendar {
     NSString *callbackId = command.callbackId;
     NSDictionary* options = [command.arguments objectAtIndex:0];
-
+    
     NSString* title      = [options objectForKey:@"title"];
     NSString* location   = [options objectForKey:@"location"];
     NSString* notes      = [options objectForKey:@"notes"];
@@ -60,7 +60,7 @@
     myEvent.location = location;
     myEvent.notes = notes;
     myEvent.startDate = myStartDate;
-
+    
     int duration = _endInterval - _startInterval;
     int moduloDay = duration % (60*60*24);
     if (moduloDay == 0) {
@@ -71,7 +71,7 @@
     }
     myEvent.calendar = calendar;
     
-    // TODO base on passed alarm with a decent default (1 hour)
+    // TODO base on passed alarm
     EKAlarm *reminder = [EKAlarm alarmWithRelativeOffset:-1*60*60];
     [myEvent addAlarm:reminder];
     
@@ -89,17 +89,19 @@
 }
 
 - (void)createEventWithCalendarOptions:(CDVInvokedUrlCommand*)command
-                       calendar: (EKCalendar *) calendar {
+                              calendar: (EKCalendar *) calendar {
     NSString *callbackId = command.callbackId;
     NSDictionary* options = [command.arguments objectAtIndex:0];
-
+    
     NSString* title      = [options objectForKey:@"title"];
     NSString* location   = [options objectForKey:@"location"];
     NSString* notes      = [options objectForKey:@"notes"];
     NSNumber* startTime  = [options objectForKey:@"startTime"];
     NSNumber* endTime    = [options objectForKey:@"endTime"];
-    NSNumber* firstReminderMinutes = [options objectForKey:@"firstReminderMinutes"];
 
+    NSDictionary* calOptions = [options objectForKey:@"options"];
+    NSNumber* firstReminderMinutes = [calOptions objectForKey:@"firstReminderMinutes"];
+    
     NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
     NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
     
@@ -110,7 +112,7 @@
     myEvent.location = location;
     myEvent.notes = notes;
     myEvent.startDate = myStartDate;
-
+    
     int duration = _endInterval - _startInterval;
     int moduloDay = duration % (60*60*24);
     if (moduloDay == 0) {
@@ -121,9 +123,10 @@
     }
     myEvent.calendar = calendar;
     
-    // added by Vt
-    EKAlarm *reminder = [EKAlarm alarmWithRelativeOffset:-1*firstReminderMinutes.intValue*60];
-    [myEvent addAlarm:reminder];
+    if (firstReminderMinutes != (id)[NSNull null]) {
+        EKAlarm *reminder = [EKAlarm alarmWithRelativeOffset:-1*firstReminderMinutes.intValue*60];
+        [myEvent addAlarm:reminder];
+    }
     
     NSError *error = nil;
     [self.eventStore saveEvent:myEvent span:EKSpanThisEvent error:&error];
@@ -149,7 +152,7 @@
     NSString* notes      = [options objectForKey:@"notes"];
     NSNumber* startTime  = [options objectForKey:@"startTime"];
     NSNumber* endTime    = [options objectForKey:@"endTime"];
-
+    
     NSString* ntitle     = [options objectForKey:@"newTitle"];
     NSString* nlocation  = [options objectForKey:@"newLocation"];
     NSString* nnotes     = [options objectForKey:@"newNotes"];
@@ -254,13 +257,13 @@
     // Build up a predicateString - this means we only query a parameter if we actually had a value in it
     NSMutableString *predicateString= [[NSMutableString alloc] initWithString:@""];
     if (title.length > 0) {
-      [predicateString appendString:[NSString stringWithFormat:@"title == '%@'", title]];
+        [predicateString appendString:[NSString stringWithFormat:@"title == '%@'", title]];
     }
     if (location.length > 0) {
-      [predicateString appendString:[NSString stringWithFormat:@" AND location == '%@'", location]];
+        [predicateString appendString:[NSString stringWithFormat:@" AND location == '%@'", location]];
     }
     if (notes.length > 0) {
-      [predicateString appendString:[NSString stringWithFormat:@" AND notes == '%@'", notes]];
+        [predicateString appendString:[NSString stringWithFormat:@" AND notes == '%@'", notes]];
     }
     
     NSPredicate *matches = [NSPredicate predicateWithFormat:predicateString];
@@ -307,7 +310,7 @@
 - (void)listCalendars:(CDVInvokedUrlCommand*)command {
     NSString *callbackId = command.callbackId;
     NSArray * calendars = self.eventStore.calendars;
-
+    
     NSMutableArray *finalResults = [[NSMutableArray alloc] initWithCapacity:calendars.count];
     for (EKCalendar *thisCalendar in calendars){
         NSMutableDictionary *entry = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
@@ -316,7 +319,7 @@
                                       nil];
         [finalResults addObject:entry];
     }
-
+    
     CDVPluginResult* result = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:finalResults];
     [self writeJavascript:[result toSuccessCallbackString:callbackId]];
 }
@@ -332,6 +335,10 @@
     } else {
         [self createEventWithCalendar:command calendar:calendar];
     }
+}
+
+- (void)listEventsInRange:(CDVInvokedUrlCommand*)command {
+    
 }
 
 - (void)createEvent:(CDVInvokedUrlCommand*)command {
@@ -440,7 +447,7 @@
     
     NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
     NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
-
+    
     NSTimeInterval _endInterval = [endTime doubleValue] / 1000; // strip millis
     NSDate *myEndDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
     

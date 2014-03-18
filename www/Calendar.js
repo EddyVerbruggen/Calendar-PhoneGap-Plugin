@@ -24,27 +24,36 @@ Calendar.prototype.createEvent = function (title, location, notes, startDate, en
   }])
 };
 
+Calendar.prototype.getCalendarOptions = function () {
+  return {
+    firstReminderMinutes: 60
+//  secondReminderMinutes: null, // TODO: future support
+//  calendarName: null, // TODO: future support
+//  recurs: null // TODO: future support
+  };
+};
+
 /**
- * This method was added to not break backwards compatibility with current usages of createEvent.
- * The options JS object can have these values (others are ignored):
- * TODO: expose options object, with defaults
- *
- * options {
- *   'calendarName: 'testcal',   // planned
- *   'firstReminderMinutes': 60, // supported
- *   'secondReminderMinutes': 5, // planned
- *   'recurs': 'weekly'          // planned
- * }
+ * This method can be used if you want more control over the event details.
+ * Pass in an options object which you can easily override as follow:
+ *   var otions = window.plugins.calendar.getCalendarOptions();
+ *   options.firstReminderMinutes = 150;
  */
 Calendar.prototype.createEventWithOptions = function (title, location, notes, startDate, endDate, options, successCallback, errorCallback) {
+  // merge passed options with defaults
+  var mergedOptions = Calendar.prototype.getCalendarOptions();
+  for (var val in options) {
+    if (options.hasOwnProperty(val)) {
+      mergedOptions[val] = options[val];
+    }
+  }
   cordova.exec(successCallback, errorCallback, "Calendar", "createEventWithOptions", [{
     "title": title,
     "location": location,
     "notes": notes,
     "startTime": startDate instanceof Date ? startDate.getTime() : null,
     "endTime": endDate instanceof Date ? endDate.getTime() : null,
-    // TODO pass options object later, but for a quick API change, just pass the param
-    "firstReminderMinutes": options.firstReminderMinutes
+    "options": mergedOptions
   }])
 };
 
