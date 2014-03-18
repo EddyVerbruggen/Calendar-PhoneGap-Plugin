@@ -137,8 +137,8 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   // create an event silently (on Android < 4 an interactive dialog is shown which doesn't use this options) with options.
   // The options support one option for now, but I will add more in the future:
   var calOptions = window.plugins.calendar.getCalendarOptions(); // grab the defaults
-  __options.firstReminderMinutes__ = 120; // default is 60
-  window.plugins.calendar.createEventWithOptions(title,location,notes,startDate,endDate,__options__,success,error);
+  options.firstReminderMinutes = 120; // default is 60, pass in null for no reminder (alarm)
+  window.plugins.calendar.createEventWithOptions(title,location,notes,startDate,endDate,options,success,error);
 
   // create an event interactively (only supported on Android)
   window.plugins.calendar.createEventInteractively(title,location,notes,startDate,endDate,success,error);
