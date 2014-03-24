@@ -14,16 +14,6 @@ Calendar.prototype.deleteCalendar = function (calendarName, successCallback, err
   }]);
 };
 
-Calendar.prototype.createEvent = function (title, location, notes, startDate, endDate, successCallback, errorCallback) {
-  cordova.exec(successCallback, errorCallback, "Calendar", "createEvent", [{
-    "title": title,
-    "location": location,
-    "notes": notes,
-    "startTime": startDate instanceof Date ? startDate.getTime() : null,
-    "endTime": endDate instanceof Date ? endDate.getTime() : null
-  }])
-};
-
 Calendar.prototype.getCalendarOptions = function () {
   return {
     firstReminderMinutes: 60
@@ -57,16 +47,22 @@ Calendar.prototype.createEventWithOptions = function (title, location, notes, st
   }])
 };
 
+Calendar.prototype.createEvent = function (title, location, notes, startDate, endDate, successCallback, errorCallback) {
+  Calendar.prototype.createEventWithOptions(title, location, notes, startDate, endDate, {}, successCallback, errorCallback);
+};
+
 Calendar.prototype.createEventInteractively = function (title, location, notes, startDate, endDate, successCallback, errorCallback) {
   cordova.exec(successCallback, errorCallback, "Calendar", "createEventInteractively", [{
     "title": title,
     "location": location,
     "notes": notes,
     "startTime": startDate instanceof Date ? startDate.getTime() : null,
-    "endTime": endDate instanceof Date ? endDate.getTime() : null
+    "endTime": endDate instanceof Date ? endDate.getTime() : null,
+    "options": Calendar.prototype.getCalendarOptions()
   }])
 };
 
+// TODO add calendarname to options and call that method, like we did with createEvent
 Calendar.prototype.createEventInNamedCalendar = function (title, location, notes, startDate, endDate, calendarName, successCallback, errorCallback) {
   cordova.exec(successCallback, errorCallback, "Calendar", "createEventInNamedCalendar", [{
     "title": title,
