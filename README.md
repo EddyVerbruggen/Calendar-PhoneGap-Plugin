@@ -2,11 +2,6 @@
 
 for iOS and Android, by [Eddy Verbruggen](http://www.x-services.nl)
 
->
-> Warning PhoneGap Build users: version 4.2.1 has a broken `createEvent`.
-> Please wait for 4.2.2, use an older version or user the new `createEventWithOptions` function.
->
-
 1. [Description](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#1-description)
 2. [Installation](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#2-installation)
 	2. [Automatically (CLI / Plugman)](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#automatically-cli--plugman)
