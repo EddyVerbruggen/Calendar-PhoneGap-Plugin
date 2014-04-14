@@ -310,6 +310,8 @@
 - (void)listCalendars:(CDVInvokedUrlCommand*)command {
     NSString *callbackId = command.callbackId;
     NSArray * calendars = self.eventStore.calendars;
+    // TODO when iOS 5 support is no longer needed, change the line above by the line below (and a few other places as well)
+    // NSArray * calendars = [self.eventStore calendarsForEntityType:EKEntityTypeEvent];
     
     NSMutableArray *finalResults = [[NSMutableArray alloc] initWithCapacity:calendars.count];
     for (EKCalendar *thisCalendar in calendars){
