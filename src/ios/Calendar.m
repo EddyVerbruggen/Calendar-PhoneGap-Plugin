@@ -331,9 +331,8 @@
     NSString* calendarName = [options objectForKey:@"calendarName"];
     EKCalendar* calendar = [self findEKCalendar:calendarName];
     if (calendar == nil) {
-        NSString *callbackId = command.callbackId;
         CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Could not find calendar"];
-        [self writeJavascript:[result toErrorCallbackString:callbackId]];
+        [self writeJavascript:[result toErrorCallbackString:command.callbackId]];
     } else {
         [self createEventWithCalendar:command calendar:calendar];
     }
@@ -343,14 +342,14 @@
     
 }
 
-- (void)createEvent:(CDVInvokedUrlCommand*)command {
-    EKCalendar* calendar = self.eventStore.defaultCalendarForNewEvents;
-    [self createEventWithCalendar:command calendar:calendar];
-}
-
 - (void)createEventWithOptions:(CDVInvokedUrlCommand*)command {
     EKCalendar* calendar = self.eventStore.defaultCalendarForNewEvents;
-    [self createEventWithCalendarOptions:command calendar:calendar];
+    if (calendar == nil) {
+      CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No default calendar found. Is access to the Calendar blocked for this app?"];
+      [self writeJavascript:[result toErrorCallbackString:command.callbackId]];
+    } else {
+      [self createEventWithCalendarOptions:command calendar:calendar];
+    }
 }
 
 - (void)createEventInteractively:(CDVInvokedUrlCommand*)command {
@@ -375,7 +374,12 @@
 
 -(void)deleteEvent:(CDVInvokedUrlCommand*)command {
     EKCalendar* calendar = self.eventStore.defaultCalendarForNewEvents;
-    [self deleteEventFromCalendar:command calendar: calendar];
+    if (calendar == nil) {
+        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No default calendar found. Is access to the Calendar blocked for this app?"];
+        [self writeJavascript:[result toErrorCallbackString:command.callbackId]];
+    } else {
+        [self deleteEventFromCalendar:command calendar: calendar];
+    }
 }
 
 
@@ -395,7 +399,12 @@
 
 -(void)modifyEvent:(CDVInvokedUrlCommand*)command {
     EKCalendar* calendar = self.eventStore.defaultCalendarForNewEvents;
-    [self modifyEventWithCalendar:command calendar: calendar];
+    if (calendar == nil) {
+        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No default calendar found. Is access to the Calendar blocked for this app?"];
+        [self writeJavascript:[result toErrorCallbackString:command.callbackId]];
+    } else {
+        [self modifyEventWithCalendar:command calendar: calendar];
+    }
 }
 
 
@@ -456,23 +465,29 @@
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
     [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
     
-    NSArray *matchingEvents = [self findEKEventsWithTitle:title location:location notes:notes startDate:myStartDate endDate:myEndDate calendar:self.eventStore.defaultCalendarForNewEvents];
-    
-    NSMutableArray *finalResults = [[NSMutableArray alloc] initWithCapacity:matchingEvents.count];
-    
-    // Stringify the results - Cordova can't deal with Obj-C objects
-    for (EKEvent * event in matchingEvents) {
-        NSMutableDictionary *entry = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                                      event.title, @"title",
-                                      event.location, @"location",
-                                      event.notes, @"message",
-                                      [df stringFromDate:event.startDate], @"startDate",
-                                      [df stringFromDate:event.endDate], @"endDate", nil];
-        [finalResults addObject:entry];
+    EKCalendar* calendar = self.eventStore.defaultCalendarForNewEvents;
+    if (calendar == nil) {
+        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No default calendar found. Is access to the Calendar blocked for this app?"];
+        [self writeJavascript:[result toErrorCallbackString:command.callbackId]];
+    } else {
+        NSArray *matchingEvents = [self findEKEventsWithTitle:title location:location notes:notes startDate:myStartDate endDate:myEndDate calendar:calendar];
+        
+        NSMutableArray *finalResults = [[NSMutableArray alloc] initWithCapacity:matchingEvents.count];
+        
+        // Stringify the results - Cordova can't deal with Obj-C objects
+        for (EKEvent * event in matchingEvents) {
+            NSMutableDictionary *entry = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                                          event.title, @"title",
+                                          event.location, @"location",
+                                          event.notes, @"message",
+                                          [df stringFromDate:event.startDate], @"startDate",
+                                          [df stringFromDate:event.endDate], @"endDate", nil];
+            [finalResults addObject:entry];
+        }
+        
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:finalResults];
+        [self writeJavascript:[result toSuccessCallbackString:callbackId]];
     }
-    
-    CDVPluginResult* result = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:finalResults];
-    [self writeJavascript:[result toSuccessCallbackString:callbackId]];
 }
 
 
