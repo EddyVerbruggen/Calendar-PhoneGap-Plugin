@@ -30,6 +30,11 @@ Calendar.prototype.getCalendarOptions = function () {
  *   options.firstReminderMinutes = 150;
  */
 Calendar.prototype.createEventWithOptions = function (title, location, notes, startDate, endDate, options, successCallback, errorCallback) {
+  if (!(startDate instanceof Date && endDate instanceof Date)) {
+    errorCallback("startDate and endDate must be JavaScript Date Objects");
+    return;
+  }
+
   // merge passed options with defaults
   var mergedOptions = Calendar.prototype.getCalendarOptions();
   for (var val in options) {
@@ -64,6 +69,9 @@ Calendar.prototype.createEventInteractively = function (title, location, notes, 
 
 // TODO add calendarname to options and call that method, like we did with createEvent
 Calendar.prototype.createEventInNamedCalendar = function (title, location, notes, startDate, endDate, calendarName, successCallback, errorCallback) {
+  if (!(startDate instanceof Date && endDate instanceof Date)) {
+    errorCallback("startDate and endDate must be JavaScript Date Objects");
+  }
   cordova.exec(successCallback, errorCallback, "Calendar", "createEventInNamedCalendar", [{
     "title": title,
     "location": location,
@@ -112,6 +120,10 @@ Calendar.prototype.findAllEventsInNamedCalendar = function (calendarName, succes
 };
 
 Calendar.prototype.modifyEvent = function (title, location, notes, startDate, endDate, newTitle, newLocation, newNotes, newStartDate, newEndDate, successCallback, errorCallback) {
+  if (!(newStartDate instanceof Date && newEndDate instanceof Date)) {
+    errorCallback("newStartDate and newEndDate must be JavaScript Date Objects");
+    return;
+  }
   cordova.exec(successCallback, errorCallback, "Calendar", "modifyEvent", [{
     "title": title,
     "location": location,
@@ -127,6 +139,10 @@ Calendar.prototype.modifyEvent = function (title, location, notes, startDate, en
 };
 
 Calendar.prototype.modifyEventInNamedCalendar = function (title, location, notes, startDate, endDate, newTitle, newLocation, newNotes, newStartDate, newEndDate, calendarName, successCallback, errorCallback) {
+  if (!(newStartDate instanceof Date && newEndDate instanceof Date)) {
+    errorCallback("newStartDate and newEndDate must be JavaScript Date Objects");
+    return;
+  }
   cordova.exec(successCallback, errorCallback, "Calendar", "modifyEventInNamedCalendar", [{
     "title": title,
     "location": location,
