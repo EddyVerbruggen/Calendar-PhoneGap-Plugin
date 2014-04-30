@@ -345,10 +345,10 @@
 - (void)createEventWithOptions:(CDVInvokedUrlCommand*)command {
     EKCalendar* calendar = self.eventStore.defaultCalendarForNewEvents;
     if (calendar == nil) {
-      CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No default calendar found. Is access to the Calendar blocked for this app?"];
-      [self writeJavascript:[result toErrorCallbackString:command.callbackId]];
+        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No default calendar found. Is access to the Calendar blocked for this app?"];
+        [self writeJavascript:[result toErrorCallbackString:command.callbackId]];
     } else {
-      [self createEventWithCalendarOptions:command calendar:calendar];
+        [self createEventWithCalendarOptions:command calendar:calendar];
     }
 }
 
@@ -507,10 +507,20 @@
         cal = [EKCalendar calendarWithEventStore:self.eventStore];
         cal.title = calendarName;
         cal.source = [self findEKSource];
-        [self.eventStore saveCalendar:cal commit:YES error:nil];
-        NSLog(@"created calendar: %@", cal.title);
-        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-        [self writeJavascript:[result toSuccessCallbackString:callbackId]];
+
+        // if the user did not allow permission to access the calendar, the error Object will be filled
+        NSError* error;
+        [self.eventStore saveCalendar:cal commit:YES error:&error];
+        if (error == nil) {
+            NSLog(@"created calendar: %@", cal.title);
+            CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+            [self writeJavascript:[result toSuccessCallbackString:callbackId]];
+        } else {
+            NSLog(@"could not create calendar, error: %@", error.description);
+            CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Calendar could not be created. Is access to the Calendar blocked for this app?"];
+            [self writeJavascript:[result toErrorCallbackString:callbackId]];
+        }
+        
     } else {
         // ok, it already exists
         CDVPluginResult* result = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsString:@"OK, Calendar already exists"];
