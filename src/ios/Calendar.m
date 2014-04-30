@@ -256,13 +256,13 @@
     
     // Build up a predicateString - this means we only query a parameter if we actually had a value in it
     NSMutableString *predicateString= [[NSMutableString alloc] initWithString:@""];
-    if (title.length > 0) {
+    if (title != (id)[NSNull null] && title.length > 0) {
         [predicateString appendString:[NSString stringWithFormat:@"title == '%@'", title]];
     }
-    if (location.length > 0) {
+    if (location != (id)[NSNull null] && location.length > 0) {
         [predicateString appendString:[NSString stringWithFormat:@" AND location == '%@'", location]];
     }
-    if (notes.length > 0) {
+    if (notes != (id)[NSNull null] && notes.length > 0) {
         [predicateString appendString:[NSString stringWithFormat:@" AND notes == '%@'", notes]];
     }
     
@@ -428,14 +428,20 @@
         NSDateFormatter *df = [[NSDateFormatter alloc] init];
         [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
         
-        // Stringify the results - Cordova can't deal with Obj-C objects
+        // Stringify the results
         for (EKEvent * event in matchingEvents) {
             NSMutableDictionary *entry = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                           event.title, @"title",
-                                          event.location, @"location",
-                                          event.notes, @"message",
                                           [df stringFromDate:event.startDate], @"startDate",
-                                          [df stringFromDate:event.endDate], @"endDate", nil];
+                                          [df stringFromDate:event.endDate], @"endDate",
+                                          nil];
+            // optional fields
+            if (event.location != nil) {
+                [entry setObject:event.location forKey:@"location"];
+            }
+            if (event.notes != nil) {
+                [entry setObject:event.notes forKey:@"message"];
+            }
             [finalResults addObject:entry];
         }
         

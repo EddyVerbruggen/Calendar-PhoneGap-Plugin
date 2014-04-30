@@ -73,13 +73,19 @@ public class Calendar extends CordovaPlugin {
     final Intent calIntent = new Intent(Intent.ACTION_EDIT)
         .setType("vnd.android.cursor.item/event")
         .putExtra("title", jsonFilter.optString("title"))
-        .putExtra("eventLocation", jsonFilter.optString("location"))
-        .putExtra("description", jsonFilter.optString("notes"))
         .putExtra("beginTime", jsonFilter.optLong("startTime"))
         .putExtra("endTime", jsonFilter.optLong("endTime"))
         .putExtra("hasAlarm", 1)
         .putExtra("allDay", AbstractCalendarAccessor.isAllDayEvent(new Date(jsonFilter.optLong("startTime")), new Date(jsonFilter.optLong("endTime"))));
-        // TODO can we pass a reminder here?
+    // TODO can we pass a reminder here?
+
+    // optional fields
+    if (!jsonFilter.isNull("location")) {
+      calIntent.putExtra("eventLocation", jsonFilter.optString("location"));
+    }
+    if (!jsonFilter.isNull("notes")) {
+      calIntent.putExtra("description", jsonFilter.optString("notes"));
+    }
 
     this.cordova.startActivityForResult(this, calIntent, RESULT_CODE_CREATE);
     return true;
@@ -152,9 +158,13 @@ public class Calendar extends CordovaPlugin {
       final JSONObject argObject = args.getJSONObject(0);
       final JSONObject argOptionsObject = argObject.getJSONObject("options");
 
-      boolean status = getCalendarAccessor().createEvent(null, argObject.getString("title"),
-          argObject.getLong("startTime"), argObject.getLong("endTime"),
-          argObject.getString("notes"), argObject.getString("location"),
+      boolean status = getCalendarAccessor().createEvent(
+          null,
+          argObject.getString("title"),
+          argObject.getLong("startTime"),
+          argObject.getLong("endTime"),
+          argObject.isNull("notes") ? null : argObject.getString("notes"),
+          argObject.isNull("location") ? null : argObject.getString("location"),
           argOptionsObject.isNull("firstReminderMinutes") ? null : argOptionsObject.getLong("firstReminderMinutes"));
 
       callback.success("" + status);
