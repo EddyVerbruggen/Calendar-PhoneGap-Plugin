@@ -19,7 +19,6 @@
 - (void)createCalendar:(CDVInvokedUrlCommand*)command;
 - (void)deleteCalendar:(CDVInvokedUrlCommand*)command;
 
-- (void)createEvent:(CDVInvokedUrlCommand*)command;
 - (void)createEventWithOptions:(CDVInvokedUrlCommand*)command;
 - (void)createEventInteractively:(CDVInvokedUrlCommand*)command;
 - (void)createEventInNamedCalendar:(CDVInvokedUrlCommand*)command;

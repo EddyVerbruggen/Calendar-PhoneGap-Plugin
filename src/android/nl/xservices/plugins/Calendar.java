@@ -21,7 +21,6 @@ import org.json.JSONObject;
 import java.util.Date;
 
 public class Calendar extends CordovaPlugin {
-  public static final String ACTION_CREATE_EVENT = "createEvent";
   public static final String ACTION_CREATE_EVENT_WITH_OPTIONS = "createEventWithOptions";
   public static final String ACTION_CREATE_EVENT_INTERACTIVELY = "createEventInteractively";
   public static final String ACTION_DELETE_EVENT = "deleteEvent";
@@ -40,7 +39,7 @@ public class Calendar extends CordovaPlugin {
     callback = callbackContext;
     // TODO this plugin may work fine on 3.0 devices, but have not tested it yet, so to be sure:
     final boolean hasLimitedSupport = Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH;
-    if (ACTION_CREATE_EVENT.equals(action) || ACTION_CREATE_EVENT_WITH_OPTIONS.equals(action)) {
+    if (ACTION_CREATE_EVENT_WITH_OPTIONS.equals(action)) {
       if (hasLimitedSupport) {
         // TODO investigate this option some day: http://stackoverflow.com/questions/3721963/how-to-add-calendar-events-in-android
         return createEventInteractively(args);
