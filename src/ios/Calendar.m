@@ -501,11 +501,16 @@
     NSString *callbackId = command.callbackId;
     NSDictionary* options = [command.arguments objectAtIndex:0];
     NSString* calendarName = [options objectForKey:@"calendarName"];
-    
+    NSString* hexColor = [options objectForKey:@"calendarColor"];
+
     EKCalendar *cal = [self findEKCalendar:calendarName];
     if (cal == nil) {
         cal = [EKCalendar calendarWithEventStore:self.eventStore];
         cal.title = calendarName;
+        if (hexColor != (id)[NSNull null]) {
+            UIColor *theColor = [self colorFromHexString:hexColor];
+            cal.CGColor = theColor.CGColor;
+        }
         cal.source = [self findEKSource];
 
         // if the user did not allow permission to access the calendar, the error Object will be filled
@@ -526,6 +531,15 @@
         CDVPluginResult* result = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsString:@"OK, Calendar already exists"];
         [self writeJavascript:[result toSuccessCallbackString:callbackId]];
     }
+}
+
+// Assumes input like "#00FF00" (#RRGGBB)
+- (UIColor *)colorFromHexString:(NSString *)hexString {
+    unsigned rgbValue = 0;
+    NSScanner *scanner = [NSScanner scannerWithString:hexString];
+    [scanner setScanLocation:1]; // bypass '#' character
+    [scanner scanHexInt:&rgbValue];
+    return [UIColor colorWithRed:((rgbValue & 0xFF0000) >> 16)/255.0 green:((rgbValue & 0xFF00) >> 8)/255.0 blue:(rgbValue & 0xFF)/255.0 alpha:1.0];
 }
 
 -(void)deleteCalendar:(CDVInvokedUrlCommand*)command {

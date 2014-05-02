@@ -2,10 +2,30 @@
 function Calendar() {
 }
 
-Calendar.prototype.createCalendar = function (calendarName, successCallback, errorCallback) {
-  cordova.exec(successCallback, errorCallback, "Calendar", "createCalendar", [{
-    "calendarName": calendarName
-  }]);
+Calendar.prototype.getCreateCalendarOptions = function () {
+  return {
+    calendarName: null,
+    calendarColor: null // optional, the OS will choose one if left empty, example: pass "#FF0000" for red
+  };
+};
+
+Calendar.prototype.createCalendar = function (calendarNameOrOptionsObject, successCallback, errorCallback) {
+  var options;
+  if (typeof calendarNameOrOptionsObject == "string") {
+    options = {
+      "calendarName": calendarNameOrOptionsObject
+    };
+  } else {
+    options = calendarNameOrOptionsObject;
+  }
+  // merge passed options with defaults
+  var mergedOptions = Calendar.prototype.getCreateCalendarOptions();
+  for (var val in options) {
+    if (options.hasOwnProperty(val)) {
+        mergedOptions[val] = options[val];
+    }
+  }
+  cordova.exec(successCallback, errorCallback, "Calendar", "createCalendar", [mergedOptions]);
 };
 
 Calendar.prototype.deleteCalendar = function (calendarName, successCallback, errorCallback) {
