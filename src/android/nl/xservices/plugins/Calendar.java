@@ -27,6 +27,7 @@ public class Calendar extends CordovaPlugin {
   public static final String ACTION_FIND_EVENT = "findEvent";
   public static final String ACTION_LIST_EVENTS_IN_RANGE = "listEventsInRange";
   public static final String ACTION_LIST_CALENDARS = "listCalendars";
+  public static final String ACTION_CREATE_CALENDAR = "createCalendar";
 
   public static final Integer RESULT_CODE_CREATE = 0;
 
@@ -54,8 +55,10 @@ public class Calendar extends CordovaPlugin {
       return findEvents(args);
     } else if (!hasLimitedSupport && ACTION_DELETE_EVENT.equals(action)) {
       return deleteEvent(args);
-    } else if (!hasLimitedSupport && ACTION_LIST_CALENDARS.equals(action)) {
+    } else if (ACTION_LIST_CALENDARS.equals(action)) {
       return listCalendars();
+//    } else if (!hasLimitedSupport && ACTION_CREATE_CALENDAR.equals(action)) {
+//      return createCalendar(args);
     }
     return false;
   }
@@ -66,6 +69,29 @@ public class Calendar extends CordovaPlugin {
     callback.sendPluginResult(res);
     return true;
   }
+
+  // note: not quite ready for primetime yet
+  private boolean createCalendar(JSONArray args) {
+    if (args.length() == 0) {
+      System.err.println("Exception: No Arguments passed");
+    } else {
+      try {
+        JSONObject jsonFilter = args.getJSONObject(0);
+        final String calendarName = jsonFilter.getString("calendarName");
+
+        getCalendarAccessor().createCalendar(calendarName);
+
+        PluginResult res = new PluginResult(PluginResult.Status.OK, "yes");
+        res.setKeepCallback(true);
+        callback.sendPluginResult(res);
+        return true;
+      } catch (JSONException e) {
+        System.err.println("Exception: " + e.getMessage());
+      }
+    }
+    return false;
+  }
+
 
   private boolean createEventInteractively(JSONArray args) throws JSONException {
     final JSONObject jsonFilter = args.getJSONObject(0);
@@ -165,7 +191,8 @@ public class Calendar extends CordovaPlugin {
           argObject.getLong("endTime"),
           argObject.isNull("notes") ? null : argObject.getString("notes"),
           argObject.isNull("location") ? null : argObject.getString("location"),
-          argOptionsObject.isNull("firstReminderMinutes") ? null : argOptionsObject.getLong("firstReminderMinutes"));
+          argOptionsObject.isNull("firstReminderMinutes") ? null : argOptionsObject.getLong("firstReminderMinutes"),
+          argOptionsObject.isNull("secondReminderMinutes") ? null : argOptionsObject.getLong("secondReminderMinutes"));
 
       callback.success("" + status);
       return true;

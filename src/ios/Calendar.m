@@ -101,6 +101,7 @@
 
     NSDictionary* calOptions = [options objectForKey:@"options"];
     NSNumber* firstReminderMinutes = [calOptions objectForKey:@"firstReminderMinutes"];
+    NSNumber* secondReminderMinutes = [calOptions objectForKey:@"secondReminderMinutes"];
     
     NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
     NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
@@ -125,6 +126,11 @@
     
     if (firstReminderMinutes != (id)[NSNull null]) {
         EKAlarm *reminder = [EKAlarm alarmWithRelativeOffset:-1*firstReminderMinutes.intValue*60];
+        [myEvent addAlarm:reminder];
+    }
+    
+    if (secondReminderMinutes != (id)[NSNull null]) {
+        EKAlarm *reminder = [EKAlarm alarmWithRelativeOffset:-1*secondReminderMinutes.intValue*60];
         [myEvent addAlarm:reminder];
     }
     

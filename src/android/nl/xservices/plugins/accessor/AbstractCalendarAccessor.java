@@ -36,6 +36,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.CalendarContract;
 import android.text.TextUtils;
 import android.util.Log;
 import org.apache.cordova.CordovaInterface;
@@ -250,12 +251,14 @@ public abstract class AbstractCalendarAccessor {
     return calendarIds;
   }
 
-  public JSONArray getActiveCalendars() throws JSONException {
-    Cursor cursor = queryCalendars(new String[]{
-        this.getKey(KeyIndex.CALENDARS_ID),
-        this.getKey(KeyIndex.CALENDARS_NAME)
-    },
-        this.getKey(KeyIndex.CALENDARS_VISIBLE) + "=1", null, null);
+  public final JSONArray getActiveCalendars() throws JSONException {
+    Cursor cursor = queryCalendars(
+        new String[]{
+            this.getKey(KeyIndex.CALENDARS_ID),
+            this.getKey(KeyIndex.CALENDARS_NAME)
+        },
+        this.getKey(KeyIndex.CALENDARS_VISIBLE) + "=1", null, null
+    );
     JSONArray calendarsWrapper = new JSONArray();
     if (cursor.moveToFirst()) {
       do {
@@ -443,7 +446,8 @@ public abstract class AbstractCalendarAccessor {
     return nrDeletedRecords > 0;
   }
 
-  public boolean createEvent(Uri eventsUri, String title, long startTime, long endTime, String description, String location, Long firstReminderMinutes) {
+  public boolean createEvent(Uri eventsUri, String title, long startTime, long endTime, String description,
+                             String location, Long firstReminderMinutes, Long secondReminderMinutes) {
     try {
       ContentResolver cr = this.cordova.getActivity().getContentResolver();
       ContentValues values = new ContentValues();
@@ -461,12 +465,21 @@ public abstract class AbstractCalendarAccessor {
 
       Log.d(LOG_TAG, "Added to ContentResolver");
 
+      // TODO ?
       getActiveCalendarIds();
 
       if (firstReminderMinutes != null) {
         ContentValues reminderValues = new ContentValues();
         reminderValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
         reminderValues.put("minutes", firstReminderMinutes);
+        reminderValues.put("method", 1);
+        cr.insert(Uri.parse(CONTENT_PROVIDER + CONTENT_PROVIDER_PATH_REMINDERS), reminderValues);
+      }
+
+      if (secondReminderMinutes != null) {
+        ContentValues reminderValues = new ContentValues();
+        reminderValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
+        reminderValues.put("minutes", secondReminderMinutes);
         reminderValues.put("method", 1);
         cr.insert(Uri.parse(CONTENT_PROVIDER + CONTENT_PROVIDER_PATH_REMINDERS), reminderValues);
       }
@@ -477,7 +490,30 @@ public abstract class AbstractCalendarAccessor {
 
     return true;
   }
-  
+
+  public void createCalendar(String calendarName) {
+    Uri calUri = CalendarContract.Calendars.CONTENT_URI;
+    ContentValues cv = new ContentValues();
+//    cv.put(CalendarContract.Calendars.ACCOUNT_NAME, yourAccountName);
+//    cv.put(CalendarContract.Calendars.ACCOUNT_TYPE, CalendarContract.ACCOUNT_TYPE_LOCAL);
+//    cv.put(CalendarContract.Calendars.NAME, "myname");
+    cv.put(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME, calendarName);
+//    cv.put(CalendarContract.Calendars.CALENDAR_COLOR, yourColor);
+//    cv.put(CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL, CalendarContract.Calendars.CAL_ACCESS_OWNER);
+//    cv.put(CalendarContract.Calendars.OWNER_ACCOUNT, true);
+    cv.put(CalendarContract.Calendars.VISIBLE, 1);
+    cv.put(CalendarContract.Calendars.SYNC_EVENTS, 0);
+
+    calUri = calUri.buildUpon()
+//        .appendQueryParameter(CalendarContract.CALLER_IS_SYNCADAPTER, "false")
+//        .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_NAME, ACCOUNT_NAME)
+//        .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, CalendarContract.ACCOUNT_TYPE_LOCAL)
+        .build();
+
+    Uri result = this.cordova.getActivity().getApplicationContext().getContentResolver().insert(calUri, cv);
+    int i=0;
+  }
+
   public static boolean isAllDayEvent(final Date startDate, final Date endDate) {
     return
         endDate.getTime() - startDate.getTime() == (24*60*60*1000) &&
