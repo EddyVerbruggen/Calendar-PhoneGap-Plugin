@@ -36,8 +36,8 @@ Calendar.prototype.deleteCalendar = function (calendarName, successCallback, err
 
 Calendar.prototype.getCalendarOptions = function () {
   return {
-    firstReminderMinutes: 60
-//  secondReminderMinutes: null, // TODO: future support
+    firstReminderMinutes: 60,
+    secondReminderMinutes: null
 //  calendarName: null, // TODO: future support
 //  recurs: null // TODO: future support
   };
