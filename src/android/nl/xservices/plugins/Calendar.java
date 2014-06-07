@@ -227,16 +227,70 @@ public class Calendar extends CordovaPlugin {
       calendar_end.setTime(date_end);
 
       //projection of DB columns
-      String[] l_projection = new String[]{"title", "dtstart", "dtend", "eventLocation", "allDay"};
+      String[] l_projection = new String[]{
+        "calendar_id", 
+        "title", 
+        "dtstart", 
+        "dtend", 
+        "eventLocation", 
+        "allDay",
+        "displayColor",
+        "description",
+        "duration",
+        "lastDate",
+        "rdate",
+        "rrule",
+        "selfAttendeeStatus"
+      };
 
       //actual query
       Cursor cursor = contentResolver.query(l_eventUri, l_projection, "( dtstart >" + calendar_start.getTimeInMillis() + " AND dtend <" + calendar_end.getTimeInMillis() + ")", null, "dtstart ASC");
 
       int i = 0;
+      JSONObject event;
+      String key;
+      int status;
+      JSONArray color;
       while (cursor.moveToNext()) {
-        result.put(i++, new JSONObject().put("title", cursor.getString(0)).put("dtstart", cursor.getLong(1)).put("dtend", cursor.getLong(2)).put("eventLocation", cursor.getString(3) != null ? cursor.getString(3) : "").put("allDay", cursor.getInt(4)));
+        event = new JSONObject();
+
+        for (int j = 0; j < l_projection.length; j++) {
+          key = l_projection[j];
+          if (key.equals("dtstart") || key.equals("dtend") || key.equals("lastDate")) {
+            event.put(key, cursor.getLong(cursor.getColumnIndex(key)));
+          }
+          else if (key.equals("displayColor")) {
+            status = cursor.getInt(cursor.getColumnIndex(key));
+            color = new JSONArray();
+            color.put(0, (status & 0x00FF0000) >> 16);
+            color.put(1, (status & 0x0000FF00) >> 8);
+            color.put(2, (status & 0x000000FF));
+            event.put(key, color);
+          }
+          else if (key.equals("allDay")) {
+            status = cursor.getInt(cursor.getColumnIndex(key));
+            event.put(key, status > 0 ? true : false);
+          }
+          else if (key.equals("selfAttendeeStatus")) {
+            status = cursor.getInt(cursor.getColumnIndex(key));
+            event.put(key, 
+              status == 1 ? "accepted"
+              : status == 2 ? "declined"
+              : status == 3 ? "invited"
+              : status == 4 ? "tentative"
+              : "none"
+            );
+          }
+          else {
+            event.put(key, cursor.getString(cursor.getColumnIndex(key)));
+          }
+        }
+
+        result.put(i++, event);
       }
-      callback.success("" + result);
+
+      PluginResult res = new PluginResult(PluginResult.Status.OK, result);
+      callback.sendPluginResult(res);
       return true;
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
