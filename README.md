@@ -139,11 +139,15 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   // create an event silently (on Android < 4 an interactive dialog is shown)
   window.plugins.calendar.createEvent(title,location,notes,startDate,endDate,success,error);
   
-  // create an event silently (on Android < 4 an interactive dialog is shown which doesn't use this options) with options.
-  // The options support only the reminders/alarms for now, but I will add more in the future:
+  // create an event silently (on Android < 4 an interactive dialog is shown which doesn't use this options) with options:
   var calOptions = window.plugins.calendar.getCalendarOptions(); // grab the defaults
   calOptions.firstReminderMinutes = 120; // default is 60, pass in null for no reminder (alarm)
   calOptions.secondReminderMinutes = 5;
+
+  // Added these options in version 4.2.4, for iOS only right now (ignored on Android):
+  calOptions.calendarName = "MyCreatedCalendar";
+  calOptions.recurrence = "monthly"; // supported are: daily, weekly, monthly, yearly
+  calOptions.recurrenceEndDate = new Date(2015,6,1,0,0,0,0,0); // leave blank to add events into infinity and beyond
   window.plugins.calendar.createEventWithOptions(title,location,notes,startDate,endDate,calOptions,success,error);
 
   // create an event interactively (only supported on Android)

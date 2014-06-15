@@ -22,7 +22,7 @@ Calendar.prototype.createCalendar = function (calendarNameOrOptionsObject, succe
   var mergedOptions = Calendar.prototype.getCreateCalendarOptions();
   for (var val in options) {
     if (options.hasOwnProperty(val)) {
-        mergedOptions[val] = options[val];
+      mergedOptions[val] = options[val];
     }
   }
   cordova.exec(successCallback, errorCallback, "Calendar", "createCalendar", [mergedOptions]);
@@ -37,16 +37,17 @@ Calendar.prototype.deleteCalendar = function (calendarName, successCallback, err
 Calendar.prototype.getCalendarOptions = function () {
   return {
     firstReminderMinutes: 60,
-    secondReminderMinutes: null
-//  calendarName: null, // TODO: future support
-//  recurs: null // TODO: future support
+    secondReminderMinutes: null,
+    recurrence: null, // options are: 'daily', 'weekly', 'monthly', 'yearly'
+    recurrenceEndDate: null,
+    calendarName: null
   };
 };
 
 /**
  * This method can be used if you want more control over the event details.
  * Pass in an options object which you can easily override as follow:
- *   var otions = window.plugins.calendar.getCalendarOptions();
+ *   var options = window.plugins.calendar.getCalendarOptions();
  *   options.firstReminderMinutes = 150;
  */
 Calendar.prototype.createEventWithOptions = function (title, location, notes, startDate, endDate, options, successCallback, errorCallback) {
@@ -61,6 +62,9 @@ Calendar.prototype.createEventWithOptions = function (title, location, notes, st
     if (options.hasOwnProperty(val)) {
       mergedOptions[val] = options[val];
     }
+  }
+  if (options.recurrenceEndDate != null) {
+    mergedOptions.recurrenceEndTime = options.recurrenceEndDate.getTime();
   }
   cordova.exec(successCallback, errorCallback, "Calendar", "createEventWithOptions", [{
     "title": title,

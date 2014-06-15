@@ -71,7 +71,7 @@
     }
     myEvent.calendar = calendar;
     
-    // TODO base on passed alarm
+    // if a custom reminder is required: use createCalendarWithOptions
     EKAlarm *reminder = [EKAlarm alarmWithRelativeOffset:-1*60*60];
     [myEvent addAlarm:reminder];
     
@@ -88,63 +88,18 @@
     }
 }
 
-- (void)createEventWithCalendarOptions:(CDVInvokedUrlCommand*)command
-                              calendar: (EKCalendar *) calendar {
-    NSString *callbackId = command.callbackId;
-    NSDictionary* options = [command.arguments objectAtIndex:0];
-    
-    NSString* title      = [options objectForKey:@"title"];
-    NSString* location   = [options objectForKey:@"location"];
-    NSString* notes      = [options objectForKey:@"notes"];
-    NSNumber* startTime  = [options objectForKey:@"startTime"];
-    NSNumber* endTime    = [options objectForKey:@"endTime"];
-
-    NSDictionary* calOptions = [options objectForKey:@"options"];
-    NSNumber* firstReminderMinutes = [calOptions objectForKey:@"firstReminderMinutes"];
-    NSNumber* secondReminderMinutes = [calOptions objectForKey:@"secondReminderMinutes"];
-    
-    NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
-    NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
-    
-    NSTimeInterval _endInterval = [endTime doubleValue] / 1000; // strip millis
-    
-    EKEvent *myEvent = [EKEvent eventWithEventStore: self.eventStore];
-    myEvent.title = title;
-    myEvent.location = location;
-    myEvent.notes = notes;
-    myEvent.startDate = myStartDate;
-    
-    int duration = _endInterval - _startInterval;
-    int moduloDay = duration % (60*60*24);
-    if (moduloDay == 0) {
-        myEvent.allDay = YES;
-        myEvent.endDate = [NSDate dateWithTimeIntervalSince1970:_endInterval-1];
-    } else {
-        myEvent.endDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
+-(EKRecurrenceFrequency) toEKRecurrenceFrequency:(NSString*) recurrence {
+    if ([recurrence isEqualToString:@"daily"]) {
+        return EKRecurrenceFrequencyDaily;
+    } else if ([recurrence isEqualToString:@"weekly"]) {
+        return EKRecurrenceFrequencyWeekly;
+    } else if ([recurrence isEqualToString:@"monthly"]) {
+        return EKRecurrenceFrequencyMonthly;
+    } else if ([recurrence isEqualToString:@"yearly"]) {
+        return EKRecurrenceFrequencyYearly;
     }
-    myEvent.calendar = calendar;
-    
-    if (firstReminderMinutes != (id)[NSNull null]) {
-        EKAlarm *reminder = [EKAlarm alarmWithRelativeOffset:-1*firstReminderMinutes.intValue*60];
-        [myEvent addAlarm:reminder];
-    }
-    
-    if (secondReminderMinutes != (id)[NSNull null]) {
-        EKAlarm *reminder = [EKAlarm alarmWithRelativeOffset:-1*secondReminderMinutes.intValue*60];
-        [myEvent addAlarm:reminder];
-    }
-    
-    NSError *error = nil;
-    [self.eventStore saveEvent:myEvent span:EKSpanThisEvent error:&error];
-    
-    if (error) {
-        CDVPluginResult * pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.userInfo.description];
-        [self writeJavascript:[pluginResult toErrorCallbackString:callbackId]];
-    } else {
-        NSLog(@"Reached Success");
-        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-        [self writeJavascript:[pluginResult toSuccessCallbackString:callbackId]];
-    }
+    // default to daily, so invoke this method only when recurrence is set
+    return EKRecurrenceFrequencyDaily;
 }
 
 -(void)modifyEventWithCalendar:(CDVInvokedUrlCommand*)command
@@ -345,16 +300,96 @@
 }
 
 - (void)listEventsInRange:(CDVInvokedUrlCommand*)command {
-    
 }
 
 - (void)createEventWithOptions:(CDVInvokedUrlCommand*)command {
-    EKCalendar* calendar = self.eventStore.defaultCalendarForNewEvents;
-    if (calendar == nil) {
-        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No default calendar found. Is access to the Calendar blocked for this app?"];
-        [self writeJavascript:[result toErrorCallbackString:command.callbackId]];
+    NSString *callbackId = command.callbackId;
+    NSDictionary* options = [command.arguments objectAtIndex:0];
+    
+    NSString* title      = [options objectForKey:@"title"];
+    NSString* location   = [options objectForKey:@"location"];
+    NSString* notes      = [options objectForKey:@"notes"];
+    NSNumber* startTime  = [options objectForKey:@"startTime"];
+    NSNumber* endTime    = [options objectForKey:@"endTime"];
+    
+    NSDictionary* calOptions = [options objectForKey:@"options"];
+    NSNumber* firstReminderMinutes = [calOptions objectForKey:@"firstReminderMinutes"];
+    NSNumber* secondReminderMinutes = [calOptions objectForKey:@"secondReminderMinutes"];
+    NSString* recurrence = [calOptions objectForKey:@"recurrence"];
+    NSString* recurrenceEndTime = [calOptions objectForKey:@"recurrenceEndTime"];
+    NSString* calendarName = [calOptions objectForKey:@"calendarName"];
+    
+    NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
+    NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
+    
+    NSTimeInterval _endInterval = [endTime doubleValue] / 1000; // strip millis
+    
+    EKEvent *myEvent = [EKEvent eventWithEventStore: self.eventStore];
+    myEvent.title = title;
+    myEvent.location = location;
+    myEvent.notes = notes;
+    myEvent.startDate = myStartDate;
+    
+    int duration = _endInterval - _startInterval;
+    int moduloDay = duration % (60*60*24);
+    if (moduloDay == 0) {
+        myEvent.allDay = YES;
+        myEvent.endDate = [NSDate dateWithTimeIntervalSince1970:_endInterval-1];
     } else {
-        [self createEventWithCalendarOptions:command calendar:calendar];
+        myEvent.endDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
+    }
+    
+    EKCalendar* calendar = nil;
+    if (calendarName == (id)[NSNull null]) {
+        calendar = self.eventStore.defaultCalendarForNewEvents;
+        if (calendar == nil) {
+            CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No default calendar found. Is access to the Calendar blocked for this app?"];
+            [self writeJavascript:[result toErrorCallbackString:command.callbackId]];
+            return;
+        }
+    } else {
+        calendar = [self findEKCalendar:calendarName];
+        if (calendar == nil) {
+            CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Could not find calendar"];
+            [self writeJavascript:[result toErrorCallbackString:command.callbackId]];
+            return;
+        }
+    }
+    myEvent.calendar = calendar;
+    
+    if (firstReminderMinutes != (id)[NSNull null]) {
+        EKAlarm *reminder = [EKAlarm alarmWithRelativeOffset:-1*firstReminderMinutes.intValue*60];
+        [myEvent addAlarm:reminder];
+    }
+    
+    if (secondReminderMinutes != (id)[NSNull null]) {
+        EKAlarm *reminder = [EKAlarm alarmWithRelativeOffset:-1*secondReminderMinutes.intValue*60];
+        [myEvent addAlarm:reminder];
+    }
+    
+    if (recurrence != (id)[NSNull null]) {
+        EKRecurrenceRule *rule = [[EKRecurrenceRule alloc] initRecurrenceWithFrequency: [self toEKRecurrenceFrequency:recurrence]
+                                                                              interval: 1
+                                                                                   end: nil];
+        if (recurrenceEndTime != (id)[NSNull null]) {
+            NSTimeInterval _recurrenceEndTimeInterval = [recurrenceEndTime doubleValue] / 1000; // strip millis
+            NSDate *myRecurrenceEndDate = [NSDate dateWithTimeIntervalSince1970:_recurrenceEndTimeInterval];
+            EKRecurrenceEnd *end = [EKRecurrenceEnd recurrenceEndWithEndDate:myRecurrenceEndDate];
+            rule.recurrenceEnd = end;
+        }
+        [myEvent addRecurrenceRule:rule];
+    }
+    
+    NSError *error = nil;
+    [self.eventStore saveEvent:myEvent span:EKSpanThisEvent error:&error];
+    
+    if (error) {
+        CDVPluginResult * pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.userInfo.description];
+        [self writeJavascript:[pluginResult toErrorCallbackString:callbackId]];
+    } else {
+        NSLog(@"Reached Success");
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self writeJavascript:[pluginResult toSuccessCallbackString:callbackId]];
     }
 }
 
@@ -508,7 +543,7 @@
     NSDictionary* options = [command.arguments objectAtIndex:0];
     NSString* calendarName = [options objectForKey:@"calendarName"];
     NSString* hexColor = [options objectForKey:@"calendarColor"];
-
+    
     EKCalendar *cal = [self findEKCalendar:calendarName];
     if (cal == nil) {
         cal = [EKCalendar calendarWithEventStore:self.eventStore];
@@ -518,10 +553,10 @@
             cal.CGColor = theColor.CGColor;
         }
         cal.source = [self findEKSource];
-
+        
         // if the user did not allow permission to access the calendar, the error Object will be filled
         NSError* error;
-        [self.eventStore saveCalendar:cal commit:YES error:&error];
+        BOOL created = [self.eventStore saveCalendar:cal commit:YES error:&error];
         if (error == nil) {
             NSLog(@"created calendar: %@", cal.title);
             CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
