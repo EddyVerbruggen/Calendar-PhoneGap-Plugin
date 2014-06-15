@@ -144,10 +144,10 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   calOptions.firstReminderMinutes = 120; // default is 60, pass in null for no reminder (alarm)
   calOptions.secondReminderMinutes = 5;
 
-  // Added these options in version 4.2.4, for iOS only right now (ignored on Android):
-  calOptions.calendarName = "MyCreatedCalendar";
+  // Added these options in version 4.2.4:
   calOptions.recurrence = "monthly"; // supported are: daily, weekly, monthly, yearly
-  calOptions.recurrenceEndDate = new Date(2015,6,1,0,0,0,0,0); // leave blank to add events into infinity and beyond
+  calOptions.recurrenceEndDate = new Date(2015,6,1,0,0,0,0,0); // leave null to add events into infinity and beyond
+  calOptions.calendarName = "MyCreatedCalendar"; // iOS only
   window.plugins.calendar.createEventWithOptions(title,location,notes,startDate,endDate,calOptions,success,error);
 
   // create an event interactively (only supported on Android)

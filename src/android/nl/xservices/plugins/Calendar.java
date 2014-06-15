@@ -192,7 +192,10 @@ public class Calendar extends CordovaPlugin {
           argObject.isNull("notes") ? null : argObject.getString("notes"),
           argObject.isNull("location") ? null : argObject.getString("location"),
           argOptionsObject.isNull("firstReminderMinutes") ? null : argOptionsObject.getLong("firstReminderMinutes"),
-          argOptionsObject.isNull("secondReminderMinutes") ? null : argOptionsObject.getLong("secondReminderMinutes"));
+          argOptionsObject.isNull("secondReminderMinutes") ? null : argOptionsObject.getLong("secondReminderMinutes"),
+          argOptionsObject.isNull("recurrence") ? null : argOptionsObject.getString("recurrence"),
+          argOptionsObject.isNull("recurrenceEndTime") ? null : argOptionsObject.getLong("recurrenceEndTime")
+      );
 
       callback.success("" + status);
       return true;
@@ -235,14 +238,14 @@ public class Calendar extends CordovaPlugin {
       int i = 0;
       while (cursor.moveToNext()) {
         result.put(
-          i++, 
-          new JSONObject()
-            .put("calendar_id", cursor.getString(cursor.getColumnIndex("calendar_id")))
-            .put("title", cursor.getString(cursor.getColumnIndex("title")))
-            .put("dtstart", cursor.getLong(cursor.getColumnIndex("dtstart")))
-            .put("dtend", cursor.getLong(cursor.getColumnIndex("dtend")))
-            .put("eventLocation", cursor.getString(cursor.getColumnIndex("eventLocation")) != null ? cursor.getString(cursor.getColumnIndex("eventLocation")) : "")
-            .put("allDay", cursor.getInt(cursor.getColumnIndex("allDay")))
+            i++,
+            new JSONObject()
+                .put("calendar_id", cursor.getString(cursor.getColumnIndex("calendar_id")))
+                .put("title", cursor.getString(cursor.getColumnIndex("title")))
+                .put("dtstart", cursor.getLong(cursor.getColumnIndex("dtstart")))
+                .put("dtend", cursor.getLong(cursor.getColumnIndex("dtend")))
+                .put("eventLocation", cursor.getString(cursor.getColumnIndex("eventLocation")) != null ? cursor.getString(cursor.getColumnIndex("eventLocation")) : "")
+                .put("allDay", cursor.getInt(cursor.getColumnIndex("allDay")))
         );
       }
 

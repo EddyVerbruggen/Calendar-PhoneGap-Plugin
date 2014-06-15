@@ -447,7 +447,8 @@ public abstract class AbstractCalendarAccessor {
   }
 
   public boolean createEvent(Uri eventsUri, String title, long startTime, long endTime, String description,
-                             String location, Long firstReminderMinutes, Long secondReminderMinutes) {
+                             String location, Long firstReminderMinutes, Long secondReminderMinutes,
+                             String recurrence, Long recurrenceEndTime) {
     try {
       ContentResolver cr = this.cordova.getActivity().getContentResolver();
       ContentValues values = new ContentValues();
@@ -461,6 +462,16 @@ public abstract class AbstractCalendarAccessor {
       values.put(Events.HAS_ALARM, 1);
       values.put(Events.CALENDAR_ID, 1);
       values.put(Events.EVENT_LOCATION, location);
+
+      if (recurrence != null) {
+        if (recurrenceEndTime == null) {
+          values.put(Events.RRULE, "FREQ=" + recurrence.toUpperCase());
+        } else {
+          final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+          values.put(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";UNTIL=" + sdf.format(new Date(recurrenceEndTime)));
+        }
+      }
+
       Uri uri = cr.insert(eventsUri, values);
 
       Log.d(LOG_TAG, "Added to ContentResolver");
