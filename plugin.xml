@@ -21,7 +21,10 @@
       <clobbers target="Calendar" />
    </js-module>
 
-   <!-- ios -->
+  <js-module src="test/tests.js" name="tests">
+  </js-module>
+
+  <!-- ios -->
    <platform name="ios">
       <config-file target="config.xml" parent="/*">
          <feature name="Calendar">
