@@ -41,7 +41,7 @@
 
 - (NSDictionary*)dateInfoFromStartTime:(NSNumber*)startTime andEndTime:(NSNumber*)endTime {
     NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
-    NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
+    NSDate *startDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
     
     NSTimeInterval _endInterval = [endTime doubleValue] / 1000; // strip millis
     
@@ -65,7 +65,7 @@
 }
 
 - (NSArray*)calendarsFromIds:(NSArray*)calendarIds {
-    NSMutableArray *calendars = [NSMutableArray arrayWithCapacity:[calendarIds count]]
+    NSMutableArray *calendars = [NSMutableArray arrayWithCapacity:[calendarIds count]];
     for(NSString *calendarId in calendarIds) {
         EKCalendar *c = [self.eventStore calendarWithIdentifier:calendarId];
         [calendars addObject:c];
