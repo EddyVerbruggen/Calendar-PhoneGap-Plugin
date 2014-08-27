@@ -39,6 +39,40 @@
 
 #pragma mark Helper Functions
 
+- (NSDictionary*)dateInfoFromStartTime:(NSNumber*)startTime andEndTime:(NSNumber*)endTime {
+    NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
+    NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
+    
+    NSTimeInterval _endInterval = [endTime doubleValue] / 1000; // strip millis
+    
+    int duration = _endInterval - _startInterval;
+    int moduloDay = duration % (60*60*24);
+    
+    NSDate *endDate;
+    BOOL allDay = NO;
+    if (moduloDay == 0) {
+        allDay = YES;
+        endDate = [NSDate dateWithTimeIntervalSince1970:_endInterval-1];
+    } else {
+        endDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
+    }
+    
+    return @{
+             @"startDate": startDate,
+             @"endDate": endDate,
+             @"allDay": [NSNumber numberWithBool:allDay]
+             };
+}
+
+- (NSArray*)calendarsFromIds:(NSArray*)calendarIds {
+    NSMutableArray *calendars = [NSMutableArray arrayWithCapacity:[calendarIds count]]
+    for(NSString *calendarId in calendarIds) {
+        EKCalendar *c = [self.eventStore calendarWithIdentifier:calendarId];
+        [calendars addObject:c];
+    }
+    return calendars;
+}
+
 - (void)createEventWithCalendar:(CDVInvokedUrlCommand*)command
                        calendar: (EKCalendar *) calendar {
     NSString *callbackId = command.callbackId;
@@ -50,25 +84,17 @@
     NSNumber* startTime  = [options objectForKey:@"startTime"];
     NSNumber* endTime    = [options objectForKey:@"endTime"];
     
-    NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
-    NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
-    
-    NSTimeInterval _endInterval = [endTime doubleValue] / 1000; // strip millis
-    
     EKEvent *myEvent = [EKEvent eventWithEventStore: self.eventStore];
     myEvent.title = title;
     myEvent.location = location;
     myEvent.notes = notes;
-    myEvent.startDate = myStartDate;
     
-    int duration = _endInterval - _startInterval;
-    int moduloDay = duration % (60*60*24);
-    if (moduloDay == 0) {
-        myEvent.allDay = YES;
-        myEvent.endDate = [NSDate dateWithTimeIntervalSince1970:_endInterval-1];
-    } else {
-        myEvent.endDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
-    }
+    NSDictionary *dateInfo = [self dateInfoFromStartTime:startTime andEndTime:endTime];
+    
+    myEvent.startDate = [dateInfo objectForKey:@"startDate"];
+    myEvent.endDate = [dateInfo objectForKey:@"endDate"];
+    myEvent.allDay = [[dateInfo objectForKey:@"allDay"] boolValue];
+    
     myEvent.calendar = calendar;
     
     // if a custom reminder is required: use createCalendarWithOptions
@@ -300,6 +326,27 @@
 }
 
 - (void)listEventsInRange:(CDVInvokedUrlCommand*)command {
+    NSString *callbackId = command.callbackId;
+    NSDictionary* options = [command.arguments objectAtIndex:0];
+    
+    NSDictionary* subOptions= [options objectForKey:@"options"];
+    NSNumber* startTime  = [subOptions objectForKey:@"startTime"];
+    NSNumber* endTime    = [subOptions objectForKey:@"endTime"];
+    NSArray* calendarIds  = [subOptions objectForKey:@"calendarIds"];
+    
+    NSDictionary *dateInfo = [self dateInfoFromStartTime:startTime andEndTime:endTime];
+    
+    NSDate *startDate = [dateInfo objectForKey:@"startDate"];
+    NSDate *endDate = [dateInfo objectForKey:@"endDate"];
+    
+    NSArray *calendars = [self  calendarsFromIds:calendarIds];
+    
+    NSPredicate *predicate = [self.eventStore predicateForEventsWithStartDate:startDate endDate:endDate calendars:calendars];
+    
+    NSArray *events = [self.eventStore eventsMatchingPredicate:predicate];
+    
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:events];
+    [self writeJavascript:[result toSuccessCallbackString:callbackId]];
 }
 
 - (void)createEventWithOptions:(CDVInvokedUrlCommand*)command {
@@ -318,6 +365,7 @@
     NSString* recurrence = [calOptions objectForKey:@"recurrence"];
     NSString* recurrenceEndTime = [calOptions objectForKey:@"recurrenceEndTime"];
     NSString* calendarName = [calOptions objectForKey:@"calendarName"];
+    NSString* calendarId = [calOptions objectForKey:@"calendarId"];
     
     NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
     NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
@@ -340,13 +388,23 @@
     }
     
     EKCalendar* calendar = nil;
-    if (calendarName == (id)[NSNull null]) {
+    if (calendarName != (id)[NSNull null]) {
         calendar = self.eventStore.defaultCalendarForNewEvents;
         if (calendar == nil) {
             CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No default calendar found. Is access to the Calendar blocked for this app?"];
             [self writeJavascript:[result toErrorCallbackString:command.callbackId]];
             return;
         }
+    } else if(calendarId != (id)[NSNull null]) {
+        
+        calendar = [self.eventStore calendarWithIdentifier:calendarId];
+        
+        if (calendar == nil) {
+            CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Could not find calendar id"];
+            [self writeJavascript:[result toErrorCallbackString:command.callbackId]];
+            return;
+        }
+        
     } else {
         calendar = [self findEKCalendar:calendarName];
         if (calendar == nil) {
