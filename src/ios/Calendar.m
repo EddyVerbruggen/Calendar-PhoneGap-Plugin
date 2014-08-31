@@ -329,10 +329,9 @@
     NSString *callbackId = command.callbackId;
     NSDictionary* options = [command.arguments objectAtIndex:0];
     
-    NSDictionary* subOptions= [options objectForKey:@"options"];
-    NSNumber* startTime  = [subOptions objectForKey:@"startTime"];
-    NSNumber* endTime    = [subOptions objectForKey:@"endTime"];
-    NSArray* calendarIds  = [subOptions objectForKey:@"calendarIds"];
+    NSNumber* startTime  = [options objectForKey:@"startTime"];
+    NSNumber* endTime    = [options objectForKey:@"endTime"];
+    NSArray* calendarIds  = [options objectForKey:@"calendarIds"];
     
     NSDictionary *dateInfo = [self dateInfoFromStartTime:startTime andEndTime:endTime];
     
