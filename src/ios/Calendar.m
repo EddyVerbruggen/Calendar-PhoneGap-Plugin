@@ -39,6 +39,26 @@
 
 #pragma mark Helper Functions
 
+- (NSMutableArray*)reformatEvents:(NSArray*)matchingEvents {
+    
+    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+    [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+    
+    NSMutableArray *finalResults = [[NSMutableArray alloc] initWithCapacity:matchingEvents.count];
+    
+    // Stringify the results - Cordova can't deal with Obj-C objects
+    for (EKEvent * event in matchingEvents) {
+        NSMutableDictionary *entry = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                                      event.title, @"title",
+                                      event.location, @"location",
+                                      event.notes, @"message",
+                                      [df stringFromDate:event.startDate], @"startDate",
+                                      [df stringFromDate:event.endDate], @"endDate", nil];
+        [finalResults addObject:entry];
+    }
+    return finalResults;
+}
+
 - (NSDictionary*)dateInfoFromStartTime:(NSNumber*)startTime andEndTime:(NSNumber*)endTime {
     NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
     NSDate *startDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
@@ -344,7 +364,9 @@
     
     NSArray *events = [self.eventStore eventsMatchingPredicate:predicate];
     
-    CDVPluginResult* result = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:events];
+    NSArray *formattedEvents = [self reformatEvents:events];
+    
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:formattedEvents];
     [self writeJavascript:[result toSuccessCallbackString:callbackId]];
 }
 
@@ -521,27 +543,7 @@
         NSPredicate *fetchCalendarEvents = [eventStore predicateForEventsWithStartDate:[NSDate date] endDate:endDate calendars:calendarArray];
         NSArray *matchingEvents = [eventStore eventsMatchingPredicate:fetchCalendarEvents];
         
-        NSMutableArray *finalResults = [[NSMutableArray alloc] initWithCapacity:matchingEvents.count];
-        
-        NSDateFormatter *df = [[NSDateFormatter alloc] init];
-        [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-        
-        // Stringify the results
-        for (EKEvent * event in matchingEvents) {
-            NSMutableDictionary *entry = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                                          event.title, @"title",
-                                          [df stringFromDate:event.startDate], @"startDate",
-                                          [df stringFromDate:event.endDate], @"endDate",
-                                          nil];
-            // optional fields
-            if (event.location != nil) {
-                [entry setObject:event.location forKey:@"location"];
-            }
-            if (event.notes != nil) {
-                [entry setObject:event.notes forKey:@"message"];
-            }
-            [finalResults addObject:entry];
-        }
+        NSMutableArray *finalResults = [self reformatEvents:matchingEvents];
         
         CDVPluginResult* result = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:finalResults];
         [self writeJavascript:[result toSuccessCallbackString:callbackId]];
