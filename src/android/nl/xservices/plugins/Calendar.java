@@ -163,8 +163,8 @@ public class Calendar extends CordovaPlugin {
     try {
       JSONObject jsonFilter = args.getJSONObject(0);
       JSONArray jsonEvents = getCalendarAccessor().findEvents(
-          jsonFilter.optString("title"),
-          jsonFilter.optString("location"),
+          jsonFilter.isNull("title") ? null : jsonFilter.optString("title"),
+          jsonFilter.isNull("location") ? null : jsonFilter.optString("location"),
           jsonFilter.optLong("startTime"),
           jsonFilter.optLong("endTime"));
 
