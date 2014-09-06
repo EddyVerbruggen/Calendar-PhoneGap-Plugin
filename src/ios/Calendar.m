@@ -353,12 +353,28 @@
     NSNumber* endTime    = [options objectForKey:@"endTime"];
     NSArray* calendarIds  = [options objectForKey:@"calendarIds"];
     
-    NSDictionary *dateInfo = [self dateInfoFromStartTime:startTime andEndTime:endTime];
+    NSDate *startDate, *endDate;
     
-    NSDate *startDate = [dateInfo objectForKey:@"startDate"];
-    NSDate *endDate = [dateInfo objectForKey:@"endDate"];
+    if(startTime && endTime && ![startTime isEqual:[NSNull null]] && ![endTime isEqual:[NSNull null]]) {
+        NSDictionary *dateInfo = [self dateInfoFromStartTime:startTime andEndTime:endTime];
+        
+        startDate = [dateInfo objectForKey:@"startDate"];
+        endDate = [dateInfo objectForKey:@"endDate"];
+    }
+    else {
+        const double secondsInAYear = (60.0*60.0*24.0)*365.0;
+        startDate = [NSDate dateWithTimeIntervalSinceNow:-secondsInAYear];
+        endDate = [NSDate dateWithTimeIntervalSinceNow:secondsInAYear];
+        
+        //Bug where can only fetch events from 4 years
+        //startDate = [NSDate distantPast];
+        //endDate = [NSDate distantFuture];
+    }
+
     
-    NSArray *calendars = [self  calendarsFromIds:calendarIds];
+    NSArray *calendars;
+    if(calendarIds)
+        calendars = [self calendarsFromIds:calendarIds];
     
     NSPredicate *predicate = [self.eventStore predicateForEventsWithStartDate:startDate endDate:endDate calendars:calendars];
     
