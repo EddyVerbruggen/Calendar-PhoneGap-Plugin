@@ -39,23 +39,72 @@
 
 #pragma mark Helper Functions
 
+// Assumes input like "#00FF00" (#RRGGBB)
+- (UIColor *)colorFromHexString:(NSString *)hexString {
+    unsigned rgbValue = 0;
+    NSScanner *scanner = [NSScanner scannerWithString:hexString];
+    [scanner setScanLocation:1]; // bypass '#' character
+    [scanner scanHexInt:&rgbValue];
+    return [UIColor colorWithRed:((rgbValue & 0xFF0000) >> 16)/255.0 green:((rgbValue & 0xFF00) >> 8)/255.0 blue:(rgbValue & 0xFF)/255.0 alpha:1.0];
+}
+
++ (NSString*)hexFromColor:(UIColor*)color {
+    NSString *webColor = nil;
+    
+    // This method only works for RGB colors
+    if (color &&
+        CGColorGetNumberOfComponents(color.CGColor) == 4)
+    {
+        // Get the red, green and blue components
+        const CGFloat *components = CGColorGetComponents(color.CGColor);
+        
+        // These components range from 0.0 till 1.0 and need to be converted to 0 till 255
+        CGFloat red, green, blue;
+        red = roundf(components[0] * 255.0);
+        green = roundf(components[1] * 255.0);
+        blue = roundf(components[2] * 255.0);
+        
+        // Convert with %02x (use 02 to always get two chars)
+        webColor = [[NSString alloc]initWithFormat:@"%02x%02x%02x", (int)red, (int)green, (int)blue];
+    }
+    
+    return webColor;
+}
+
 - (NSMutableArray*)reformatEvents:(NSArray*)matchingEvents {
     
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
-    [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+    [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"]; //Warning! This format is currently not supported in safari. Use a library such as "moment"
     
     NSMutableArray *finalResults = [[NSMutableArray alloc] initWithCapacity:matchingEvents.count];
     
     // Stringify the results - Cordova can't deal with Obj-C objects
     for (EKEvent * event in matchingEvents) {
-        NSMutableDictionary *entry = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                                      event.title, @"title",
-                                      event.location, @"location",
-                                      event.notes, @"message",
-                                      [df stringFromDate:event.startDate], @"startDate",
-                                      [df stringFromDate:event.endDate], @"endDate", nil];
+        
+        NSString *start = [df stringFromDate:event.startDate];
+        NSString *end = [df stringFromDate:event.endDate];
+        
+        //CGColorRef color = [event.calendar CGColor];
+        //NSString *colorString = [CIColor colorWithCGColor:color].stringRepresentation;
+        
+        NSDictionary *entry = @{
+                                @"title": event.title ? event.title : [NSNull null],
+                                @"location": event.location ? event.location : [NSNull null],
+                                @"notes": event.notes ? event.notes : [NSNull null],
+                                @"startDate": start ? start : [NSNull null],
+                                @"endDate": end ? end : [NSNull null],
+                                @"calendar": @{
+                                        @"name": [event.calendar title] ? [event.calendar title] : [NSNull null],
+                                        @"id": [event.calendar calendarIdentifier] ? [event.calendar calendarIdentifier] : [NSNull null],
+                                        //@"color": colorString,
+                                        @"allowsModify": [NSNumber numberWithBool:[event.calendar allowsContentModifications]]
+                                        }
+                                };
+        
+        end = [df stringFromDate:event.endDate];
         [finalResults addObject:entry];
     }
+    
     return finalResults;
 }
 
@@ -363,14 +412,14 @@
     }
     else {
         const double secondsInAYear = (60.0*60.0*24.0)*365.0;
-        startDate = [NSDate dateWithTimeIntervalSinceNow:-secondsInAYear];
-        endDate = [NSDate dateWithTimeIntervalSinceNow:secondsInAYear];
+        startDate = [NSDate dateWithTimeIntervalSinceNow:-2*secondsInAYear];
+        endDate = [NSDate dateWithTimeIntervalSinceNow:2*secondsInAYear];
         
         //Bug where can only fetch events from 4 years
         //startDate = [NSDate distantPast];
         //endDate = [NSDate distantFuture];
     }
-
+    
     
     NSArray *calendars;
     if(calendarIds)
@@ -647,15 +696,6 @@
         CDVPluginResult* result = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsString:@"OK, Calendar already exists"];
         [self writeJavascript:[result toSuccessCallbackString:callbackId]];
     }
-}
-
-// Assumes input like "#00FF00" (#RRGGBB)
-- (UIColor *)colorFromHexString:(NSString *)hexString {
-    unsigned rgbValue = 0;
-    NSScanner *scanner = [NSScanner scannerWithString:hexString];
-    [scanner setScanLocation:1]; // bypass '#' character
-    [scanner scanHexInt:&rgbValue];
-    return [UIColor colorWithRed:((rgbValue & 0xFF0000) >> 16)/255.0 green:((rgbValue & 0xFF00) >> 8)/255.0 blue:(rgbValue & 0xFF)/255.0 alpha:1.0];
 }
 
 -(void)deleteCalendar:(CDVInvokedUrlCommand*)command {
