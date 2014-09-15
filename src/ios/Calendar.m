@@ -73,16 +73,13 @@
 
 - (NSMutableArray*)reformatEvents:(NSArray*)matchingEvents {
     
-    NSDateFormatter *df = [[NSDateFormatter alloc] init];
-    [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"]; //Warning! This format is currently not supported in safari. Use a library such as "moment"
-    
     NSMutableArray *finalResults = [[NSMutableArray alloc] initWithCapacity:matchingEvents.count];
     
     // Stringify the results - Cordova can't deal with Obj-C objects
     for (EKEvent * event in matchingEvents) {
         
-        NSString *start = [df stringFromDate:event.startDate];
-        NSString *end = [df stringFromDate:event.endDate];
+        NSTimeInterval *start = [event.startDate timeIntervalSince1970];
+        NSTimeInterval *end = [event.endDate timeIntervalSince1970];
         
         //CGColorRef color = [event.calendar CGColor];
         //NSString *colorString = [CIColor colorWithCGColor:color].stringRepresentation;
@@ -91,8 +88,8 @@
                                 @"title": event.title ? event.title : [NSNull null],
                                 @"location": event.location ? event.location : [NSNull null],
                                 @"notes": event.notes ? event.notes : [NSNull null],
-                                @"startDate": start ? start : [NSNull null],
-                                @"endDate": end ? end : [NSNull null],
+                                @"startDate": [NSNumber numberWithDouble:start],
+                                @"endDate": [NSNumber numberWithDouble:end],
                                 @"calendar": @{
                                         @"name": [event.calendar title] ? [event.calendar title] : [NSNull null],
                                         @"id": [event.calendar calendarIdentifier] ? [event.calendar calendarIdentifier] : [NSNull null],
@@ -101,7 +98,6 @@
                                         }
                                 };
         
-        end = [df stringFromDate:event.endDate];
         [finalResults addObject:entry];
     }
     
