@@ -78,8 +78,8 @@
     // Stringify the results - Cordova can't deal with Obj-C objects
     for (EKEvent * event in matchingEvents) {
         
-        NSTimeInterval *start = [event.startDate timeIntervalSince1970];
-        NSTimeInterval *end = [event.endDate timeIntervalSince1970];
+        NSTimeInterval start = [event.startDate timeIntervalSince1970];
+        NSTimeInterval end = [event.endDate timeIntervalSince1970];
         
         //CGColorRef color = [event.calendar CGColor];
         //NSString *colorString = [CIColor colorWithCGColor:color].stringRepresentation;
