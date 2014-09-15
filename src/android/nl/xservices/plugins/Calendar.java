@@ -19,6 +19,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Date;
+import java.util.Map;
+import java.util.HashMap;
 
 public class Calendar extends CordovaPlugin {
   public static final String ACTION_CREATE_EVENT_WITH_OPTIONS = "createEventWithOptions";
