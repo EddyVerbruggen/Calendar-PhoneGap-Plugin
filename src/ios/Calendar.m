@@ -73,16 +73,13 @@
 
 - (NSMutableArray*)reformatEvents:(NSArray*)matchingEvents {
     
-    NSDateFormatter *df = [[NSDateFormatter alloc] init];
-    [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"]; //Warning! This format is currently not supported in safari. Use a library such as "moment"
-    
     NSMutableArray *finalResults = [[NSMutableArray alloc] initWithCapacity:matchingEvents.count];
     
     // Stringify the results - Cordova can't deal with Obj-C objects
     for (EKEvent * event in matchingEvents) {
         
-        NSString *start = [df stringFromDate:event.startDate];
-        NSString *end = [df stringFromDate:event.endDate];
+        NSString *start = [event.startDate timeIntervalSince1970];
+        NSString *end = [event.endDate timeIntervalSince1970];
         
         //CGColorRef color = [event.calendar CGColor];
         //NSString *colorString = [CIColor colorWithCGColor:color].stringRepresentation;
@@ -101,7 +98,6 @@
                                         }
                                 };
         
-        end = [df stringFromDate:event.endDate];
         [finalResults addObject:entry];
     }
     
