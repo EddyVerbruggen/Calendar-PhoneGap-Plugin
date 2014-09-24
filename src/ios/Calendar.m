@@ -90,6 +90,7 @@
                                 @"notes": event.notes ? event.notes : [NSNull null],
                                 @"startDate": [NSNumber numberWithDouble:start],
                                 @"endDate": [NSNumber numberWithDouble:end],
+                                @"allDay": [NSNumber numberWithBool: event.allDay],
                                 @"calendar": @{
                                         @"name": [event.calendar title] ? [event.calendar title] : [NSNull null],
                                         @"id": [event.calendar calendarIdentifier] ? [event.calendar calendarIdentifier] : [NSNull null],
@@ -110,13 +111,10 @@
     
     NSTimeInterval _endInterval = [endTime doubleValue] / 1000; // strip millis
     
-    int duration = _endInterval - _startInterval;
-    int moduloDay = duration % (60*60*24);
-    
     NSDate *endDate;
-    BOOL allDay = NO;
-    if (moduloDay == 0) {
-        allDay = YES;
+    BOOL allDay = [self isAllDayFromStartTime:[startTime doubleValue] andEndTime:[endTime doubleValue]];
+
+    if (allDay) {
         endDate = [NSDate dateWithTimeIntervalSince1970:_endInterval-1];
     } else {
         endDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
@@ -127,6 +125,26 @@
              @"endDate": endDate,
              @"allDay": [NSNumber numberWithBool:allDay]
              };
+}
+
+- (BOOL) isAllDayFromStartTime:(NSTimeInterval)startTime andEndTime:(NSTimeInterval)endTime {
+
+    NSTimeInterval _startInterval = startTime / 1000; // strip millis
+    NSDate *startDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
+    
+    NSTimeInterval _endInterval = endTime / 1000; // strip millis
+    
+    int duration = _endInterval - _startInterval;
+    int moduloDay = duration % (60*60*24);
+
+    return moduloDay == 0;
+}
+
+- (BOOL) isAllDayFromStartDate:(NSDate*)startDate andEndDate:(NSDate*)endDate {
+    NSTimeInterval startTime = [startDate timeIntervalSince1970]*1000;
+    NSTimeInterval endTime = [endDate timeIntervalSince1970]*1000;
+
+    return [self isAllDayFromStartTime:startTime andEndTime:endTime];
 }
 
 - (NSArray*)calendarsFromIds:(NSArray*)calendarIds {
