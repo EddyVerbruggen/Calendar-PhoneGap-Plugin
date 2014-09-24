@@ -106,14 +106,14 @@
     return finalResults;
 }
 
-- (NSDictionary*)dateInfoFromStartTime:(NSNumber*)startTime andEndTime:(NSNumber*)endTime {
-    NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
+- (NSDictionary*)dateInfoFromStartNumber:(NSNumber*)startNumber andEndNumber:(NSNumber*)endNumber {
+    NSTimeInterval _startInterval = [startNumber doubleValue] / 1000; // strip millis
     NSDate *startDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
     
-    NSTimeInterval _endInterval = [endTime doubleValue] / 1000; // strip millis
+    NSTimeInterval _endInterval = [endNumber doubleValue] / 1000; // strip millis
     
     NSDate *endDate;
-    BOOL allDay = [self isAllDayFromStartTime:[startTime doubleValue] andEndTime:[endTime doubleValue]];
+    BOOL allDay = [self isAllDayFromStartTime:[startNumber doubleValue] andEndTime:[endNumber doubleValue]];
 
     if (allDay) {
         endDate = [NSDate dateWithTimeIntervalSince1970:_endInterval-1];
@@ -131,8 +131,6 @@
 - (BOOL) isAllDayFromStartTime:(NSTimeInterval)startTime andEndTime:(NSTimeInterval)endTime {
 
     NSTimeInterval _startInterval = startTime / 1000; // strip millis
-    NSDate *startDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
-    
     NSTimeInterval _endInterval = endTime / 1000; // strip millis
     
     int duration = _endInterval - _startInterval;
