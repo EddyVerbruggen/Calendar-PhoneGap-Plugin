@@ -91,6 +91,7 @@
                                 @"startDate": [NSNumber numberWithDouble:start],
                                 @"endDate": [NSNumber numberWithDouble:end],
                                 @"allDay": [NSNumber numberWithBool: event.allDay],
+                                @"id": event.eventIdentifier,
                                 @"calendar": @{
                                         @"name": [event.calendar title] ? [event.calendar title] : [NSNull null],
                                         @"id": [event.calendar calendarIdentifier] ? [event.calendar calendarIdentifier] : [NSNull null],
