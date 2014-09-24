@@ -171,7 +171,7 @@
     myEvent.location = location;
     myEvent.notes = notes;
     
-    NSDictionary *dateInfo = [self dateInfoFromStartTime:startTime andEndTime:endTime];
+    NSDictionary *dateInfo = [self dateInfoFromStartNumber:startTime andEndNumber:endTime];
     
     myEvent.startDate = [dateInfo objectForKey:@"startDate"];
     myEvent.endDate = [dateInfo objectForKey:@"endDate"];
@@ -418,7 +418,7 @@
     NSDate *startDate, *endDate;
     
     if(startTime && endTime && ![startTime isEqual:[NSNull null]] && ![endTime isEqual:[NSNull null]]) {
-        NSDictionary *dateInfo = [self dateInfoFromStartTime:startTime andEndTime:endTime];
+        NSDictionary *dateInfo = [self dateInfoFromStartNumber:startTime andEndNumber:endTime];
         
         startDate = [dateInfo objectForKey:@"startDate"];
         endDate = [dateInfo objectForKey:@"endDate"];
