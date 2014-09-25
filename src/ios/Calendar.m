@@ -503,7 +503,7 @@
             calendar = self.eventStore.defaultCalendarForNewEvents;
             if (calendar == nil) {
                 CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No default calendar found. Is access to the Calendar blocked for this app?"];
-                [self writeJavascript:[result toErrorCallbackString:command.callbackId]];
+                [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
                 return;
             }
         } else if(calendarId != (id)[NSNull null]) {
@@ -512,7 +512,7 @@
             
             if (calendar == nil) {
                 CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Could not find calendar id"];
-                [self writeJavascript:[result toErrorCallbackString:command.callbackId]];
+                [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
                 return;
             }
             
@@ -520,7 +520,7 @@
             calendar = [self findEKCalendar:calendarName];
             if (calendar == nil) {
                 CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Could not find calendar"];
-                [self writeJavascript:[result toErrorCallbackString:command.callbackId]];
+                [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
                 return;
             }
         }
