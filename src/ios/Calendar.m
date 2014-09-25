@@ -397,7 +397,7 @@
         CDVPluginResult* result = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:finalResults];
 
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-    }
+    }];
 }
 
 - (void)createEventInNamedCalendar:(CDVInvokedUrlCommand*)command {
