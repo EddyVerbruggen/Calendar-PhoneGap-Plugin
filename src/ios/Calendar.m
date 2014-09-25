@@ -415,6 +415,8 @@
 
     [self.commandDelegate runInBackground:^{
 
+        NSString *callbackId = command.callbackId;
+
         NSDictionary* options = [command.arguments objectAtIndex:0];
         
         NSNumber* startTime  = [options objectForKey:@"startTime"];
@@ -453,7 +455,7 @@
         CDVPluginResult* result = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:formattedEvents];
 
         // The sendPluginResult method is thread-safe.
-        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        [self.commandDelegate sendPluginResult:result callbackId:callbackId];
     }];
 
 }
@@ -461,6 +463,8 @@
 - (void)createEventWithOptions:(CDVInvokedUrlCommand*)command {
 
     [self.commandDelegate runInBackground:^{
+
+        NSString *callbackId = command.callbackId;
 
         NSDictionary* options = [command.arguments objectAtIndex:0];
     
@@ -560,7 +564,7 @@
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         }
 
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
     }];
     
 }

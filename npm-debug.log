@@ -1,0 +1,232 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'install', '-g', 'plugman' ]
+2 info using npm@1.4.14
+3 info using node@v0.10.29
+4 verbose cache add [ 'plugman', null ]
+5 verbose cache add name=undefined spec="plugman" args=["plugman",null]
+6 verbose parsed url { protocol: null,
+6 verbose parsed url   slashes: null,
+6 verbose parsed url   auth: null,
+6 verbose parsed url   host: null,
+6 verbose parsed url   port: null,
+6 verbose parsed url   hostname: null,
+6 verbose parsed url   hash: null,
+6 verbose parsed url   search: null,
+6 verbose parsed url   query: null,
+6 verbose parsed url   pathname: 'plugman',
+6 verbose parsed url   path: 'plugman',
+6 verbose parsed url   href: 'plugman' }
+7 silly lockFile 3c17847d-plugman plugman
+8 verbose lock plugman /Users/samedi/.npm/3c17847d-plugman.lock
+9 silly lockFile 3c17847d-plugman plugman
+10 silly lockFile 3c17847d-plugman plugman
+11 verbose addNamed [ 'plugman', '' ]
+12 verbose addNamed [ null, '*' ]
+13 silly lockFile 9ad59204-plugman plugman@
+14 verbose lock plugman@ /Users/samedi/.npm/9ad59204-plugman.lock
+15 silly addNameRange { name: 'plugman', range: '*', hasData: false }
+16 verbose url raw plugman
+17 verbose url resolving [ 'https://registry.npmjs.org/', './plugman' ]
+18 verbose url resolved https://registry.npmjs.org/plugman
+19 info trying registry request attempt 1 at 23:25:34
+20 http GET https://registry.npmjs.org/plugman
+21 http 200 https://registry.npmjs.org/plugman
+22 silly registry.get cb [ 200,
+22 silly registry.get   { date: 'Thu, 25 Sep 2014 21:25:40 GMT',
+22 silly registry.get     server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+22 silly registry.get     etag: '"AGCK3SIBN8MNNSO5G2E08ZEC0"',
+22 silly registry.get     'content-type': 'application/json',
+22 silly registry.get     'cache-control': 'max-age=60',
+22 silly registry.get     'content-length': '125332',
+22 silly registry.get     'accept-ranges': 'bytes',
+22 silly registry.get     via: '1.1 varnish',
+22 silly registry.get     age: '2706',
+22 silly registry.get     'x-served-by': 'cache-fra1235-FRA',
+22 silly registry.get     'x-cache': 'HIT',
+22 silly registry.get     'x-cache-hits': '1',
+22 silly registry.get     'x-timer': 'S1411680340.489097,VS0,VE442',
+22 silly registry.get     vary: 'Accept',
+22 silly registry.get     'keep-alive': 'timeout=10, max=50',
+22 silly registry.get     connection: 'Keep-Alive' } ]
+23 silly addNameRange number 2 { name: 'plugman', range: '*', hasData: true }
+24 silly addNameRange versions [ 'plugman',
+24 silly addNameRange   [ '0.5.6',
+24 silly addNameRange     '0.5.7',
+24 silly addNameRange     '0.5.8',
+24 silly addNameRange     '0.5.9',
+24 silly addNameRange     '0.6.0',
+24 silly addNameRange     '0.6.1',
+24 silly addNameRange     '0.6.2',
+24 silly addNameRange     '0.6.3',
+24 silly addNameRange     '0.7.0',
+24 silly addNameRange     '0.7.1',
+24 silly addNameRange     '0.7.2',
+24 silly addNameRange     '0.7.3',
+24 silly addNameRange     '0.7.4',
+24 silly addNameRange     '0.7.5',
+24 silly addNameRange     '0.7.6',
+24 silly addNameRange     '0.7.7',
+24 silly addNameRange     '0.7.8',
+24 silly addNameRange     '0.7.9',
+24 silly addNameRange     '0.7.10',
+24 silly addNameRange     '0.7.11',
+24 silly addNameRange     '0.7.12',
+24 silly addNameRange     '0.7.13',
+24 silly addNameRange     '0.7.14',
+24 silly addNameRange     '0.8.0',
+24 silly addNameRange     '0.8.1',
+24 silly addNameRange     '0.8.2',
+24 silly addNameRange     '0.9.0',
+24 silly addNameRange     '0.9.1',
+24 silly addNameRange     '0.9.2',
+24 silly addNameRange     '0.9.3',
+24 silly addNameRange     '0.9.4',
+24 silly addNameRange     '0.9.5',
+24 silly addNameRange     '0.9.6',
+24 silly addNameRange     '0.9.7',
+24 silly addNameRange     '0.9.8',
+24 silly addNameRange     '0.9.9',
+24 silly addNameRange     '0.9.10',
+24 silly addNameRange     '0.9.11',
+24 silly addNameRange     '0.9.20',
+24 silly addNameRange     '0.9.21',
+24 silly addNameRange     '0.9.22',
+24 silly addNameRange     '0.9.23',
+24 silly addNameRange     '0.10.0',
+24 silly addNameRange     '0.10.1',
+24 silly addNameRange     '0.11.0',
+24 silly addNameRange     '0.12.0',
+24 silly addNameRange     '0.13.0',
+24 silly addNameRange     '0.14.0',
+24 silly addNameRange     '0.15.0',
+24 silly addNameRange     '0.16.0',
+24 silly addNameRange     '0.17.0',
+24 silly addNameRange     '0.18.0',
+24 silly addNameRange     '0.19.0',
+24 silly addNameRange     '0.20.0',
+24 silly addNameRange     '0.20.1',
+24 silly addNameRange     '0.20.2',
+24 silly addNameRange     '0.21.0',
+24 silly addNameRange     '0.22.0',
+24 silly addNameRange     '0.22.1',
+24 silly addNameRange     '0.22.2',
+24 silly addNameRange     '0.22.4',
+24 silly addNameRange     '0.22.5',
+24 silly addNameRange     '0.22.6',
+24 silly addNameRange     '0.22.7',
+24 silly addNameRange     '0.22.8',
+24 silly addNameRange     '0.22.9',
+24 silly addNameRange     '0.22.10' ] ]
+25 verbose addNamed [ 'plugman', '0.22.10' ]
+26 verbose addNamed [ '0.22.10', '0.22.10' ]
+27 silly lockFile d4079fb9-plugman-0-22-10 plugman@0.22.10
+28 verbose lock plugman@0.22.10 /Users/samedi/.npm/d4079fb9-plugman-0-22-10.lock
+29 silly lockFile 0967c6c1--org-plugman-plugman-0-22-10-tgz https://registry.npmjs.org/plugman/-/plugman-0.22.10.tgz
+30 verbose lock https://registry.npmjs.org/plugman/-/plugman-0.22.10.tgz /Users/samedi/.npm/0967c6c1--org-plugman-plugman-0-22-10-tgz.lock
+31 verbose addRemoteTarball [ 'https://registry.npmjs.org/plugman/-/plugman-0.22.10.tgz',
+31 verbose addRemoteTarball   'c6be21c9588ceef57b845c815c5096634c7c67b7' ]
+32 info retry fetch attempt 1 at 23:25:36
+33 verbose fetch to= /var/folders/cb/4vrbs47x677cnkyn34sn8mdh0000gn/T/npm-6705-aHiEMTDa/registry.npmjs.org/plugman/-/plugman-0.22.10.tgz
+34 http GET https://registry.npmjs.org/plugman/-/plugman-0.22.10.tgz
+35 http 200 https://registry.npmjs.org/plugman/-/plugman-0.22.10.tgz
+36 silly lockFile 0967c6c1--org-plugman-plugman-0-22-10-tgz https://registry.npmjs.org/plugman/-/plugman-0.22.10.tgz
+37 silly lockFile 0967c6c1--org-plugman-plugman-0-22-10-tgz https://registry.npmjs.org/plugman/-/plugman-0.22.10.tgz
+38 silly lockFile d4079fb9-plugman-0-22-10 plugman@0.22.10
+39 silly lockFile d4079fb9-plugman-0-22-10 plugman@0.22.10
+40 silly lockFile 9ad59204-plugman plugman@
+41 silly lockFile 9ad59204-plugman plugman@
+42 silly resolved [ { author: { name: 'Andrew Lunny', email: 'alunny@gmail.com' },
+42 silly resolved     name: 'plugman',
+42 silly resolved     description: 'install/uninstall Cordova plugins',
+42 silly resolved     version: '0.22.10',
+42 silly resolved     repository:
+42 silly resolved      { type: 'git',
+42 silly resolved        url: 'git://git-wip-us.apache.org/repos/asf/cordova-plugman.git' },
+42 silly resolved     bugs:
+42 silly resolved      { url: 'https://issues.apache.org/jira/browse/CB',
+42 silly resolved        email: 'dev@cordova.apache.org' },
+42 silly resolved     main: 'plugman.js',
+42 silly resolved     engines: { node: '>=0.9.9' },
+42 silly resolved     engineStrict: true,
+42 silly resolved     dependencies:
+42 silly resolved      { 'cordova-lib': '0.21.13',
+42 silly resolved        nopt: '1.0.x',
+42 silly resolved        underscore: '1.4.4',
+42 silly resolved        q: '~0.9',
+42 silly resolved        npm: '1.3.4',
+42 silly resolved        rc: '0.3.0' },
+42 silly resolved     devDependencies: { 'jasmine-node': '~1' },
+42 silly resolved     bin: { plugman: './main.js' },
+42 silly resolved     scripts: {},
+42 silly resolved     contributors:
+42 silly resolved      [ [Object],
+42 silly resolved        [Object],
+42 silly resolved        [Object],
+42 silly resolved        [Object],
+42 silly resolved        [Object],
+42 silly resolved        [Object],
+42 silly resolved        [Object],
+42 silly resolved        [Object],
+42 silly resolved        [Object],
+42 silly resolved        [Object],
+42 silly resolved        [Object] ],
+42 silly resolved     _id: 'plugman@0.22.10',
+42 silly resolved     _shasum: 'c6be21c9588ceef57b845c815c5096634c7c67b7',
+42 silly resolved     _resolved: 'https://registry.npmjs.org/plugman/-/plugman-0.22.10.tgz',
+42 silly resolved     _from: 'plugman@',
+42 silly resolved     _npmVersion: '1.4.23',
+42 silly resolved     _npmUser: { name: 'cmarcelk', email: 'cmarcelk@gmail.com' },
+42 silly resolved     maintainers:
+42 silly resolved      [ [Object],
+42 silly resolved        [Object],
+42 silly resolved        [Object],
+42 silly resolved        [Object],
+42 silly resolved        [Object],
+42 silly resolved        [Object],
+42 silly resolved        [Object],
+42 silly resolved        [Object],
+42 silly resolved        [Object],
+42 silly resolved        [Object],
+42 silly resolved        [Object] ],
+42 silly resolved     dist:
+42 silly resolved      { shasum: 'c6be21c9588ceef57b845c815c5096634c7c67b7',
+42 silly resolved        tarball: 'http://registry.npmjs.org/plugman/-/plugman-0.22.10.tgz' },
+42 silly resolved     directories: {} } ]
+43 info install plugman@0.22.10 into /usr/local/lib
+44 info installOne plugman@0.22.10
+45 info /usr/local/lib/node_modules/plugman unbuild
+46 verbose tar unpack /Users/samedi/.npm/plugman/0.22.10/package.tgz
+47 silly lockFile 816dbcda-r-local-lib-node-modules-plugman tar:///usr/local/lib/node_modules/plugman
+48 verbose lock tar:///usr/local/lib/node_modules/plugman /Users/samedi/.npm/816dbcda-r-local-lib-node-modules-plugman.lock
+49 silly lockFile 37a6d75e--npm-plugman-0-22-10-package-tgz tar:///Users/samedi/.npm/plugman/0.22.10/package.tgz
+50 verbose lock tar:///Users/samedi/.npm/plugman/0.22.10/package.tgz /Users/samedi/.npm/37a6d75e--npm-plugman-0-22-10-package-tgz.lock
+51 silly gunzTarPerm modes [ '755', '644' ]
+52 error Error: EACCES, mkdir '/usr/local/lib/node_modules/plugman'
+52 error  { [Error: EACCES, mkdir '/usr/local/lib/node_modules/plugman']
+52 error   errno: 3,
+52 error   code: 'EACCES',
+52 error   path: '/usr/local/lib/node_modules/plugman',
+52 error   fstream_type: 'Directory',
+52 error   fstream_path: '/usr/local/lib/node_modules/plugman',
+52 error   fstream_class: 'DirWriter',
+52 error   fstream_stack:
+52 error    [ '/usr/local/lib/node_modules/npm/node_modules/fstream/lib/dir-writer.js:36:23',
+52 error      '/usr/local/lib/node_modules/npm/node_modules/mkdirp/index.js:37:53',
+52 error      'Object.oncomplete (fs.js:107:15)' ] }
+53 error Please try running this command again as root/Administrator.
+54 error System Darwin 13.4.0
+55 error command "node" "/usr/local/bin/npm" "install" "-g" "plugman"
+56 error cwd /Users/samedi/Calendar-Phonegap-Plugin
+57 error node -v v0.10.29
+58 error npm -v 1.4.14
+59 error path /usr/local/lib/node_modules/plugman
+60 error fstream_path /usr/local/lib/node_modules/plugman
+61 error fstream_type Directory
+62 error fstream_class DirWriter
+63 error code EACCES
+64 error errno 3
+65 error stack Error: EACCES, mkdir '/usr/local/lib/node_modules/plugman'
+66 error fstream_stack /usr/local/lib/node_modules/npm/node_modules/fstream/lib/dir-writer.js:36:23
+66 error fstream_stack /usr/local/lib/node_modules/npm/node_modules/mkdirp/index.js:37:53
+66 error fstream_stack Object.oncomplete (fs.js:107:15)
+67 verbose exit [ 3, true ]
