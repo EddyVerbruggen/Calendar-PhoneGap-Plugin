@@ -408,6 +408,10 @@
 }
 
 - (void)listEventsInRange:(CDVInvokedUrlCommand*)command {
+    [self performSelectorInBackground:@selector(_listEventsInRange:) withObject:command];
+}
+
+-(void)_listEventsInRange:(CDVInvokedUrlCommand*)command {
     NSString *callbackId = command.callbackId;
     NSDictionary* options = [command.arguments objectAtIndex:0];
     
