@@ -449,8 +449,8 @@
     NSArray *formattedEvents = [self reformatEvents:events];
     
     CDVPluginResult* result = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:formattedEvents];
-    
-    [self performSelectorOnMainThread:@selector(writeJavascript:) withObject:[result toSuccessCallbackString:callbackId]];
+
+    [self performSelectorOnMainThread:@selector(writeJavascript:) withObject:[result toSuccessCallbackString:callbackId] waitUntilDone:NO];
 }
 
 - (void)createEventWithOptions:(CDVInvokedUrlCommand*)command {
