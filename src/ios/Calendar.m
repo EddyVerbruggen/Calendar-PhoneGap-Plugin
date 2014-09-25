@@ -408,49 +408,50 @@
 }
 
 - (void)listEventsInRange:(CDVInvokedUrlCommand*)command {
-    [self performSelectorInBackground:@selector(_listEventsInRange:) withObject:command];
-}
 
--(void)_listEventsInRange:(CDVInvokedUrlCommand*)command {
-    NSString *callbackId = command.callbackId;
-    NSDictionary* options = [command.arguments objectAtIndex:0];
-    
-    NSNumber* startTime  = [options objectForKey:@"startTime"];
-    NSNumber* endTime    = [options objectForKey:@"endTime"];
-    NSArray* calendarIds  = [options objectForKey:@"calendarIds"];
-    
-    NSDate *startDate, *endDate;
-    
-    if(startTime && endTime && ![startTime isEqual:[NSNull null]] && ![endTime isEqual:[NSNull null]]) {
-        NSDictionary *dateInfo = [self dateInfoFromStartNumber:startTime andEndNumber:endTime];
-        
-        startDate = [dateInfo objectForKey:@"startDate"];
-        endDate = [dateInfo objectForKey:@"endDate"];
-    }
-    else {
-        const double secondsInAYear = (60.0*60.0*24.0)*365.0;
-        startDate = [NSDate dateWithTimeIntervalSinceNow:-2*secondsInAYear];
-        endDate = [NSDate dateWithTimeIntervalSinceNow:2*secondsInAYear];
-        
-        //Bug where can only fetch events from 4 years
-        //startDate = [NSDate distantPast];
-        //endDate = [NSDate distantFuture];
-    }
-    
-    
-    NSArray *calendars;
-    if(calendarIds)
-        calendars = [self calendarsFromIds:calendarIds];
-    
-    NSPredicate *predicate = [self.eventStore predicateForEventsWithStartDate:startDate endDate:endDate calendars:calendars];
-    
-    NSArray *events = [self.eventStore eventsMatchingPredicate:predicate];
-    
-    NSArray *formattedEvents = [self reformatEvents:events];
-    
-    CDVPluginResult* result = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:formattedEvents];
+    [self.commandDelegate runInBackground:^{
 
-    [self performSelectorOnMainThread:@selector(writeJavascript:) withObject:[result toSuccessCallbackString:callbackId] waitUntilDone:NO];
+        NSDictionary* options = [command.arguments objectAtIndex:0];
+        
+        NSNumber* startTime  = [options objectForKey:@"startTime"];
+        NSNumber* endTime    = [options objectForKey:@"endTime"];
+        NSArray* calendarIds  = [options objectForKey:@"calendarIds"];
+        
+        NSDate *startDate, *endDate;
+        
+        if(startTime && endTime && ![startTime isEqual:[NSNull null]] && ![endTime isEqual:[NSNull null]]) {
+            NSDictionary *dateInfo = [self dateInfoFromStartNumber:startTime andEndNumber:endTime];
+            
+            startDate = [dateInfo objectForKey:@"startDate"];
+            endDate = [dateInfo objectForKey:@"endDate"];
+        }
+        else {
+            const double secondsInAYear = (60.0*60.0*24.0)*365.0;
+            startDate = [NSDate dateWithTimeIntervalSinceNow:-2*secondsInAYear];
+            endDate = [NSDate dateWithTimeIntervalSinceNow:2*secondsInAYear];
+            
+            //Bug where can only fetch events from 4 years
+            //startDate = [NSDate distantPast];
+            //endDate = [NSDate distantFuture];
+        }
+        
+        
+        NSArray *calendars;
+        if(calendarIds)
+            calendars = [self calendarsFromIds:calendarIds];
+        
+        NSPredicate *predicate = [self.eventStore predicateForEventsWithStartDate:startDate endDate:endDate calendars:calendars];
+        
+        NSArray *events = [self.eventStore eventsMatchingPredicate:predicate];
+        
+        NSArray *formattedEvents = [self reformatEvents:events];
+        
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:formattedEvents];
+
+        // The sendPluginResult method is thread-safe.
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+
 }
 
 - (void)createEventWithOptions:(CDVInvokedUrlCommand*)command {
