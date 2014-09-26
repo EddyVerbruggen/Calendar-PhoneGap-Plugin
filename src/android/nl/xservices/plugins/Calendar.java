@@ -19,6 +19,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Date;
+import java.util.Map;
+import java.util.HashMap;
 
 public class Calendar extends CordovaPlugin {
   public static final String ACTION_CREATE_EVENT_WITH_OPTIONS = "createEventWithOptions";
@@ -230,21 +232,27 @@ public class Calendar extends CordovaPlugin {
       calendar_end.setTime(date_end);
 
       //projection of DB columns
-      String[] l_projection = new String[]{"calendar_id", "title", "dtstart", "dtend", "eventLocation", "allDay"};
+      String[] l_projection = new String[]{"calendar_id", "eventColor", "title", "description", "dtstart", "dtend", "eventLocation", "allDay"};
 
       //actual query
       Cursor cursor = contentResolver.query(l_eventUri, l_projection, "( dtstart >" + calendar_start.getTimeInMillis() + " AND dtend <" + calendar_end.getTimeInMillis() + " AND deleted = 0)", null, "dtstart ASC");
 
       int i = 0;
       while (cursor.moveToNext()) {
+
+        Map calendarMap = new HashMap();
+        calendarMap.put("id", cursor.getString(cursor.getColumnIndex("calendar_id")));
+        calendarMap.put("color", cursor.getString(cursor.getColumnIndex("eventColor")));
+
         result.put(
             i++,
             new JSONObject()
-                .put("calendar_id", cursor.getString(cursor.getColumnIndex("calendar_id")))
+                .put("calendar", calendarMap)
                 .put("title", cursor.getString(cursor.getColumnIndex("title")))
-                .put("dtstart", cursor.getLong(cursor.getColumnIndex("dtstart")))
-                .put("dtend", cursor.getLong(cursor.getColumnIndex("dtend")))
-                .put("eventLocation", cursor.getString(cursor.getColumnIndex("eventLocation")) != null ? cursor.getString(cursor.getColumnIndex("eventLocation")) : "")
+                .put("notes", cursor.getString(cursor.getColumnIndex("description")))
+                .put("startDate", cursor.getLong(cursor.getColumnIndex("dtstart")))
+                .put("endDate", cursor.getLong(cursor.getColumnIndex("dtend")))
+                .put("location", cursor.getString(cursor.getColumnIndex("eventLocation")) != null ? cursor.getString(cursor.getColumnIndex("eventLocation")) : "")
                 .put("allDay", cursor.getInt(cursor.getColumnIndex("allDay")))
         );
       }

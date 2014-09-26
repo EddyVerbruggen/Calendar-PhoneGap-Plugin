@@ -185,7 +185,16 @@ Calendar.prototype.modifyEventInNamedCalendar = function (title, location, notes
 Calendar.prototype.listEventsInRange = function (startDate, endDate, successCallback, errorCallback) {
   cordova.exec(successCallback, errorCallback, "Calendar", "listEventsInRange", [{
     "startTime": startDate instanceof Date ? startDate.getTime() : null,
-    "endTime": endDate instanceof Date ? endDate.getTime() : null
+    "endTime": endDate instanceof Date ? endDate.getTime() : null,
+    "calendarIds": null
+  }])
+};
+
+Calendar.prototype.listEventsWithOptions = function (options, successCallback, errorCallback) {
+  cordova.exec(successCallback, errorCallback, "Calendar", "listEventsInRange", [{
+    "startTime": options.startDate instanceof Date ? options.startDate.getTime() : null,
+    "endTime": options.endDate instanceof Date ? options.endDate.getTime() : null,
+    "calendarIds": options.calendarIds
   }])
 };
 
