@@ -266,6 +266,49 @@
     return nil;
 }
 
+-(NSMutableArray*)eventsToDataArray: (NSArray*)matchingEvents{
+    NSMutableArray *results = [[NSMutableArray alloc] initWithCapacity:matchingEvents.count];
+    
+    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+    [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+    
+    for (EKEvent * event in matchingEvents) {
+        NSMutableDictionary *entry = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                                      event.title, @"title",
+                                      [df stringFromDate:event.startDate], @"startDate",
+                                      [df stringFromDate:event.endDate], @"endDate",
+                                      nil];
+        // optional fields
+        if (event.location != nil) {
+            [entry setObject:event.location forKey:@"location"];
+        }
+        if (event.notes != nil) {
+            [entry setObject:event.notes forKey:@"message"];
+        }
+        if (event.attendees != nil) {
+            NSMutableArray * attendees = [[NSMutableArray alloc] init];
+            for (EKParticipant * participant in event.attendees) {
+                
+                NSString *role = [[NSArray arrayWithObjects:@"Unknown", @"Required", @"Optional", @"Chair", @"Non Participant", nil] objectAtIndex:participant.participantStatus];
+                NSString *status = [[NSArray arrayWithObjects:@"Unknown", @"Pending", @"Accepted", @"Declined", @"Tentative", @"Delegated", @"Completed", @"In Process", nil] objectAtIndex:participant.participantStatus];
+                NSString *type = [[NSArray arrayWithObjects:@"Unknown", @"Person", @"Room", @"Resource", @"Group", nil] objectAtIndex:participant.participantStatus];
+                
+                NSMutableDictionary *attendeeEntry = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                                                      participant.name, @"name",
+                                                      [participant.URL absoluteString], @"URL",
+                                                      status, @"status",
+                                                      type, @"type",
+                                                      role, @"role",
+                                                      nil];
+                [attendees addObject:attendeeEntry];
+            }
+            [entry setObject:attendees forKey:@"attendees"];
+        }
+        [results addObject:entry];
+    }
+    return results;
+}
+
 #pragma mark Cordova functions
 
 - (void)listCalendars:(CDVInvokedUrlCommand*)command {
@@ -463,30 +506,8 @@
         NSArray *calendarArray = [NSArray arrayWithObject:calendar];
         NSPredicate *fetchCalendarEvents = [eventStore predicateForEventsWithStartDate:[NSDate date] endDate:endDate calendars:calendarArray];
         NSArray *matchingEvents = [eventStore eventsMatchingPredicate:fetchCalendarEvents];
-        
-        NSMutableArray *finalResults = [[NSMutableArray alloc] initWithCapacity:matchingEvents.count];
-        
-        NSDateFormatter *df = [[NSDateFormatter alloc] init];
-        [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-        
-        // Stringify the results
-        for (EKEvent * event in matchingEvents) {
-            NSMutableDictionary *entry = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                                          event.title, @"title",
-                                          [df stringFromDate:event.startDate], @"startDate",
-                                          [df stringFromDate:event.endDate], @"endDate",
-                                          nil];
-            // optional fields
-            if (event.location != nil) {
-                [entry setObject:event.location forKey:@"location"];
-            }
-            if (event.notes != nil) {
-                [entry setObject:event.notes forKey:@"message"];
-            }
-            [finalResults addObject:entry];
-        }
-        
-        CDVPluginResult* result = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:finalResults];
+        NSMutableArray * eventsDataArray = [self eventsToDataArray:matchingEvents];
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:eventsDataArray];
         [self writeJavascript:[result toSuccessCallbackString:callbackId]];
     }
 }
@@ -509,30 +530,14 @@
     NSTimeInterval _endInterval = [endTime doubleValue] / 1000; // strip millis
     NSDate *myEndDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
     
-    NSDateFormatter *df = [[NSDateFormatter alloc] init];
-    [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-    
     EKCalendar* calendar = self.eventStore.defaultCalendarForNewEvents;
     if (calendar == nil) {
         CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No default calendar found. Is access to the Calendar blocked for this app?"];
         [self writeJavascript:[result toErrorCallbackString:command.callbackId]];
     } else {
         NSArray *matchingEvents = [self findEKEventsWithTitle:title location:location notes:notes startDate:myStartDate endDate:myEndDate calendar:calendar];
-        
-        NSMutableArray *finalResults = [[NSMutableArray alloc] initWithCapacity:matchingEvents.count];
-        
-        // Stringify the results - Cordova can't deal with Obj-C objects
-        for (EKEvent * event in matchingEvents) {
-            NSMutableDictionary *entry = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                                          event.title, @"title",
-                                          event.location, @"location",
-                                          event.notes, @"message",
-                                          [df stringFromDate:event.startDate], @"startDate",
-                                          [df stringFromDate:event.endDate], @"endDate", nil];
-            [finalResults addObject:entry];
-        }
-        
-        CDVPluginResult* result = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:finalResults];
+        NSMutableArray * eventsDataArray = [self eventsToDataArray:matchingEvents];
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:eventsDataArray];
         [self writeJavascript:[result toSuccessCallbackString:callbackId]];
     }
 }
