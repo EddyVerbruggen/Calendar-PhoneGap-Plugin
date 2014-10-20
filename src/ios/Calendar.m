@@ -319,9 +319,11 @@
     
     NSMutableArray *finalResults = [[NSMutableArray alloc] initWithCapacity:calendars.count];
     for (EKCalendar *thisCalendar in calendars){
+        NSString *type = [[NSArray arrayWithObjects:@"Local", @"Exchange", @"CalDAV", @"MobileMe", @"Subscribed", @"Birthdays", nil] objectAtIndex:thisCalendar.type];
         NSMutableDictionary *entry = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                       thisCalendar.calendarIdentifier, @"id",
                                       thisCalendar.title, @"name",
+                                      type, @"type",
                                       nil];
         [finalResults addObject:entry];
     }
