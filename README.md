@@ -163,7 +163,7 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   // create an event in a named calendar (iOS only for now)
   window.plugins.calendar.createEventInNamedCalendar(title,location,notes,startDate,endDate,calendarName,success,error);
 
-  // find events
+  // find events (on iOS this includes a list of attendees (if any))
   window.plugins.calendar.findEvent(title,location,notes,startDate,endDate,success,error);
 
   // list all events in a date range (only supported on Android for now)
@@ -172,7 +172,7 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   // list all calendar names - returns this JS Object to the success callback: [{"id":"1", "name":"first"}, ..]
   window.plugins.calendar.listCalendars(success,error);
 
-  // find all events in a named calendar (iOS only for now)
+  // find all events in a named calendar (iOS only for now, this includes a list of attendees (if any))
   window.plugins.calendar.findAllEventsInNamedCalendar(calendarName,success,error);
 
   // change an event (iOS only for now)
