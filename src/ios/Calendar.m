@@ -221,18 +221,10 @@
         [predicateString appendString:[NSString stringWithFormat:@"title == '%@'", title]];
     }
     if (location != (id)[NSNull null] && location.length > 0) {
-    
-    	if (predicateString.length > 0) {
-            [predicateString appendString:@" AND "];
-    	}    
-        [predicateString appendString:[NSString stringWithFormat:@"location == '%@'", location]];
+        [predicateString appendString:[NSString stringWithFormat:@" AND location == '%@'", location]];
     }
     if (notes != (id)[NSNull null] && notes.length > 0) {
-    
-    	if (predicateString.length > 0) {
-            [predicateString appendString:@" AND "];
-    	}
-        [predicateString appendString:[NSString stringWithFormat:@"notes == '%@'", notes]];
+        [predicateString appendString:[NSString stringWithFormat:@" AND notes == '%@'", notes]];
     }
     
     NSPredicate *matches = [NSPredicate predicateWithFormat:predicateString];
