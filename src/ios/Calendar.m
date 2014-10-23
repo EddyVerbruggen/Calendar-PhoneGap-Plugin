@@ -217,23 +217,19 @@
     
     // Build up a predicateString - this means we only query a parameter if we actually had a value in it
     NSMutableString *predicateString= [[NSMutableString alloc] initWithString:@""];
+    
+    NSMutableArray *predicateStrings = [NSMutableArray arrayWithCapacity:3];
     if (title != (id)[NSNull null] && title.length > 0) {
-        [predicateString appendString:[NSString stringWithFormat:@"title == '%@'", title]];
+        [predicateStrings addObject:[NSString stringWithFormat:@"title == '%@'", title]];
     }
     if (location != (id)[NSNull null] && location.length > 0) {
-    
-    	if (predicateString.length > 0) {
-            [predicateString appendString:@" AND "];
-    	}    
-        [predicateString appendString:[NSString stringWithFormat:@"location == '%@'", location]];
+        [predicateStrings addObject:[NSString stringWithFormat:@"location == '%@'", location]];
     }
     if (notes != (id)[NSNull null] && notes.length > 0) {
-    
-    	if (predicateString.length > 0) {
-            [predicateString appendString:@" AND "];
-    	}
-        [predicateString appendString:[NSString stringWithFormat:@"notes == '%@'", notes]];
+        [predicateStrings addObject:[NSString stringWithFormat:@"notes == '%@'", notes]];
     }
+    
+    NSString *predicateString = [predicateStrings componentsJoinedByString:@" AND "];
     
     NSPredicate *matches = [NSPredicate predicateWithFormat:predicateString];
     
