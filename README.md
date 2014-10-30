@@ -179,7 +179,7 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   var newTitle = "New title!";
   window.plugins.calendar.modifyEvent(title,location,notes,startDate,endDate,newTitle,location,notes,startDate,endDate,success,error);
 
-  // delete an event (you can pass nulls for irrelevant parameters, note that on Android `notes` is ignored)
+  // delete an event (you can pass nulls for irrelevant parameters, note that on Android `notes` is ignored). The dates are mandatory and represent a date range to delete events in.
   window.plugins.calendar.deleteEvent(newTitle,location,notes,startDate,endDate,success,error);
   
   // open the calendar app (added in 4.2.8):

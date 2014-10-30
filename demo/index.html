@@ -39,6 +39,7 @@
     <button onclick="listCalendars()">list calendars</button><br/><br/>
     <button onclick="createCalendar()">create calendar</button><br/><br/>
     <button onclick="createCalendarEvent()">create event</button><br/><br/>
+    <button onclick="deleteEvent()">delete event</button><br/><br/>
     <button onclick="findEventWithFilter()">find event with filter</button><br/><br/>
     <button onclick="findEventNoFilter()">find event no filter</button>
   </div>
@@ -83,6 +84,10 @@
 
   function createCalendar() {
     window.plugins.calendar.createCalendar(calendarName, onSuccess, onError);
+  }
+
+  function deleteEvent() {
+    window.plugins.calendar.deleteEvent(title, loc, notes, startDate, endDate, onSuccess, onError);
   }
 
   function createCalendarEvent() {
