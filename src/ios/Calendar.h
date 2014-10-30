@@ -16,6 +16,8 @@
                          endDate: (NSDate *)endDate
                         calendar: (EKCalendar *) calendar;
 
+- (void)openCalendar:(CDVInvokedUrlCommand*)command;
+
 - (void)createCalendar:(CDVInvokedUrlCommand*)command;
 - (void)deleteCalendar:(CDVInvokedUrlCommand*)command;
 

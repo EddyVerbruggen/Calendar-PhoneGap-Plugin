@@ -317,6 +317,18 @@
 
 #pragma mark Cordova functions
 
+- (void)openCalendar:(CDVInvokedUrlCommand*)command {
+  NSDictionary* options = [command.arguments objectAtIndex:0];
+  NSNumber* date = [options objectForKey:@"date"];
+
+  NSTimeInterval _startInterval = [date doubleValue] / 1000; // strip millis
+  NSDate *openDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
+  NSInteger interval = [openDate timeIntervalSinceReferenceDate];
+
+  NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"calshow:%ld", interval]];
+  [[UIApplication sharedApplication] openURL:url];
+}
+
 - (void)listCalendars:(CDVInvokedUrlCommand*)command {
   NSArray * calendars = [self.eventStore calendarsForEntityType:EKEntityTypeEvent];
   NSMutableArray *finalResults = [[NSMutableArray alloc] initWithCapacity:calendars.count];

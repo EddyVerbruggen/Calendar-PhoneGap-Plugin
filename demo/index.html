@@ -23,7 +23,7 @@
   <meta name="format-detection" content="telephone=no"/>
   <meta name="msapplication-tap-highlight" content="no"/>
   <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
-  <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi"/>
+  <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height"/>
   <link rel="stylesheet" type="text/css" href="css/index.css"/>
   <title>Hello World</title>
 </head>
@@ -35,10 +35,12 @@
     <p class="event listening">Connecting to Device</p>
 
     <p class="event received">Device is Ready</p><br/>
+    <button onclick="openCalendar()">open calendar</button><br/><br/>
     <button onclick="listCalendars()">list calendars</button><br/><br/>
     <button onclick="createCalendar()">create calendar</button><br/><br/>
     <button onclick="createCalendarEvent()">create event</button><br/><br/>
-    <button onclick="findEvent()">find event</button>
+    <button onclick="findEventWithFilter()">find event with filter</button><br/><br/>
+    <button onclick="findEventNoFilter()">find event no filter</button>
   </div>
 </div>
 <script type="text/javascript" src="cordova.js"></script>
@@ -69,6 +71,12 @@
     alert('Calendar error: ' + JSON.stringify(msg));
   }
 
+  function openCalendar() {
+    // today + 3 days
+    var d = new Date(new Date().getTime() + 3*24*60*60*1000);
+    window.plugins.calendar.openCalendar(d, onSuccess, onError);
+  }
+
   function listCalendars() {
     window.plugins.calendar.listCalendars(onSuccess, onError);
   }
@@ -81,8 +89,12 @@
     window.plugins.calendar.createEvent(title, loc, notes, startDate, endDate, onSuccess, onError);
   }
 
-  function findEvent() {
+  function findEventWithFilter() {
     window.plugins.calendar.findEvent(title, loc, notes, startDate, endDate, onSuccess, onError);
+  }
+
+  function findEventNoFilter() {
+    window.plugins.calendar.findEvent(null, null, null, startDate, endDate, onSuccess, onError);
   }
 
   window.onerror = function(msg, file, line) {

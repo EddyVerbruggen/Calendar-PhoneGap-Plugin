@@ -1,16 +1,18 @@
 package nl.xservices.plugins;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
+import android.provider.CalendarContract;
 import android.util.Log;
 import nl.xservices.plugins.accessor.AbstractCalendarAccessor;
 import nl.xservices.plugins.accessor.CalendarProviderAccessor;
 import nl.xservices.plugins.accessor.LegacyCalendarAccessor;
-import android.database.Cursor;
-import android.net.Uri;
-
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
@@ -21,6 +23,7 @@ import org.json.JSONObject;
 import java.util.Date;
 
 public class Calendar extends CordovaPlugin {
+  public static final String ACTION_OPEN_CALENDAR = "openCalendar";
   public static final String ACTION_CREATE_EVENT_WITH_OPTIONS = "createEventWithOptions";
   public static final String ACTION_CREATE_EVENT_INTERACTIVELY = "createEventInteractively";
   public static final String ACTION_DELETE_EVENT = "deleteEvent";
@@ -30,6 +33,7 @@ public class Calendar extends CordovaPlugin {
   public static final String ACTION_CREATE_CALENDAR = "createCalendar";
 
   public static final Integer RESULT_CODE_CREATE = 0;
+  public static final Integer RESULT_CODE_OPENCAL = 1;
 
   private CallbackContext callback;
 
@@ -38,9 +42,14 @@ public class Calendar extends CordovaPlugin {
   @Override
   public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
     callback = callbackContext;
-    // TODO this plugin may work fine on 3.0 devices, but have not tested it yet, so to be sure:
     final boolean hasLimitedSupport = Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH;
-    if (ACTION_CREATE_EVENT_WITH_OPTIONS.equals(action)) {
+    if (ACTION_OPEN_CALENDAR.equals(action)) {
+      if (hasLimitedSupport) {
+        return openCalendarLegacy(args);
+      } else {
+        return openCalendar(args);
+      }
+    } else if (ACTION_CREATE_EVENT_WITH_OPTIONS.equals(action)) {
       if (hasLimitedSupport) {
         // TODO investigate this option some day: http://stackoverflow.com/questions/3721963/how-to-add-calendar-events-in-android
         return createEventInteractively(args);
@@ -61,6 +70,30 @@ public class Calendar extends CordovaPlugin {
 //      return createCalendar(args);
     }
     return false;
+  }
+
+  private boolean openCalendarLegacy(JSONArray args) throws JSONException {
+    final Long millis = args.getJSONObject(0).optLong("date");
+
+    final Intent calendarIntent = new Intent();
+    calendarIntent.putExtra("beginTime", millis);
+    calendarIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+    calendarIntent.setClassName("com.android.calendar","com.android.calendar.AgendaActivity");
+    this.cordova.startActivityForResult(this, calendarIntent, RESULT_CODE_OPENCAL);
+
+    return true;
+  }
+
+  @TargetApi(14)
+  private boolean openCalendar(JSONArray args) throws JSONException {
+    final Long millis = args.getJSONObject(0).optLong("date");
+    final Uri.Builder builder = CalendarContract.CONTENT_URI.buildUpon().appendPath("time");
+    ContentUris.appendId(builder, millis);
+
+    final Intent intent = new Intent(Intent.ACTION_VIEW).setData(builder.build());
+    this.cordova.startActivityForResult(this, intent, RESULT_CODE_OPENCAL);
+
+    return true;
   }
 
   private boolean listCalendars() throws JSONException {
@@ -264,6 +297,8 @@ public class Calendar extends CordovaPlugin {
         // resultCode may be 0 (RESULT_CANCELED) even when it was created, so passing nothing is the clearest option here
         callback.success();
       }
+    } else if (requestCode == RESULT_CODE_OPENCAL) {
+      callback.success();
     } else {
       callback.error("Unable to add event (" + resultCode + ").");
     }
