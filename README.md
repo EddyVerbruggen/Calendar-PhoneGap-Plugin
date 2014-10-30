@@ -180,7 +180,7 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   window.plugins.calendar.modifyEvent(title,location,notes,startDate,endDate,newTitle,location,notes,startDate,endDate,success,error);
 
   // delete an event (you can pass nulls for irrelevant parameters, note that on Android `notes` is ignored). The dates are mandatory and represent a date range to delete events in.
-  // note that on iOS there is a bug where the timespan must not be larger than 4 years, see #102 for details
+  // note that on iOS there is a bug where the timespan must not be larger than 4 years, see issue 102 for details.. call this method multiple times if need be
   window.plugins.calendar.deleteEvent(newTitle,location,notes,startDate,endDate,success,error);
   
   // open the calendar app (added in 4.2.8):
