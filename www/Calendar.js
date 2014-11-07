@@ -36,7 +36,7 @@ Calendar.prototype.deleteCalendar = function (calendarName, successCallback, err
 
 Calendar.prototype.openCalendar = function (date, successCallback, errorCallback) {
   // default: today
-  if (!date instanceof Date) {
+  if (!(date instanceof Date)) {
     date = new Date();
   }
   cordova.exec(successCallback, errorCallback, "Calendar", "openCalendar", [{
