@@ -513,8 +513,10 @@
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
   } else {
     NSDate* endDate =  [NSDate dateWithTimeIntervalSinceNow:[[NSDate distantFuture] timeIntervalSinceReferenceDate]];
+    const double secondsInAYear = (60.0*60.0*24.0)*365.0*4;
+    NSDate* startDate =  [NSDate dateWithTimeIntervalSinceNow:-secondsInAYear];
     NSArray *calendarArray = [NSArray arrayWithObject:calendar];
-    NSPredicate *fetchCalendarEvents = [eventStore predicateForEventsWithStartDate:[NSDate date] endDate:endDate calendars:calendarArray];
+    NSPredicate *fetchCalendarEvents = [eventStore predicateForEventsWithStartDate:startDate endDate:endDate calendars:calendarArray];
     NSArray *matchingEvents = [eventStore eventsMatchingPredicate:fetchCalendarEvents];
     NSMutableArray * eventsDataArray = [self eventsToDataArray:matchingEvents];
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:eventsDataArray];
