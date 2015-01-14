@@ -217,7 +217,7 @@ public class Calendar extends CordovaPlugin {
       final JSONObject argObject = args.getJSONObject(0);
       final JSONObject argOptionsObject = argObject.getJSONObject("options");
 
-      boolean status = getCalendarAccessor().createEvent(
+      getCalendarAccessor().createEvent(
           null,
           argObject.getString("title"),
           argObject.getLong("startTime"),
@@ -230,10 +230,11 @@ public class Calendar extends CordovaPlugin {
           argOptionsObject.isNull("recurrenceEndTime") ? null : argOptionsObject.getLong("recurrenceEndTime")
       );
 
-      callback.success("" + status);
+      callback.success();
       return true;
     } catch (Exception e) {
       System.err.println("Exception: " + e.getMessage());
+      callback.error(e.getMessage());
     }
     return false;
   }

@@ -3,7 +3,7 @@
     xmlns="http://apache.org/cordova/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="nl.x-services.plugins.calendar"
-    version="4.2.8">
+    version="4.2.9">
 
    <name>Calendar</name>
 
