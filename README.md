@@ -29,7 +29,7 @@ This plugin allows you to add events to the Calendar of the mobile device.
 
 ### iOS specifics
 * Supported methods: `find`, `create`, `modify`, `delete`, ..
-* All methods work without showing the native calendar. Your app never looses control.
+* All methods work without showing the native calendar. Your app never loses control.
 * Tested on iOS 6 and 7.
 
 ### Android specifics
