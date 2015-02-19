@@ -520,7 +520,7 @@ public abstract class AbstractCalendarAccessor {
 
   public static boolean isAllDayEvent(final Date startDate, final Date endDate) {
     return
-        endDate.getTime() - startDate.getTime() == (24*60*60*1000) &&
+        ((endDate.getTime() - startDate.getTime()) % (24*60*60*1000) == 0) &&
             startDate.getHours() == 0 &&
             startDate.getMinutes() == 0 &&
             startDate.getSeconds() == 0 &&
