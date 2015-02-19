@@ -150,6 +150,17 @@ Calendar.prototype.findEvent = function (title, location, notes, startDate, endD
   }])
 };
 
+Calendar.prototype.findEventInNamedCalendar = function (title, location, notes, startDate, endDate, calendarName, successCallback, errorCallback) {
+  cordova.exec(successCallback, errorCallback, "Calendar", "findEventInNamedCalendar", [{
+    "title": title,
+    "location": location,
+    "notes": notes,
+    "startTime": startDate instanceof Date ? startDate.getTime() : null,
+    "endTime": endDate instanceof Date ? endDate.getTime() : null,
+    "calendarName": calendarName
+  }])
+};
+
 Calendar.prototype.findAllEventsInNamedCalendar = function (calendarName, successCallback, errorCallback) {
   cordova.exec(successCallback, errorCallback, "Calendar", "findAllEventsInNamedCalendar", [{
     "calendarName": calendarName
