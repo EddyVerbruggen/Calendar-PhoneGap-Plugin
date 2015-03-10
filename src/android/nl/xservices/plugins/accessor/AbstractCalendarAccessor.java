@@ -33,6 +33,7 @@
 package nl.xservices.plugins.accessor;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
@@ -196,10 +197,11 @@ public abstract class AbstractCalendarAccessor {
     List<String> selectionList = new ArrayList<String>();
 
     if (title != null) {
-      selection += Events.TITLE + "=?";
-      selectionList.add(title);
+      //selection += Events.TITLE + "=?";
+      selection += Events.TITLE + " LIKE ?";
+      selectionList.add(title+"%");
     }
-    if (location != null) {
+    if (location != null && !location.equals("")) {
       if (!"".equals(selection)) {
         selection += " AND ";
       }
@@ -442,7 +444,14 @@ public abstract class AbstractCalendarAccessor {
 
     String[] selectionArgs = new String[selectionList.size()];
     ContentResolver resolver = this.cordova.getActivity().getApplicationContext().getContentResolver();
-    int nrDeletedRecords = resolver.delete(eventsUri, where, selectionList.toArray(selectionArgs));
+    Event[] events = fetchEventInstances(title, location,startFrom, startTo);
+
+    int nrDeletedRecords = 0;
+    for (int i = 0; i < events.length; i++){
+      Uri eventUri = ContentUris.withAppendedId(eventsUri, Integer.parseInt(events[i].eventId));
+      nrDeletedRecords = resolver.delete(eventUri, null, null);
+    }
+    //int nrDeletedRecords = resolver.delete(eventsUri, where, selectionList.toArray(selectionArgs));
     return nrDeletedRecords > 0;
   }
 
