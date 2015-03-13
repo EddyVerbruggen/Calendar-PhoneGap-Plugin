@@ -447,8 +447,8 @@ public abstract class AbstractCalendarAccessor {
   }
 
   public void createEvent(Uri eventsUri, String title, long startTime, long endTime, String description,
-                             String location, Long firstReminderMinutes, Long secondReminderMinutes,
-                             String recurrence, Long recurrenceEndTime) {
+                          String location, Long firstReminderMinutes, Long secondReminderMinutes,
+                          String recurrence, Long recurrenceEndTime) {
       ContentResolver cr = this.cordova.getActivity().getContentResolver();
       ContentValues values = new ContentValues();
       final boolean allDayEvent = isAllDayEvent(new Date(startTime), new Date(endTime));
@@ -467,7 +467,7 @@ public abstract class AbstractCalendarAccessor {
           values.put(Events.RRULE, "FREQ=" + recurrence.toUpperCase());
         } else {
           final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-          values.put(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";UNTIL=" + sdf.format(new Date(recurrenceEndTime)));
+          values.put(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";UNTIL=" + sdf.format(new Date(recurrenceEndTime))+"T000000Z");
         }
       }
 
