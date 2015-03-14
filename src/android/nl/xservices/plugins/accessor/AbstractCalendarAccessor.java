@@ -411,47 +411,15 @@ public abstract class AbstractCalendarAccessor {
   }
 
   public boolean deleteEvent(Uri eventsUri, long startFrom, long startTo, String title, String location) {
-
-    // filter
-    String where = "";
-    List<String> selectionList = new ArrayList<String>();
-
-    if (title != null) {
-      where += Events.TITLE + "=?";
-      selectionList.add(title);
-    }
-    if (location != null) {
-      if (!"".equals(where)) {
-        where += " AND ";
-      }
-      where += Events.EVENT_LOCATION + "=?";
-      selectionList.add(location);
-    }
-    if (startFrom > 0) {
-      if (!"".equals(where)) {
-        where += " AND ";
-      }
-      where += Events.DTSTART + "=?";
-      selectionList.add(""+startFrom);
-    }
-    if (startTo > 0) {
-      if (!"".equals(where)) {
-        where += " AND ";
-      }
-      where += Events.DTEND + "=?";
-      selectionList.add(""+startTo);
-    }
-
-    String[] selectionArgs = new String[selectionList.size()];
     ContentResolver resolver = this.cordova.getActivity().getApplicationContext().getContentResolver();
     Event[] events = fetchEventInstances(title, location,startFrom, startTo);
-
     int nrDeletedRecords = 0;
-    for (int i = 0; i < events.length; i++){
-      Uri eventUri = ContentUris.withAppendedId(eventsUri, Integer.parseInt(events[i].eventId));
-      nrDeletedRecords = resolver.delete(eventUri, null, null);
+    if (events != null) {
+      for (Event event : events) {
+        Uri eventUri = ContentUris.withAppendedId(eventsUri, Integer.parseInt(event.eventId));
+        nrDeletedRecords = resolver.delete(eventUri, null, null);
+      }
     }
-    //int nrDeletedRecords = resolver.delete(eventsUri, where, selectionList.toArray(selectionArgs));
     return nrDeletedRecords > 0;
   }
 
