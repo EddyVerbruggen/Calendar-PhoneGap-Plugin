@@ -5,52 +5,63 @@
     id="nl.x-services.plugins.calendar"
     version="4.3.0">
 
-   <name>Calendar</name>
+  <name>Calendar</name>
 
-   <description>
-     This plugin allows you to manipulate the native calendar.
-   </description>
+  <description>
+    This plugin allows you to manipulate the native calendar.
+  </description>
 
-   <license>MIT</license>
+  <author>Eddy Verbruggen</author>
 
-   <engines>
-      <engine name="cordova" version=">=3.0.0" />
-   </engines>
+  <license>MIT</license>
 
-   <js-module src="www/Calendar.js" name="Calendar">
-      <clobbers target="Calendar" />
-   </js-module>
+  <keywords>Calendar, Agenda, Event</keywords>
+
+  <repo>https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin.git</repo>
+
+  <issue>https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin/issues</issue>
+
+  <engines>
+    <engine name="cordova" version=">=3.0.0"/>
+  </engines>
+
+  <js-module src="www/Calendar.js" name="Calendar">
+    <clobbers target="Calendar"/>
+  </js-module>
 
   <js-module src="test/tests.js" name="tests">
   </js-module>
 
   <!-- ios -->
-   <platform name="ios">
-      <config-file target="config.xml" parent="/*">
-         <feature name="Calendar">
-            <param name="ios-package" value="Calendar" />
-         </feature>
-      </config-file>
-      <header-file src="src/ios/Calendar.h" />
-      <source-file src="src/ios/Calendar.m" />
-      <framework src="EventKit.framework" />
-      <framework src="EventKitUI.framework" />
-   </platform>
-   
-   <!-- android -->
-   <platform name="android">
-      <config-file target="res/xml/config.xml" parent="/*">
-         <feature name="Calendar">
-            <param name="android-package" value="nl.xservices.plugins.Calendar" />
-         </feature>
-      </config-file>
-     <config-file target="AndroidManifest.xml" parent="/manifest">
-       <uses-permission android:name="android.permission.READ_CALENDAR"/>
-       <uses-permission android:name="android.permission.WRITE_CALENDAR"/>
-     </config-file>
-      <source-file src="src/android/nl/xservices/plugins/Calendar.java" target-dir="src/nl/xservices/plugins" />
-      <source-file src="src/android/nl/xservices/plugins/accessor/AbstractCalendarAccessor.java" target-dir="src/nl/xservices/plugins/accessor" />
-      <source-file src="src/android/nl/xservices/plugins/accessor/CalendarProviderAccessor.java" target-dir="src/nl/xservices/plugins/accessor" />
-      <source-file src="src/android/nl/xservices/plugins/accessor/LegacyCalendarAccessor.java" target-dir="src/nl/xservices/plugins/accessor" />
-   </platform>
+  <platform name="ios">
+    <config-file target="config.xml" parent="/*">
+      <feature name="Calendar">
+        <param name="ios-package" value="Calendar"/>
+      </feature>
+    </config-file>
+    <header-file src="src/ios/Calendar.h"/>
+    <source-file src="src/ios/Calendar.m"/>
+    <framework src="EventKit.framework"/>
+    <framework src="EventKitUI.framework"/>
+  </platform>
+
+  <!-- android -->
+  <platform name="android">
+    <config-file target="res/xml/config.xml" parent="/*">
+      <feature name="Calendar">
+        <param name="android-package" value="nl.xservices.plugins.Calendar"/>
+      </feature>
+    </config-file>
+    <config-file target="AndroidManifest.xml" parent="/manifest">
+      <uses-permission android:name="android.permission.READ_CALENDAR"/>
+      <uses-permission android:name="android.permission.WRITE_CALENDAR"/>
+    </config-file>
+    <source-file src="src/android/nl/xservices/plugins/Calendar.java" target-dir="src/nl/xservices/plugins"/>
+    <source-file src="src/android/nl/xservices/plugins/accessor/AbstractCalendarAccessor.java"
+                 target-dir="src/nl/xservices/plugins/accessor"/>
+    <source-file src="src/android/nl/xservices/plugins/accessor/CalendarProviderAccessor.java"
+                 target-dir="src/nl/xservices/plugins/accessor"/>
+    <source-file src="src/android/nl/xservices/plugins/accessor/LegacyCalendarAccessor.java"
+                 target-dir="src/nl/xservices/plugins/accessor"/>
+  </platform>
 </plugin>
