@@ -285,6 +285,7 @@
   for (EKEvent * event in matchingEvents) {
     NSMutableDictionary *entry = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                   event.title, @"title",
+                                  event.calendar.title, @"calendar",
                                   [df stringFromDate:event.startDate], @"startDate",
                                   [df stringFromDate:event.endDate], @"endDate",
                                   nil];
