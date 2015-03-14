@@ -213,12 +213,15 @@
 
   NSMutableArray *predicateStrings = [NSMutableArray arrayWithCapacity:3];
   if (title != (id)[NSNull null] && title.length > 0) {
+    title = [title stringByReplacingOccurrencesOfString:@"'" withString:@"\\'"];
     [predicateStrings addObject:[NSString stringWithFormat:@"title beginswith[c] '%@'", title]];
   }
   if (location != (id)[NSNull null] && location.length > 0) {
+    location = [location stringByReplacingOccurrencesOfString:@"'" withString:@"\\'"];
     [predicateStrings addObject:[NSString stringWithFormat:@"location == '%@'", location]];
   }
   if (notes != (id)[NSNull null] && notes.length > 0) {
+    notes = [notes stringByReplacingOccurrencesOfString:@"'" withString:@"\\'"];
     [predicateStrings addObject:[NSString stringWithFormat:@"notes == '%@'", notes]];
   }
 
