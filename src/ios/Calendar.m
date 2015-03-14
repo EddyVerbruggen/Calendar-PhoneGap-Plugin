@@ -213,7 +213,7 @@
 
   NSMutableArray *predicateStrings = [NSMutableArray arrayWithCapacity:3];
   if (title != (id)[NSNull null] && title.length > 0) {
-    [predicateStrings addObject:[NSString stringWithFormat:@"title == '%@'", title]];
+    [predicateString appendString:[NSString stringWithFormat:@"title beginswith[c] '%@'", title]];
   }
   if (location != (id)[NSNull null] && location.length > 0) {
     [predicateStrings addObject:[NSString stringWithFormat:@"location == '%@'", location]];
