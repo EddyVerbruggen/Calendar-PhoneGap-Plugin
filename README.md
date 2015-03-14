@@ -124,10 +124,10 @@ Basic operations, you'll want to copy-paste this for testing purposes:
 
 ```javascript
   // prep some variables
-  var startDate = new Date(2014,10,15,18,30,0,0,0); // beware: month 0 = january, 11 = december
-  var endDate = new Date(2014,10,15,19,30,0,0,0);
+  var startDate = new Date(2015,2,15,18,30,0,0,0); // beware: month 0 = january, 11 = december
+  var endDate = new Date(2015,2,15,19,30,0,0,0);
   var title = "My nice event";
-  var location = "Home";
+  var eventLocation = "Home";
   var notes = "Some notes about this event.";
   var success = function(message) { alert("Success: " + JSON.stringify(message)); };
   var error = function(message) { alert("Error: " + message); };
@@ -144,7 +144,7 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   window.plugins.calendar.deleteCalendar(calendarName,success,error);
 
   // create an event silently (on Android < 4 an interactive dialog is shown)
-  window.plugins.calendar.createEvent(title,location,notes,startDate,endDate,success,error);
+  window.plugins.calendar.createEvent(title,eventLocation,notes,startDate,endDate,success,error);
   
   // create an event silently (on Android < 4 an interactive dialog is shown which doesn't use this options) with options:
   var calOptions = window.plugins.calendar.getCalendarOptions(); // grab the defaults
@@ -153,18 +153,18 @@ Basic operations, you'll want to copy-paste this for testing purposes:
 
   // Added these options in version 4.2.4:
   calOptions.recurrence = "monthly"; // supported are: daily, weekly, monthly, yearly
-  calOptions.recurrenceEndDate = new Date(2015,6,1,0,0,0,0,0); // leave null to add events into infinity and beyond
+  calOptions.recurrenceEndDate = new Date(2015,10,1,0,0,0,0,0); // leave null to add events into infinity and beyond
   calOptions.calendarName = "MyCreatedCalendar"; // iOS only
-  window.plugins.calendar.createEventWithOptions(title,location,notes,startDate,endDate,calOptions,success,error);
+  window.plugins.calendar.createEventWithOptions(title,eventLocation,notes,startDate,endDate,calOptions,success,error);
 
   // create an event interactively
-  window.plugins.calendar.createEventInteractively(title,location,notes,startDate,endDate,success,error);
+  window.plugins.calendar.createEventInteractively(title,eventLocation,notes,startDate,endDate,success,error);
 
   // create an event in a named calendar (iOS only for now)
-  window.plugins.calendar.createEventInNamedCalendar(title,location,notes,startDate,endDate,calendarName,success,error);
+  window.plugins.calendar.createEventInNamedCalendar(title,eventLocation,notes,startDate,endDate,calendarName,success,error);
 
   // find events (on iOS this includes a list of attendees (if any))
-  window.plugins.calendar.findEvent(title,location,notes,startDate,endDate,success,error);
+  window.plugins.calendar.findEvent(title,eventLocation,notes,startDate,endDate,success,error);
 
   // list all events in a date range (only supported on Android for now)
   window.plugins.calendar.listEventsInRange(startDate,endDate,success,error);
@@ -172,16 +172,17 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   // list all calendar names - returns this JS Object to the success callback: [{"id":"1", "name":"first"}, ..]
   window.plugins.calendar.listCalendars(success,error);
 
-  // find all events in a named calendar (iOS only for now, this includes a list of attendees (if any))
+  // find all _future_ events in the first calendar with the specified name (iOS only for now, this includes a list of attendees (if any))
   window.plugins.calendar.findAllEventsInNamedCalendar(calendarName,success,error);
 
   // change an event (iOS only for now)
   var newTitle = "New title!";
-  window.plugins.calendar.modifyEvent(title,location,notes,startDate,endDate,newTitle,location,notes,startDate,endDate,success,error);
+  window.plugins.calendar.modifyEvent(title,eventLocation,notes,startDate,endDate,newTitle,eventLocation,notes,startDate,endDate,success,error);
 
   // delete an event (you can pass nulls for irrelevant parameters, note that on Android `notes` is ignored). The dates are mandatory and represent a date range to delete events in.
   // note that on iOS there is a bug where the timespan must not be larger than 4 years, see issue 102 for details.. call this method multiple times if need be
-  window.plugins.calendar.deleteEvent(newTitle,location,notes,startDate,endDate,success,error);
+  // since 4.3.0 you can match events starting with a prefix title, so if your event title is 'My app - cool event' then 'My app -' will match.
+  window.plugins.calendar.deleteEvent(newTitle,eventLocation,notes,startDate,endDate,success,error);
   
   // open the calendar app (added in 4.2.8):
   // - open it at 'today'
