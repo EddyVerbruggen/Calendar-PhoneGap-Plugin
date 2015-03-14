@@ -183,7 +183,10 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   // note that on iOS there is a bug where the timespan must not be larger than 4 years, see issue 102 for details.. call this method multiple times if need be
   // since 4.3.0 you can match events starting with a prefix title, so if your event title is 'My app - cool event' then 'My app -' will match.
   window.plugins.calendar.deleteEvent(newTitle,eventLocation,notes,startDate,endDate,success,error);
-  
+
+  // delete an event, as above, but for a specific calendar (iOS only)
+  window.plugins.calendar.deleteEventFromNamedCalendar(newTitle,eventLocation,notes,startDate,endDate,calendarName,success,error);
+
   // open the calendar app (added in 4.2.8):
   // - open it at 'today'
   window.plugins.calendar.openCalendar();
