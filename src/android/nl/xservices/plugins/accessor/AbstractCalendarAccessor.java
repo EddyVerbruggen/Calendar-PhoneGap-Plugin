@@ -429,10 +429,17 @@ public abstract class AbstractCalendarAccessor {
       ContentResolver cr = this.cordova.getActivity().getContentResolver();
       ContentValues values = new ContentValues();
       final boolean allDayEvent = isAllDayEvent(new Date(startTime), new Date(endTime));
-      values.put(Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
+      if (allDayEvent) {
+        //all day events must be in UTC time zone per Android specification, getOffset accounts for daylight savings time
+        values.put(Events.EVENT_TIMEZONE, TimeZone.getTimeZone("UTC").getID());
+        values.put(Events.DTSTART, startTime + TimeZone.getDefault().getOffset(startTime));
+        values.put(Events.DTEND, endTime + TimeZone.getDefault().getOffset(endTime));
+      } else {
+        values.put(Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
+        values.put(Events.DTSTART, startTime);
+        values.put(Events.DTEND, endTime);
+	  }
       values.put(Events.ALL_DAY, allDayEvent ? 1 : 0);
-      values.put(Events.DTSTART, startTime);
-      values.put(Events.DTEND, allDayEvent ? endTime-(1000*60*60*24) : endTime);
       values.put(Events.TITLE, title);
       values.put(Events.DESCRIPTION, description);
       values.put(Events.HAS_ALARM, 1);
