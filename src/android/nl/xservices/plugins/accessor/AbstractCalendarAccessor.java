@@ -438,7 +438,7 @@ public abstract class AbstractCalendarAccessor {
         values.put(Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
         values.put(Events.DTSTART, startTime);
         values.put(Events.DTEND, endTime);
-	  }
+      }
       values.put(Events.ALL_DAY, allDayEvent ? 1 : 0);
       values.put(Events.TITLE, title);
       values.put(Events.DESCRIPTION, description);
