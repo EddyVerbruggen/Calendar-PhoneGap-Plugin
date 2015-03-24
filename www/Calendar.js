@@ -74,7 +74,7 @@ Calendar.prototype.createEventWithOptions = function (title, location, notes, st
       mergedOptions[val] = options[val];
     }
   }
-  if (options.recurrenceEndDate !== null) {
+  if (options.recurrenceEndDate != null) {
     mergedOptions.recurrenceEndTime = options.recurrenceEndDate.getTime();
   }
   cordova.exec(successCallback, errorCallback, "Calendar", "createEventWithOptions", [{
