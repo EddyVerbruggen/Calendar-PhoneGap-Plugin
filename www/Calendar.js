@@ -50,7 +50,8 @@ Calendar.prototype.getCalendarOptions = function () {
     secondReminderMinutes: null,
     recurrence: null, // options are: 'daily', 'weekly', 'monthly', 'yearly'
     recurrenceEndDate: null,
-    calendarName: null
+    calendarName: null,
+    calendarId: null
   };
 };
 
@@ -73,7 +74,7 @@ Calendar.prototype.createEventWithOptions = function (title, location, notes, st
       mergedOptions[val] = options[val];
     }
   }
-  if (options.recurrenceEndDate != null) {
+  if (options.recurrenceEndDate !== null) {
     mergedOptions.recurrenceEndTime = options.recurrenceEndDate.getTime();
   }
   cordova.exec(successCallback, errorCallback, "Calendar", "createEventWithOptions", [{
@@ -83,7 +84,7 @@ Calendar.prototype.createEventWithOptions = function (title, location, notes, st
     "startTime": startDate instanceof Date ? startDate.getTime() : null,
     "endTime": endDate instanceof Date ? endDate.getTime() : null,
     "options": mergedOptions
-  }])
+  }]);
 };
 
 Calendar.prototype.createEvent = function (title, location, notes, startDate, endDate, successCallback, errorCallback) {
@@ -98,7 +99,7 @@ Calendar.prototype.createEventInteractively = function (title, location, notes, 
     "startTime": startDate instanceof Date ? startDate.getTime() : null,
     "endTime": endDate instanceof Date ? endDate.getTime() : null,
     "options": Calendar.prototype.getCalendarOptions()
-  }])
+  }]);
 };
 
 // TODO add calendarname to options and call that method, like we did with createEvent
@@ -113,7 +114,21 @@ Calendar.prototype.createEventInNamedCalendar = function (title, location, notes
     "startTime": startDate instanceof Date ? startDate.getTime() : null,
     "endTime": endDate instanceof Date ? endDate.getTime() : null,
     "calendarName": calendarName
-  }])
+  }]);
+};
+
+Calendar.prototype.createEventInIdCalendar = function (title, location, notes, startDate, endDate, calendarId, successCallback, errorCallback) {
+  if (!(startDate instanceof Date && endDate instanceof Date)) {
+    errorCallback("startDate and endDate must be JavaScript Date Objects");
+  }
+  cordova.exec(successCallback, errorCallback, "Calendar", "createEventInNamedCalendar", [{
+    "title": title,
+    "location": location,
+    "notes": notes,
+    "startTime": startDate instanceof Date ? startDate.getTime() : null,
+    "endTime": endDate instanceof Date ? endDate.getTime() : null,
+    "calendarId": calendarId
+  }]);
 };
 
 Calendar.prototype.deleteEvent = function (title, location, notes, startDate, endDate, successCallback, errorCallback) {
@@ -126,7 +141,7 @@ Calendar.prototype.deleteEvent = function (title, location, notes, startDate, en
     "notes": notes,
     "startTime": startDate instanceof Date ? startDate.getTime() : null,
     "endTime": endDate instanceof Date ? endDate.getTime() : null
-  }])
+  }]);
 };
 
 Calendar.prototype.deleteEventFromNamedCalendar = function (title, location, notes, startDate, endDate, calendarName, successCallback, errorCallback) {
@@ -137,7 +152,7 @@ Calendar.prototype.deleteEventFromNamedCalendar = function (title, location, not
     "startTime": startDate instanceof Date ? startDate.getTime() : null,
     "endTime": endDate instanceof Date ? endDate.getTime() : null,
     "calendarName": calendarName
-  }])
+  }]);
 };
 
 Calendar.prototype.findEvent = function (title, location, notes, startDate, endDate, successCallback, errorCallback) {
@@ -147,7 +162,7 @@ Calendar.prototype.findEvent = function (title, location, notes, startDate, endD
     "notes": notes,
     "startTime": startDate instanceof Date ? startDate.getTime() : null,
     "endTime": endDate instanceof Date ? endDate.getTime() : null
-  }])
+  }]);
 };
 
 Calendar.prototype.findAllEventsInNamedCalendar = function (calendarName, successCallback, errorCallback) {
@@ -172,7 +187,7 @@ Calendar.prototype.modifyEvent = function (title, location, notes, startDate, en
     "newNotes": newNotes,
     "newStartTime": newStartDate instanceof Date ? newStartDate.getTime() : null,
     "newEndTime": newEndDate instanceof Date ? newEndDate.getTime() : null
-  }])
+  }]);
 };
 
 Calendar.prototype.modifyEventInNamedCalendar = function (title, location, notes, startDate, endDate, newTitle, newLocation, newNotes, newStartDate, newEndDate, calendarName, successCallback, errorCallback) {
@@ -192,14 +207,14 @@ Calendar.prototype.modifyEventInNamedCalendar = function (title, location, notes
     "newStartTime": newStartDate instanceof Date ? newStartDate.getTime() : null,
     "newEndTime": newEndDate instanceof Date ? newEndDate.getTime() : null,
     "calendarName": calendarName
-  }])
+  }]);
 };
 
 Calendar.prototype.listEventsInRange = function (startDate, endDate, successCallback, errorCallback) {
   cordova.exec(successCallback, errorCallback, "Calendar", "listEventsInRange", [{
     "startTime": startDate instanceof Date ? startDate.getTime() : null,
     "endTime": endDate instanceof Date ? endDate.getTime() : null
-  }])
+  }]);
 };
 
 Calendar.prototype.listCalendars = function (successCallback, errorCallback) {
