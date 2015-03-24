@@ -436,7 +436,7 @@ public abstract class AbstractCalendarAccessor {
       values.put(Events.TITLE, title);
       values.put(Events.DESCRIPTION, description);
       values.put(Events.HAS_ALARM, 1);
-      values.put(Events.CALENDAR_ID, calendarId || 1);
+      values.put(Events.CALENDAR_ID, calendarId);
       values.put(Events.EVENT_LOCATION, location);
 
       if (recurrence != null) {
