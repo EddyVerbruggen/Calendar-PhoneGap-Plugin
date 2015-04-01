@@ -425,7 +425,7 @@ public abstract class AbstractCalendarAccessor {
 
   public void createEvent(Uri eventsUri, String title, long startTime, long endTime, String description,
                           String location, Long firstReminderMinutes, Long secondReminderMinutes,
-                          String recurrence, Long recurrenceEndTime) {
+                          String recurrence, Long recurrenceEndTime, Integer calendarId) {
       ContentResolver cr = this.cordova.getActivity().getContentResolver();
       ContentValues values = new ContentValues();
       final boolean allDayEvent = isAllDayEvent(new Date(startTime), new Date(endTime));
@@ -436,7 +436,7 @@ public abstract class AbstractCalendarAccessor {
       values.put(Events.TITLE, title);
       values.put(Events.DESCRIPTION, description);
       values.put(Events.HAS_ALARM, 1);
-      values.put(Events.CALENDAR_ID, 1);
+      values.put(Events.CALENDAR_ID, calendarId);
       values.put(Events.EVENT_LOCATION, location);
 
       if (recurrence != null) {

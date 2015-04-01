@@ -50,7 +50,8 @@ Calendar.prototype.getCalendarOptions = function () {
     secondReminderMinutes: null,
     recurrence: null, // options are: 'daily', 'weekly', 'monthly', 'yearly'
     recurrenceEndDate: null,
-    calendarName: null
+    calendarName: null,
+    calendarId: null,
   };
 };
 
