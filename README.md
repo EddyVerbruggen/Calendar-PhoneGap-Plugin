@@ -156,6 +156,10 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   calOptions.recurrenceEndDate = new Date(2015,10,1,0,0,0,0,0); // leave null to add events into infinity and beyond
   calOptions.calendarName = "MyCreatedCalendar"; // iOS only
   calOptions.calendarId = 1; // Android only, use id obtained from listCalendars() call which is described below. This will be ignored on iOS in favor of calendarName and vice versa. Default: 1.
+
+  // And the URL can be passed since 4.3.2 (will be appended to the notes on Android as there doesn't seem to be a sep field)
+  calOptions.url = "https://www.google.com";
+
   window.plugins.calendar.createEventWithOptions(title,eventLocation,notes,startDate,endDate,calOptions,success,error);
 
   // create an event interactively

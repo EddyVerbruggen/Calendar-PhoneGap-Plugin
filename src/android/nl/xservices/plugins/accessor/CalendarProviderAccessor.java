@@ -122,10 +122,11 @@ public class CalendarProviderAccessor extends AbstractCalendarAccessor {
 
   @Override
   public void createEvent(Uri eventsUri, String title, long startTime, long endTime,
-                             String description, String location, Long firstReminderMinutes, Long secondReminderMinutes,
-                             String recurrence, Long recurrenceEndTime, Integer calendarId) {
+                          String description, String location, Long firstReminderMinutes, Long secondReminderMinutes,
+                          String recurrence, Long recurrenceEndTime, Integer calendarId,
+                          String url) {
     eventsUri = eventsUri == null ? Uri.parse(CONTENT_PROVIDER + CONTENT_PROVIDER_PATH_EVENTS) : eventsUri;
     super.createEvent(eventsUri, title, startTime, endTime, description, location,
-        firstReminderMinutes, secondReminderMinutes, recurrence, recurrenceEndTime, calendarId);
+        firstReminderMinutes, secondReminderMinutes, recurrence, recurrenceEndTime, calendarId, url);
   }
 }

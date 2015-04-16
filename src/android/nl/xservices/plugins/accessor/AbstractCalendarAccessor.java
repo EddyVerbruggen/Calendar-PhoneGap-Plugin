@@ -425,7 +425,8 @@ public abstract class AbstractCalendarAccessor {
 
   public void createEvent(Uri eventsUri, String title, long startTime, long endTime, String description,
                           String location, Long firstReminderMinutes, Long secondReminderMinutes,
-                          String recurrence, Long recurrenceEndTime, Integer calendarId) {
+                          String recurrence, Long recurrenceEndTime, Integer calendarId,
+                          String url) {
       ContentResolver cr = this.cordova.getActivity().getContentResolver();
       ContentValues values = new ContentValues();
       final boolean allDayEvent = isAllDayEvent(new Date(startTime), new Date(endTime));
@@ -434,6 +435,14 @@ public abstract class AbstractCalendarAccessor {
       values.put(Events.DTSTART, allDayEvent ? startTime+(1000*60*60*24) : startTime);
       values.put(Events.DTEND, endTime);
       values.put(Events.TITLE, title);
+      // there's no separate url field, so adding it to the notes
+      if (url != null) {
+        if (description == null) {
+          description = url;
+        } else {
+          description += " " + url;
+        }
+      }
       values.put(Events.DESCRIPTION, description);
       values.put(Events.HAS_ALARM, 1);
       values.put(Events.CALENDAR_ID, calendarId);

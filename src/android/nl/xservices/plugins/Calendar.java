@@ -228,7 +228,8 @@ public class Calendar extends CordovaPlugin {
           argOptionsObject.isNull("secondReminderMinutes") ? null : argOptionsObject.getLong("secondReminderMinutes"),
           argOptionsObject.isNull("recurrence") ? null : argOptionsObject.getString("recurrence"),
           argOptionsObject.isNull("recurrenceEndTime") ? null : argOptionsObject.getLong("recurrenceEndTime"),
-          argOptionsObject.isNull("calendarId") ? 1 : argOptionsObject.getInt("calendarId"));
+          argOptionsObject.isNull("calendarId") ? 1 : argOptionsObject.getInt("calendarId"),
+          argOptionsObject.isNull("url") ? null : argOptionsObject.getString("url"));
 
       callback.success();
       return true;
