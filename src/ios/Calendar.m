@@ -381,6 +381,9 @@
   NSString* recurrence = [calOptions objectForKey:@"recurrence"];
   NSString* recurrenceEndTime = [calOptions objectForKey:@"recurrenceEndTime"];
   NSString* calendarName = [calOptions objectForKey:@"calendarName"];
+  NSString* url = [calOptions objectForKey:@"url"];
+
+  NSURL* myUrl = [NSURL URLWithString:url];
 
   NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
   NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
@@ -392,6 +395,7 @@
   myEvent.location = location;
   myEvent.notes = notes;
   myEvent.startDate = myStartDate;
+  myEvent.URL = myUrl;
 
   int duration = _endInterval - _startInterval;
   int moduloDay = duration % (60*60*24);
@@ -471,7 +475,9 @@
     NSString* recurrence = [calOptions objectForKey:@"recurrence"];
     NSString* recurrenceEndTime = [calOptions objectForKey:@"recurrenceEndTime"];
     NSString* calendarName = [calOptions objectForKey:@"calendarName"];
+    NSString* url = [calOptions objectForKey:@"url"];
 
+    NSURL* myUrl = [NSURL URLWithString:url];
     NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
     NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
 
@@ -482,6 +488,7 @@
     myEvent.location = location;
     myEvent.notes = notes;
     myEvent.startDate = myStartDate;
+    myEvent.URL = myUrl;
 
     int duration = _endInterval - _startInterval;
     int moduloDay = duration % (60*60*24);
