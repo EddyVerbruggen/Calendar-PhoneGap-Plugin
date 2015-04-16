@@ -150,7 +150,7 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   var calOptions = window.plugins.calendar.getCalendarOptions(); // grab the defaults
   calOptions.firstReminderMinutes = 120; // default is 60, pass in null for no reminder (alarm)
   calOptions.secondReminderMinutes = 5;
-  window.plugins.calendar.createEventInteractively(title,eventLocation,notes,startDate,endDate,calOptions,success,error);
+  window.plugins.calendar.createEventInteractivelyWithOptions(title,eventLocation,notes,startDate,endDate,calOptions,success,error);
   
   // create an event silently (on Android < 4 an interactive dialog is shown which doesn't use this options) with options:
   var calOptions = window.plugins.calendar.getCalendarOptions(); // grab the defaults
