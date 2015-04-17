@@ -430,10 +430,17 @@ public abstract class AbstractCalendarAccessor {
       ContentResolver cr = this.cordova.getActivity().getContentResolver();
       ContentValues values = new ContentValues();
       final boolean allDayEvent = isAllDayEvent(new Date(startTime), new Date(endTime));
-      values.put(Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
+      if (allDayEvent) {
+        //all day events must be in UTC time zone per Android specification, getOffset accounts for daylight savings time
+        values.put(Events.EVENT_TIMEZONE, TimeZone.getTimeZone("UTC").getID());
+        values.put(Events.DTSTART, startTime + TimeZone.getDefault().getOffset(startTime));
+        values.put(Events.DTEND, endTime + TimeZone.getDefault().getOffset(endTime));
+      } else {
+        values.put(Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
+        values.put(Events.DTSTART, startTime);
+        values.put(Events.DTEND, endTime);
+      }
       values.put(Events.ALL_DAY, allDayEvent ? 1 : 0);
-      values.put(Events.DTSTART, allDayEvent ? startTime+(1000*60*60*24) : startTime);
-      values.put(Events.DTEND, endTime);
       values.put(Events.TITLE, title);
       // there's no separate url field, so adding it to the notes
       if (url != null) {
