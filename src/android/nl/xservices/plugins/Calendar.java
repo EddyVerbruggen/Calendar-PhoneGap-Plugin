@@ -127,6 +127,7 @@ public class Calendar extends CordovaPlugin {
 
   private boolean createEventInteractively(JSONArray args) throws JSONException {
     final JSONObject jsonFilter = args.getJSONObject(0);
+    final JSONObject argOptionsObject = jsonFilter.getJSONObject("options");
 
     final Intent calIntent = new Intent(Intent.ACTION_EDIT)
         .setType("vnd.android.cursor.item/event")
@@ -146,19 +147,15 @@ public class Calendar extends CordovaPlugin {
       description = jsonFilter.optString("notes");
     }
     // there's no separate url field, so adding it to the notes
-    if (!jsonFilter.isNull("url")) {
+    if (!argOptionsObject.isNull("url")) {
       if (description == null) {
-        description = jsonFilter.optString("url");
+        description = argOptionsObject.optString("url");
       } else {
-        description += " " + jsonFilter.optString("url");
+        description += " " + argOptionsObject.optString("url");
       }
     }
-
     calIntent.putExtra("description", description);
-
-    // TODO calendarId
-//    calIntent.putExtra(Events.CALENDAR_ID, calendarId);
-    calIntent.putExtra("calendarId", calendarId);
+    calIntent.putExtra("calendar_id", argOptionsObject.isNull("calendarId") ? 1 : argOptionsObject.getInt("calendarId"));
 
     this.cordova.startActivityForResult(this, calIntent, RESULT_CODE_CREATE);
     return true;
