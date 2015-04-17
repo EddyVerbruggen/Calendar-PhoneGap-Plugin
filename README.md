@@ -1,4 +1,4 @@
-# PhoneGap Calendar plugin 
+c# PhoneGap Calendar plugin 
 
 for iOS and Android, by [Eddy Verbruggen](http://www.x-services.nl)
 
@@ -144,7 +144,7 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   window.plugins.calendar.deleteCalendar(calendarName,success,error);
 
   // create an event silently (on Android < 4 an interactive dialog is shown)
-  window.plugins.calendar.createEvent(title,eventLocation,notes,startDate,endDate,{},success,error);
+  window.plugins.calendar.createEvent(title,eventLocation,notes,startDate,endDate,success,error);
  
   // create an event interactively with calendar options
   var calOptions = window.plugins.calendar.getCalendarOptions(); // grab the defaults
