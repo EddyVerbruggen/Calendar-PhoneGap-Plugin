@@ -78,8 +78,6 @@ public class CalendarProviderAccessor extends AbstractCalendarAccessor {
     return keys;
   }
 
-  ;
-
   @Override
   protected Cursor queryAttendees(String[] projection, String selection,
                                   String[] selectionArgs, String sortOrder) {

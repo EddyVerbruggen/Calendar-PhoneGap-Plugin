@@ -165,6 +165,9 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   // create an event interactively
   window.plugins.calendar.createEventInteractively(title,eventLocation,notes,startDate,endDate,success,error);
 
+  // create an event interactively with the calOptions object as shown above
+  window.plugins.calendar.createEventInteractivelyWithOptions(title,eventLocation,notes,startDate,endDate,calOptions,success,error);
+
   // create an event in a named calendar (iOS only for now)
   window.plugins.calendar.createEventInNamedCalendar(title,eventLocation,notes,startDate,endDate,calendarName,success,error);
 
