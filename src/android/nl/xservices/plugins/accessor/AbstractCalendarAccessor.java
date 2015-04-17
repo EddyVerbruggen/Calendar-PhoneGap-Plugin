@@ -237,8 +237,8 @@ public abstract class AbstractCalendarAccessor {
 
   private String[] getActiveCalendarIds() {
     Cursor cursor = queryCalendars(new String[]{
-        this.getKey(KeyIndex.CALENDARS_ID)
-    },
+            this.getKey(KeyIndex.CALENDARS_ID)
+        },
         this.getKey(KeyIndex.CALENDARS_VISIBLE) + "=1", null, null);
     String[] calendarIds = null;
     if (cursor.moveToFirst()) {
@@ -431,65 +431,65 @@ public abstract class AbstractCalendarAccessor {
                           String location, Long firstReminderMinutes, Long secondReminderMinutes,
                           String recurrence, Long recurrenceEndTime, Integer calendarId,
                           String url) {
-      ContentResolver cr = this.cordova.getActivity().getContentResolver();
-      ContentValues values = new ContentValues();
-      final boolean allDayEvent = isAllDayEvent(new Date(startTime), new Date(endTime));
-      if (allDayEvent) {
-        //all day events must be in UTC time zone per Android specification, getOffset accounts for daylight savings time
-        values.put(Events.EVENT_TIMEZONE, TimeZone.getTimeZone("UTC").getID());
-        values.put(Events.DTSTART, startTime + TimeZone.getDefault().getOffset(startTime));
-        values.put(Events.DTEND, endTime + TimeZone.getDefault().getOffset(endTime));
+    ContentResolver cr = this.cordova.getActivity().getContentResolver();
+    ContentValues values = new ContentValues();
+    final boolean allDayEvent = isAllDayEvent(new Date(startTime), new Date(endTime));
+    if (allDayEvent) {
+      //all day events must be in UTC time zone per Android specification, getOffset accounts for daylight savings time
+      values.put(Events.EVENT_TIMEZONE, "UTC");
+      values.put(Events.DTSTART, startTime + TimeZone.getDefault().getOffset(startTime));
+      values.put(Events.DTEND, endTime + TimeZone.getDefault().getOffset(endTime));
+    } else {
+      values.put(Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
+      values.put(Events.DTSTART, startTime);
+      values.put(Events.DTEND, endTime);
+    }
+    values.put(Events.ALL_DAY, allDayEvent ? 1 : 0);
+    values.put(Events.TITLE, title);
+    // there's no separate url field, so adding it to the notes
+    if (url != null) {
+      if (description == null) {
+        description = url;
       } else {
-        values.put(Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
-        values.put(Events.DTSTART, startTime);
-        values.put(Events.DTEND, endTime);
+        description += " " + url;
       }
-      values.put(Events.ALL_DAY, allDayEvent ? 1 : 0);
-      values.put(Events.TITLE, title);
-      // there's no separate url field, so adding it to the notes
-      if (url != null) {
-        if (description == null) {
-          description = url;
-        } else {
-          description += " " + url;
-        }
+    }
+    values.put(Events.DESCRIPTION, description);
+    values.put(Events.HAS_ALARM, 1);
+    values.put(Events.CALENDAR_ID, calendarId);
+    values.put(Events.EVENT_LOCATION, location);
+
+    if (recurrence != null) {
+      if (recurrenceEndTime == null) {
+        values.put(Events.RRULE, "FREQ=" + recurrence.toUpperCase());
+      } else {
+        final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        values.put(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";UNTIL=" + sdf.format(new Date(recurrenceEndTime))+"T000000Z");
       }
-      values.put(Events.DESCRIPTION, description);
-      values.put(Events.HAS_ALARM, 1);
-      values.put(Events.CALENDAR_ID, calendarId);
-      values.put(Events.EVENT_LOCATION, location);
+    }
 
-      if (recurrence != null) {
-        if (recurrenceEndTime == null) {
-          values.put(Events.RRULE, "FREQ=" + recurrence.toUpperCase());
-        } else {
-          final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-          values.put(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";UNTIL=" + sdf.format(new Date(recurrenceEndTime))+"T000000Z");
-        }
-      }
+    Uri uri = cr.insert(eventsUri, values);
 
-      Uri uri = cr.insert(eventsUri, values);
+    Log.d(LOG_TAG, "Added to ContentResolver");
 
-      Log.d(LOG_TAG, "Added to ContentResolver");
+    // TODO ?
+    getActiveCalendarIds();
 
-      // TODO ?
-      getActiveCalendarIds();
+    if (firstReminderMinutes != null) {
+      ContentValues reminderValues = new ContentValues();
+      reminderValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
+      reminderValues.put("minutes", firstReminderMinutes);
+      reminderValues.put("method", 1);
+      cr.insert(Uri.parse(CONTENT_PROVIDER + CONTENT_PROVIDER_PATH_REMINDERS), reminderValues);
+    }
 
-      if (firstReminderMinutes != null) {
-        ContentValues reminderValues = new ContentValues();
-        reminderValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
-        reminderValues.put("minutes", firstReminderMinutes);
-        reminderValues.put("method", 1);
-        cr.insert(Uri.parse(CONTENT_PROVIDER + CONTENT_PROVIDER_PATH_REMINDERS), reminderValues);
-      }
-
-      if (secondReminderMinutes != null) {
-        ContentValues reminderValues = new ContentValues();
-        reminderValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
-        reminderValues.put("minutes", secondReminderMinutes);
-        reminderValues.put("method", 1);
-        cr.insert(Uri.parse(CONTENT_PROVIDER + CONTENT_PROVIDER_PATH_REMINDERS), reminderValues);
-      }
+    if (secondReminderMinutes != null) {
+      ContentValues reminderValues = new ContentValues();
+      reminderValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
+      reminderValues.put("minutes", secondReminderMinutes);
+      reminderValues.put("method", 1);
+      cr.insert(Uri.parse(CONTENT_PROVIDER + CONTENT_PROVIDER_PATH_REMINDERS), reminderValues);
+    }
   }
 
   public void createCalendar(String calendarName) {

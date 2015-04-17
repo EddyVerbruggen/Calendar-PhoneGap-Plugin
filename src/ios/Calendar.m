@@ -192,7 +192,9 @@
 
   NSError *error = NULL;
   for (EKEvent * event in matchingEvents) {
-    [self.eventStore removeEvent:event span:EKSpanThisEvent error:&error];
+  // TODO test (see #150)
+//    [self.eventStore removeEvent:event span:EKSpanThisEvent error:&error];
+    [self.eventStore removeEvent:event span:span:EKSpanFutureEvents error:&error];
   }
 
   if (error) {

@@ -21,6 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Date;
+import java.util.TimeZone;
 
 public class Calendar extends CordovaPlugin {
   public static final String ACTION_OPEN_CALENDAR = "openCalendar";
@@ -279,7 +280,19 @@ public class Calendar extends CordovaPlugin {
       String[] l_projection = new String[]{"calendar_id", "title", "dtstart", "dtend", "eventLocation", "allDay"};
 
       //actual query
-      Cursor cursor = contentResolver.query(l_eventUri, l_projection, "( dtstart >=" + calendar_start.getTimeInMillis() + " AND dtend <=" + calendar_end.getTimeInMillis() + " AND deleted = 0)", null, "dtstart ASC");
+      Cursor cursor = contentResolver.query(
+          l_eventUri,
+          l_projection,
+          "(deleted = 0 AND" +
+              "   (" +
+              // all day events are stored in UTC, others in the user's timezone
+              "     (eventTimezone  = 'UTC' AND dtstart >=" + (calendar_start.getTimeInMillis() + TimeZone.getDefault().getOffset(calendar_start.getTimeInMillis())) + " AND dtend <=" + (calendar_end.getTimeInMillis() + TimeZone.getDefault().getOffset(calendar_end.getTimeInMillis())) + ")" +
+              "     OR " +
+              "     (eventTimezone <> 'UTC' AND dtstart >=" + calendar_start.getTimeInMillis() + " AND dtend <=" + calendar_end.getTimeInMillis() + ")" +
+              "   )" +
+              ")",
+          null,
+          "dtstart ASC");
 
       int i = 0;
       while (cursor.moveToNext()) {
