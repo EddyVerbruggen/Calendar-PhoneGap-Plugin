@@ -1,4 +1,4 @@
-c# PhoneGap Calendar plugin 
+# PhoneGap Calendar plugin 
 
 for iOS and Android, by [Eddy Verbruggen](http://www.x-services.nl)
 
