@@ -384,19 +384,21 @@
   NSString* calendarName = [calOptions objectForKey:@"calendarName"];
   NSString* url = [calOptions objectForKey:@"url"];
 
-  NSURL* myUrl = [NSURL URLWithString:url];
+  EKEvent *myEvent = [EKEvent eventWithEventStore: self.eventStore];
+  if (url != (id)[NSNull null]) {
+    NSURL* myUrl = [NSURL URLWithString:url];
+    myEvent.URL = myUrl;
+  }
 
   NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
   NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
 
   NSTimeInterval _endInterval = [endTime doubleValue] / 1000; // strip millis
 
-  EKEvent *myEvent = [EKEvent eventWithEventStore: self.eventStore];
   myEvent.title = title;
   myEvent.location = location;
   myEvent.notes = notes;
   myEvent.startDate = myStartDate;
-  myEvent.URL = myUrl;
 
   int duration = _endInterval - _startInterval;
   int moduloDay = duration % (60*60*24);
