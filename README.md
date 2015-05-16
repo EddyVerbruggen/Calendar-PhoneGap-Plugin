@@ -192,6 +192,14 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   var newTitle = "New title!";
   window.plugins.calendar.modifyEvent(title,eventLocation,notes,startDate,endDate,newTitle,eventLocation,notes,startDate,endDate,success,error);
 
+  // or to add a reminder, make it recurring, change the calendar, or the url, use this one:
+  var filterOptions = window.plugins.calendar.getCalendarOptions(); // or {} or null for the defaults
+  filterOptions.calendarName = "Bla"; // only filter option currently implemented (iOS only)
+  var newOptions = window.plugins.calendar.getCalendarOptions();
+  newOptions.calendaName = "New Bla"; // make sure this calendar exists before moving the event to it
+  newOptions.firstReminderMinutes = 120; // etc
+  window.plugins.calendar.modifyEventWithOptions(title,eventLocation,notes,startDate,endDate,newTitle,eventLocation,notes,startDate,endDate,filterOptions,newOptions,success,error);
+
   // delete an event (you can pass nulls for irrelevant parameters, note that on Android `notes` is ignored). The dates are mandatory and represent a date range to delete events in.
   // note that on iOS there is a bug where the timespan must not be larger than 4 years, see issue 102 for details.. call this method multiple times if need be
   // since 4.3.0 you can match events starting with a prefix title, so if your event title is 'My app - cool event' then 'My app -' will match.
