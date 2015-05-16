@@ -622,7 +622,7 @@
 }
 
 
--(void)findEvent:(CDVInvokedUrlCommand*)command {
+-(void)findEventWithOptions:(CDVInvokedUrlCommand*)command {
   NSDictionary* options = [command.arguments objectAtIndex:0];
   NSString* title      = [options objectForKey:@"title"];
   NSString* location   = [options objectForKey:@"location"];
@@ -630,22 +630,37 @@
   NSNumber* startTime  = [options objectForKey:@"startTime"];
   NSNumber* endTime    = [options objectForKey:@"endTime"];
 
+  // actually the only option we're currently using is calendarName
+  NSDictionary* calOptions = [options objectForKey:@"options"];
+  NSString* calendarName = [calOptions objectForKey:@"calendarName"];
+
   NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
   NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
 
   NSTimeInterval _endInterval = [endTime doubleValue] / 1000; // strip millis
   NSDate *myEndDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
 
-  EKCalendar* calendar = self.eventStore.defaultCalendarForNewEvents;
-  if (calendar == nil) {
-    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No default calendar found. Is access to the Calendar blocked for this app?"];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+  EKCalendar* calendar = nil;
+  if (calendarName == (id)[NSNull null]) {
+    calendar = self.eventStore.defaultCalendarForNewEvents;
+    if (calendar == nil) {
+      CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No default calendar found. Is access to the Calendar blocked for this app?"];
+      [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+      return;
+    }
   } else {
-    NSArray *matchingEvents = [self findEKEventsWithTitle:title location:location notes:notes startDate:myStartDate endDate:myEndDate calendar:calendar];
-    NSMutableArray * eventsDataArray = [self eventsToDataArray:matchingEvents];
-    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:eventsDataArray];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    calendar = [self findEKCalendar:calendarName];
+    if (calendar == nil) {
+      CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Could not find calendar"];
+      [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+      return;
+    }
   }
+
+  NSArray *matchingEvents = [self findEKEventsWithTitle:title location:location notes:notes startDate:myStartDate endDate:myEndDate calendar:calendar];
+  NSMutableArray * eventsDataArray = [self eventsToDataArray:matchingEvents];
+  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:eventsDataArray];
+  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 

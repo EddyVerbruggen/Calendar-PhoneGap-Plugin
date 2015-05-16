@@ -28,7 +28,7 @@ public class Calendar extends CordovaPlugin {
   public static final String ACTION_CREATE_EVENT_WITH_OPTIONS = "createEventWithOptions";
   public static final String ACTION_CREATE_EVENT_INTERACTIVELY = "createEventInteractively";
   public static final String ACTION_DELETE_EVENT = "deleteEvent";
-  public static final String ACTION_FIND_EVENT = "findEvent";
+  public static final String ACTION_FIND_EVENT_WITH_OPTIONS = "findEventWithOptions";
   public static final String ACTION_LIST_EVENTS_IN_RANGE = "listEventsInRange";
   public static final String ACTION_LIST_CALENDARS = "listCalendars";
   public static final String ACTION_CREATE_CALENDAR = "createCalendar";
@@ -61,7 +61,7 @@ public class Calendar extends CordovaPlugin {
       return createEventInteractively(args);
     } else if (ACTION_LIST_EVENTS_IN_RANGE.equals(action)) {
       return listEventsInRange(args);
-    } else if (!hasLimitedSupport && ACTION_FIND_EVENT.equals(action)) {
+    } else if (!hasLimitedSupport && ACTION_FIND_EVENT_WITH_OPTIONS.equals(action)) {
       return findEvents(args);
     } else if (!hasLimitedSupport && ACTION_DELETE_EVENT.equals(action)) {
       return deleteEvent(args);
@@ -206,7 +206,8 @@ public class Calendar extends CordovaPlugin {
       System.err.println("Exception: No Arguments passed");
     }
     try {
-      JSONObject jsonFilter = args.getJSONObject(0);
+      final JSONObject jsonFilter = args.getJSONObject(0);
+      final JSONObject argOptionsObject = jsonFilter.getJSONObject("options"); // not currently used
       JSONArray jsonEvents = getCalendarAccessor().findEvents(
           jsonFilter.isNull("title") ? null : jsonFilter.optString("title"),
           jsonFilter.isNull("location") ? null : jsonFilter.optString("location"),

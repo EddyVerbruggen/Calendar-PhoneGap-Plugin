@@ -174,6 +174,11 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   // find events (on iOS this includes a list of attendees (if any))
   window.plugins.calendar.findEvent(title,eventLocation,notes,startDate,endDate,success,error);
 
+  // if you need to find events in a specific calendar, use this one. All options are currently ignored when finding events, except for the calendarName.
+  var calOptions = window.plugins.calendar.getCalendarOptions();
+  calOptions.calendarName = "MyCreatedCalendar"; // iOS only
+  window.plugins.calendar.findEventWithOptions(title,eventLocation,notes,startDate,endDate,calOptions,success,error);
+
   // list all events in a date range (only supported on Android for now)
   window.plugins.calendar.listEventsInRange(startDate,endDate,success,error);
 
