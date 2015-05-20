@@ -120,6 +120,27 @@ or to use a specific version:
 
 ## 3. Usage
 
+The table gives an overview of basic operation compatibility:
+
+Operation                           | Comment     | iOS | Android
+----------------------------------- | ----------- | --- | -------
+createCalendar                      |             | yes | 
+deleteCalendar                      |             | yes | 
+createEvent                         | silent      | yes | yes (on Android < 4 dialog is shown)
+createEventWithOptions              | silent      | yes | yes (on Android < 4 dialog is shown)
+createEventInteractively            | interactive | yes | yes
+createEventInteractivelyWithOptions | interactive | yes | yes
+findEvent                           |             | yes | yes
+findEventWithOptions                |             | yes | yes
+listEventsInRange                   |             |     | yes
+listCalendars                       |             | yes | yes
+findAllEventsInNamedCalendars       |             | yes | 
+modifyEvent                         |             | yes | 
+modifyEventWithOptions              |             | yes | 
+deleteEvent                         |             | yes | yes
+deleteEventFromNamedCalendar        |             | yes | 
+openCalendar                        |             | yes | yes
+
 Basic operations, you'll want to copy-paste this for testing purposes:
 
 ```javascript
