@@ -181,6 +181,7 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   // And the URL can be passed since 4.3.2 (will be appended to the notes on Android as there doesn't seem to be a sep field)
   calOptions.url = "https://www.google.com";
 
+  // on iOS the success handler receives the event ID (since 4.3.6)
   window.plugins.calendar.createEventWithOptions(title,eventLocation,notes,startDate,endDate,calOptions,success,error);
 
   // create an event interactively
@@ -216,9 +217,11 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   // or to add a reminder, make it recurring, change the calendar, or the url, use this one:
   var filterOptions = window.plugins.calendar.getCalendarOptions(); // or {} or null for the defaults
   filterOptions.calendarName = "Bla"; // only filter option currently implemented (iOS only)
+  filterOptions.id = "D9B1D85E-1182-458D-B110-4425F17819F1"; // iOS only, get it from createEventWithOptions (if not found, we try matching against title, etc)
   var newOptions = window.plugins.calendar.getCalendarOptions();
   newOptions.calendaName = "New Bla"; // make sure this calendar exists before moving the event to it
-  newOptions.firstReminderMinutes = 120; // etc
+  // not passing in reminders will wipe them from the event. To wipe the default first reminder (60), set it to null.
+  newOptions.firstReminderMinutes = 120;
   window.plugins.calendar.modifyEventWithOptions(title,eventLocation,notes,startDate,endDate,newTitle,eventLocation,notes,startDate,endDate,filterOptions,newOptions,success,error);
 
   // delete an event (you can pass nulls for irrelevant parameters, note that on Android `notes` is ignored). The dates are mandatory and represent a date range to delete events in.

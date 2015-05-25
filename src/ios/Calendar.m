@@ -127,6 +127,7 @@
   [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
   
   NSDictionary* calOptions = [options objectForKey:@"options"];
+  NSString* calEventID = [calOptions objectForKey:@"id"];
   // the only search param we're currently matching against is the calendarName, so ignoring any passed reminder values etc
   NSString* calendarName = [calOptions objectForKey:@"calendarName"];
   EKCalendar* calendar;
@@ -146,15 +147,25 @@
     }
   }
 
+  EKEvent *theEvent = nil;
+
   // Find matches
-  NSArray *matchingEvents = [self findEKEventsWithTitle:title location:location notes:notes startDate:myStartDate endDate:myEndDate calendar:calendar];
+  if (calEventID != nil) {
+    theEvent = [self.eventStore calendarItemWithIdentifier:calEventID];
+  }
   
-  if (matchingEvents.count == 1) {
+  if (theEvent == nil) {
+    NSArray *matchingEvents = [self findEKEventsWithTitle:title location:location notes:notes startDate:myStartDate endDate:myEndDate calendar:calendar];
+  
+    if (matchingEvents.count == 1) {
 
-    // Presume we have to have an exact match to modify it!
-    // Need to load this event from an EKEventStore so we can edit it
-    EKEvent *theEvent = [self.eventStore eventWithIdentifier:((EKEvent*)[matchingEvents lastObject]).eventIdentifier];
-
+      // Presume we have to have an exact match to modify it!
+      // Need to load this event from an EKEventStore so we can edit it
+      theEvent = [self.eventStore eventWithIdentifier:((EKEvent*)[matchingEvents lastObject]).eventIdentifier];
+    }
+  }
+  
+  if (theEvent != nil) {
     NSDictionary* newCalOptions = [options objectForKey:@"newOptions"];
     NSString* newCalendarName = [newCalOptions objectForKey:@"calendarName"];
     if (newCalendarName != (id)[NSNull null]) {
@@ -182,6 +193,11 @@
     if (nendTime) {
       NSTimeInterval _nendInterval = [nendTime doubleValue] / 1000; // strip millis
       theEvent.endDate = [NSDate dateWithTimeIntervalSince1970:_nendInterval];
+    }
+    
+    // remove any existing alarms because there would be no other way to remove them
+    for (EKAlarm *alarm in theEvent.alarms) {
+      [theEvent removeAlarm:alarm];
     }
     
     NSNumber* firstReminderMinutes = [newCalOptions objectForKey:@"firstReminderMinutes"];
@@ -225,7 +241,7 @@
       CDVPluginResult * pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.userInfo.description];
       [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     } else {
-      CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+      CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:theEvent.calendarItemIdentifier];
       [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }
   } else {
@@ -521,8 +537,7 @@
     CDVPluginResult * pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.userInfo.description];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
   } else {
-    NSLog(@"Reached Success");
-    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:myEvent.calendarItemIdentifier];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
   }
 }
@@ -723,7 +738,7 @@
     [self.eventStore saveCalendar:cal commit:YES error:&error];
     if (error == nil) {
       NSLog(@"created calendar: %@", cal.title);
-      CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+      CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:cal.calendarIdentifier];
       [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     } else {
       NSLog(@"could not create calendar, error: %@", error.description);
