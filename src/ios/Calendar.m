@@ -500,9 +500,18 @@
   } else {
     calendar = [self findEKCalendar:calendarName];
     if (calendar == nil) {
-      CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Could not find calendar"];
-      [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-      return;
+      // create it
+      calendar = [EKCalendar calendarForEntityType:EKEntityTypeEvent eventStore:self.eventStore];
+      calendar.title = calendarName;
+      calendar.source = [self findEKSource];
+      NSError* error;
+      [self.eventStore saveCalendar:calendar commit:YES error:&error];
+      if (error != nil) {
+        NSLog(@"could not create calendar, error: %@", error.description);
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Calendar could not be found nor created. Is access to the Calendar blocked for this app?"];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        return;
+      }
     }
   }
   myEvent.calendar = calendar;
