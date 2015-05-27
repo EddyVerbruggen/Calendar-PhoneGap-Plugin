@@ -88,6 +88,13 @@ Calendar.prototype.createEventWithOptions = function (title, location, notes, st
   }]);
 };
 
+/**
+ * @deprecated use createEventWithOptions instead
+ */
+Calendar.prototype.createEventInNamedCalendar = function (title, location, notes, startDate, endDate, calendarName, successCallback, errorCallback) {
+  Calendar.prototype.createEventWithOptions(title, location, notes, startDate, endDate, {calendarName:calendarName}, successCallback, errorCallback);
+};
+
 Calendar.prototype.createEvent = function (title, location, notes, startDate, endDate, successCallback, errorCallback) {
   Calendar.prototype.createEventWithOptions(title, location, notes, startDate, endDate, {}, successCallback, errorCallback);
 };
@@ -114,21 +121,6 @@ Calendar.prototype.createEventInteractivelyWithOptions = function (title, locati
     "startTime": startDate instanceof Date ? startDate.getTime() : null,
     "endTime": endDate instanceof Date ? endDate.getTime() : null,
     "options": mergedOptions
-  }])
-};
-
-// TODO add calendarname to options and call that method, like we did with createEvent
-Calendar.prototype.createEventInNamedCalendar = function (title, location, notes, startDate, endDate, calendarName, successCallback, errorCallback) {
-  if (!(startDate instanceof Date && endDate instanceof Date)) {
-    errorCallback("startDate and endDate must be JavaScript Date Objects");
-  }
-  cordova.exec(successCallback, errorCallback, "Calendar", "createEventInNamedCalendar", [{
-    "title": title,
-    "location": location,
-    "notes": notes,
-    "startTime": startDate instanceof Date ? startDate.getTime() : null,
-    "endTime": endDate instanceof Date ? endDate.getTime() : null,
-    "calendarName": calendarName
   }])
 };
 

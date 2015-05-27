@@ -432,18 +432,6 @@
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
-- (void)createEventInNamedCalendar:(CDVInvokedUrlCommand*)command {
-  NSDictionary* options = [command.arguments objectAtIndex:0];
-  NSString* calendarName = [options objectForKey:@"calendarName"];
-  EKCalendar* calendar = [self findEKCalendar:calendarName];
-  if (calendar == nil) {
-    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Could not find calendar"];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-  } else {
-    [self createEventWithCalendar:command calendar:calendar];
-  }
-}
-
 - (void)listEventsInRange:(CDVInvokedUrlCommand*)command {
 }
 

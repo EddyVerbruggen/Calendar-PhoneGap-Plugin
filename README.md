@@ -190,7 +190,7 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   // create an event interactively with the calOptions object as shown above
   window.plugins.calendar.createEventInteractivelyWithOptions(title,eventLocation,notes,startDate,endDate,calOptions,success,error);
 
-  // create an event in a named calendar (iOS only for now)
+  // create an event in a named calendar (iOS only, deprecated, use createEventWithOptions instead)
   window.plugins.calendar.createEventInNamedCalendar(title,eventLocation,notes,startDate,endDate,calendarName,success,error);
 
   // find events (on iOS this includes a list of attendees (if any))
