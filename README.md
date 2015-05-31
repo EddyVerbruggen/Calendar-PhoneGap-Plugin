@@ -199,6 +199,7 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   // if you need to find events in a specific calendar, use this one. All options are currently ignored when finding events, except for the calendarName.
   var calOptions = window.plugins.calendar.getCalendarOptions();
   calOptions.calendarName = "MyCreatedCalendar"; // iOS only
+  calOptions.id = "D9B1D85E-1182-458D-B110-4425F17819F1"; // iOS only, get it from createEventWithOptions (if not found, we try matching against title, etc)
   window.plugins.calendar.findEventWithOptions(title,eventLocation,notes,startDate,endDate,calOptions,success,error);
 
   // list all events in a date range (only supported on Android for now)

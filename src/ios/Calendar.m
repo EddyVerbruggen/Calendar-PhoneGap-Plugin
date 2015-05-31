@@ -683,6 +683,7 @@
   
   // actually the only option we're currently using is calendarName
   NSDictionary* calOptions = [options objectForKey:@"options"];
+  NSString* calEventID = [calOptions objectForKey:@"id"];
   NSString* calendarName = [calOptions objectForKey:@"calendarName"];
   
   NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
@@ -708,7 +709,18 @@
     }
   }
   
-  NSArray *matchingEvents = [self findEKEventsWithTitle:title location:location notes:notes startDate:myStartDate endDate:myEndDate calendar:calendar];
+  // Find matches
+  EKCalendarItem *theEvent;
+  if (calEventID != nil) {
+    theEvent = [self.eventStore calendarItemWithIdentifier:calEventID];
+  }
+
+  NSArray *matchingEvents;
+  if (theEvent == nil) {
+    matchingEvents = [self findEKEventsWithTitle:title location:location notes:notes startDate:myStartDate endDate:myEndDate calendar:calendar];
+  } else {
+    matchingEvents = [NSArray arrayWithObject:theEvent];
+  }
   NSMutableArray * eventsDataArray = [self eventsToDataArray:matchingEvents];
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:eventsDataArray];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
