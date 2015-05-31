@@ -217,7 +217,7 @@ Basic operations, you'll want to copy-paste this for testing purposes:
 
   // or to add a reminder, make it recurring, change the calendar, or the url, use this one:
   var filterOptions = window.plugins.calendar.getCalendarOptions(); // or {} or null for the defaults
-  filterOptions.calendarName = "Bla"; // only filter option currently implemented (iOS only)
+  filterOptions.calendarName = "Bla"; // iOS only
   filterOptions.id = "D9B1D85E-1182-458D-B110-4425F17819F1"; // iOS only, get it from createEventWithOptions (if not found, we try matching against title, etc)
   var newOptions = window.plugins.calendar.getCalendarOptions();
   newOptions.calendaName = "New Bla"; // make sure this calendar exists before moving the event to it
