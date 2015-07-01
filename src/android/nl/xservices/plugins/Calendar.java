@@ -214,7 +214,12 @@ public class Calendar extends CordovaPlugin {
           jsonFilter.optLong("startTime"),
           jsonFilter.optLong("endTime"));
 
-      PluginResult res = new PluginResult(PluginResult.Status.OK, jsonEvents);
+        PluginResult res;
+        if(jsonEvents.length == 0){
+          res = new PluginResult(PluginResult.Status.ERROR, "Can't find any events matching that critera!");
+        }else {
+          res = new PluginResult(PluginResult.Status.OK, jsonEvents);
+        }
       res.setKeepCallback(true);
       callback.sendPluginResult(res);
       return true;
