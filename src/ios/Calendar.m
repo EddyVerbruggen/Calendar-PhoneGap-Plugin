@@ -721,8 +721,15 @@
   } else {
     matchingEvents = [NSArray arrayWithObject:theEvent];
   }
-  NSMutableArray * eventsDataArray = [self eventsToDataArray:matchingEvents];
-  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:eventsDataArray];
+    
+  //check to see if events were actually retrieved and formulate a result
+  CDVPluginResult *pluginresult;
+  if(!matchingEvents || !matchingEvents.count) {
+    pluginresult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Can't find any events that fit your critera!"];
+  }else {
+    NSMutableArray * eventsDataArray = [self eventsToDataArray:matchingEvents];
+    pluginresult = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:eventsDataArray];
+  }
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
