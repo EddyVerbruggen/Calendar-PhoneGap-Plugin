@@ -650,7 +650,7 @@
   }];
 }
 
-- (void) NamedCalendar:(CDVInvokedUrlCommand*)command {
+- (void) deleteEventFromNamedCalendar:(CDVInvokedUrlCommand*)command {
   NSDictionary* options = [command.arguments objectAtIndex:0];
   NSString* calendarName = [options objectForKey:@"calendarName"];
   EKCalendar* calendar = [self findEKCalendar:calendarName];

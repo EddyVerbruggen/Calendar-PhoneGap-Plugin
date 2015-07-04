@@ -18,21 +18,20 @@
                         calendar: (EKCalendar *) calendar;
 
 - (void)openCalendar:(CDVInvokedUrlCommand*)command;
-
 - (void)createCalendar:(CDVInvokedUrlCommand*)command;
 - (void)deleteCalendar:(CDVInvokedUrlCommand*)command;
 
 - (void)createEventWithOptions:(CDVInvokedUrlCommand*)command;
 - (void)createEventInteractively:(CDVInvokedUrlCommand*)command;
-
 - (void)modifyEventWithOptions:(CDVInvokedUrlCommand*)command;
 
 - (void)findEventWithOptions:(CDVInvokedUrlCommand*)command;
 - (void)findAllEventsInNamedCalendar:(CDVInvokedUrlCommand*)command;
 
 - (void)listCalendars:(CDVInvokedUrlCommand*)command;
-
 - (void)deleteEvent:(CDVInvokedUrlCommand*)command;
-- (void)deleteEventFromCalendar:(CDVInvokedUrlCommand*)command calendar: (EKCalendar *) calendar;
+- (void)deleteEventFromNamedCalendar:(CDVInvokedUrlCommand*)command;
+- (void)deleteEventFromCalendar:(CDVInvokedUrlCommand*)command calendar:(EKCalendar*)calendar;
+- (void)eventEditViewController:(EKEventEditViewController*)controller didCompleteWithAction:(EKEventEditViewAction) action;
 
 @end
