@@ -90,11 +90,12 @@ public class Calendar extends CordovaPlugin {
           callback.success();
         }
       });
+      return true;
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
       callback.error(e.getMessage());
+      return false;
     }
-    return true;
   }
 
   @TargetApi(14)
@@ -114,12 +115,12 @@ public class Calendar extends CordovaPlugin {
           callback.success();
         }
       });
+      return true;
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
       callback.error(e.getMessage());
+      return false;
     }
-
-    return true;
   }
 
   private boolean listCalendars() {
@@ -162,12 +163,12 @@ public class Calendar extends CordovaPlugin {
           callback.sendPluginResult(res);
         }
       });
+      return true;
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
       callback.error(e.getMessage());
+      return false;
     }
-
-    return true;
   }
 
   private boolean createEventInteractively(JSONArray args) {
@@ -209,12 +210,12 @@ public class Calendar extends CordovaPlugin {
           Calendar.this.cordova.startActivityForResult(Calendar.this, calIntent, RESULT_CODE_CREATE);
         }
       });
+      return true;
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
       callback.error(e.getMessage());
+      return false;
     }
-
-    return true;
   }
 
   private AbstractCalendarAccessor calendarAccessor;
@@ -257,12 +258,12 @@ public class Calendar extends CordovaPlugin {
           callback.sendPluginResult(res);
         }
       });
+      return true;
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
       callback.error(e.getMessage());
+      return false;
     }
-
-    return true;
   }
 
   private boolean findEvents(JSONArray args) {
@@ -288,12 +289,12 @@ public class Calendar extends CordovaPlugin {
           callback.sendPluginResult(res);
         }
       });
+      return true;
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
       callback.error(e.getMessage());
+      return false;
     }
-
-    return true;
   }
 
   private boolean createEvent(JSONArray args) {
