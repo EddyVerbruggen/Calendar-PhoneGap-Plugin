@@ -661,7 +661,7 @@
   } else {
     [self deleteEventFromCalendar:command calendar:calendar];
     NSString *msg = [@"Deleted from " stringByAppendingString:calendar.title];
-    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:msg];
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:msg];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
   }
 }
