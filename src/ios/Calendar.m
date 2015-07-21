@@ -216,9 +216,11 @@
       }
 
       NSString* recurrence = [newCalOptions objectForKey:@"recurrence"];
+      NSNumber* intervalAmount = [newCalOptions objectForKey:@"interval"];
+      
       if (recurrence != (id)[NSNull null]) {
         EKRecurrenceRule *rule = [[EKRecurrenceRule alloc] initRecurrenceWithFrequency: [self toEKRecurrenceFrequency:recurrence]
-                                                                              interval: 1
+                                                                              interval: intervalAmount.integerValue
                                                                                    end: nil];
         NSString* recurrenceEndTime = [newCalOptions objectForKey:@"recurrenceEndTime"];
         if (recurrenceEndTime != nil) {
@@ -462,6 +464,7 @@
   NSString* recurrenceEndTime = [calOptions objectForKey:@"recurrenceEndTime"];
   NSString* calendarName = [calOptions objectForKey:@"calendarName"];
   NSString* url = [calOptions objectForKey:@"url"];
+  NSNumber* intervalAmount = [calOptions objectForKey:@"interval"];
 
   [self.commandDelegate runInBackground: ^{
     EKEvent *myEvent = [EKEvent eventWithEventStore: self.eventStore];
@@ -530,7 +533,7 @@
 
     if (recurrence != (id)[NSNull null]) {
       EKRecurrenceRule *rule = [[EKRecurrenceRule alloc] initRecurrenceWithFrequency: [self toEKRecurrenceFrequency:recurrence]
-                                                                            interval: 1
+                                                                            interval: intervalAmount.integerValue
                                                                                  end: nil];
       if (recurrenceEndTime != nil) {
         NSTimeInterval _recurrenceEndTimeInterval = [recurrenceEndTime doubleValue] / 1000; // strip millis
@@ -569,6 +572,7 @@
   NSString* recurrenceEndTime = [calOptions objectForKey:@"recurrenceEndTime"];
   NSString* calendarName = [calOptions objectForKey:@"calendarName"];
   NSString* url = [calOptions objectForKey:@"url"];
+  NSNumber* intervalAmount = [calOptions objectForKey:@"interval"];
 
   EKEvent *myEvent = [EKEvent eventWithEventStore: self.eventStore];
   if (url != (id)[NSNull null]) {
@@ -628,7 +632,7 @@
     if (recurrence != (id)[NSNull null]) {
       [self.commandDelegate runInBackground: ^{
         EKRecurrenceRule *rule = [[EKRecurrenceRule alloc] initRecurrenceWithFrequency: [self toEKRecurrenceFrequency:recurrence]
-                                                                              interval: 1
+                                                                              interval: intervalAmount.integerValue
                                                                                    end: nil];
         if (recurrenceEndTime != nil) {
           NSTimeInterval _recurrenceEndTimeInterval = [recurrenceEndTime doubleValue] / 1000; // strip millis
