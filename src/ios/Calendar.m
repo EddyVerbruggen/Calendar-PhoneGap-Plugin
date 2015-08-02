@@ -429,7 +429,7 @@
     NSArray * calendars = [self.eventStore calendarsForEntityType:EKEntityTypeEvent];
     NSMutableArray *finalResults = [[NSMutableArray alloc] initWithCapacity:calendars.count];
     for (EKCalendar *thisCalendar in calendars) {
-      NSString *type = [[NSArray arrayWithObjects:@"Local", @"CalDAV", @"Exchange", @"Subscription", @"Birthday", nil] objectAtIndex:thisCalendar.type];
+      NSString *type = [[NSArray arrayWithObjects:@"Local", @"CalDAV", @"Exchange", @"Subscription", @"Birthday", @"Mail", nil] objectAtIndex:thisCalendar.type];
       NSMutableDictionary *entry = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                     thisCalendar.calendarIdentifier, @"id",
                                     thisCalendar.title, @"name",
