@@ -403,7 +403,7 @@
       }
       [entry setObject:attendees forKey:@"attendees"];
     }
-      [entry setObject:events.eventIdentifier forKey:@"id"];
+      [entry setObject:event.eventIdentifier forKey:@"id"];
     [results addObject:entry];
   }
   return results;
