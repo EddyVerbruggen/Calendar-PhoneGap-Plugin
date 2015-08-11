@@ -403,7 +403,8 @@
       }
       [entry setObject:attendees forKey:@"attendees"];
     }
-      [entry setObject:event.eventIdentifier forKey:@"id"];
+    
+    [entry setObject:event.calendarItemIdentifier forKey:@"id"];
     [results addObject:entry];
   }
   return results;
