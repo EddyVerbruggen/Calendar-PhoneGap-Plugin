@@ -174,9 +174,12 @@ Basic operations, you'll want to copy-paste this for testing purposes:
 
   // Added these options in version 4.2.4:
   calOptions.recurrence = "monthly"; // supported are: daily, weekly, monthly, yearly
-  calOptions.recurrenceEndDate = new Date(2015,10,1,0,0,0,0,0); // leave null to add events into infinity and beyond
+  calOptions.recurrenceEndDate = new Date(2016,10,1,0,0,0,0,0); // leave null to add events into infinity and beyond
   calOptions.calendarName = "MyCreatedCalendar"; // iOS only
   calOptions.calendarId = 1; // Android only, use id obtained from listCalendars() call which is described below. This will be ignored on iOS in favor of calendarName and vice versa. Default: 1.
+
+  // This is new since 4.2.7:
+  calOptions.recurrenceInterval = 2; // once every 2 months in this case, default: 1
 
   // And the URL can be passed since 4.3.2 (will be appended to the notes on Android as there doesn't seem to be a sep field)
   calOptions.url = "https://www.google.com";

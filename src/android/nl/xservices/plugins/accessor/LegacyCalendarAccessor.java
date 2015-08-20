@@ -121,13 +121,13 @@ public class LegacyCalendarAccessor extends AbstractCalendarAccessor {
   }
 
   @Override
-  public void createEvent(Uri eventsUri, String title, long startTime, long endTime,
+  public String createEvent(Uri eventsUri, String title, long startTime, long endTime,
                           String description, String location, Long firstReminderMinutes, Long secondReminderMinutes,
-                          String recurrence, Long recurrenceEndTime, Integer calendarId,
+                          String recurrence, int recurrenceInterval, Long recurrenceEndTime, Integer calendarId,
                           String url) {
     eventsUri = eventsUri == null ? Uri.parse(CONTENT_PROVIDER_PRE_FROYO + CONTENT_PROVIDER_PATH_EVENTS) : eventsUri;
-    super.createEvent(eventsUri, title, startTime, endTime, description, location,
-        firstReminderMinutes, secondReminderMinutes, recurrence, recurrenceEndTime, calendarId, url);
+    return super.createEvent(eventsUri, title, startTime, endTime, description, location,
+        firstReminderMinutes, secondReminderMinutes, recurrence, recurrenceInterval, recurrenceEndTime, calendarId, url);
   }
 
 }

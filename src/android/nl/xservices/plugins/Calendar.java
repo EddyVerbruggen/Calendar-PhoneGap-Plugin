@@ -220,7 +220,7 @@ public class Calendar extends CordovaPlugin {
 
   private AbstractCalendarAccessor getCalendarAccessor() {
     if (this.calendarAccessor == null) {
-      // Note: currently LegacyCalendarAccessor is never used, see the TODO at the top of this class
+      // Note: currently LegacyCalendarAccessor is never used, see the TO-DO at the top of this class
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
         Log.d(LOG_TAG, "Initializing calendar plugin");
         this.calendarAccessor = new CalendarProviderAccessor(this.cordova);
@@ -300,7 +300,7 @@ public class Calendar extends CordovaPlugin {
         @Override
         public void run() {
           try {
-            getCalendarAccessor().createEvent(
+            final String createdEventID = getCalendarAccessor().createEvent(
                 null,
                 argObject.getString("title"),
                 argObject.getLong("startTime"),
@@ -310,17 +310,18 @@ public class Calendar extends CordovaPlugin {
                 argOptionsObject.optLong("firstReminderMinutes"),
                 argOptionsObject.optLong("secondReminderMinutes"),
                 argOptionsObject.isNull("recurrence") ? null : argOptionsObject.getString("recurrence"),
+                argOptionsObject.optInt("recurrenceInterval"),
                 argOptionsObject.optLong("recurrenceEndTime"),
                 argOptionsObject.optInt("calendarId", 1),
                 argOptionsObject.optString("url"));
-            callback.success();
+            callback.success(createdEventID);
           } catch (JSONException e) {
             e.printStackTrace();
           }
         }
       });
-    } catch (JSONException e) {
-      System.err.println("Exception: " + e.getMessage());
+    } catch (Exception e) {
+      Log.e(LOG_TAG, "Error creating event. Invoking error callback.", e);
       callback.error(e.getMessage());
     }
   }
@@ -404,11 +405,18 @@ public class Calendar extends CordovaPlugin {
     if (requestCode == RESULT_CODE_CREATE) {
       if (resultCode == Activity.RESULT_OK || resultCode == Activity.RESULT_CANCELED) {
         // resultCode may be 0 (RESULT_CANCELED) even when it was created, so passing nothing is the clearest option here
+        Log.d(LOG_TAG, "onActivityResult resultcode: " + resultCode);
+        callback.success();
+      } else {
+        // odd case
+        Log.d(LOG_TAG, "onActivityResult weird resultcode: " + resultCode);
         callback.success();
       }
     } else if (requestCode == RESULT_CODE_OPENCAL) {
+      Log.d(LOG_TAG, "onActivityResult requestCode: " + RESULT_CODE_OPENCAL);
       callback.success();
     } else {
+      Log.d(LOG_TAG, "onActivityResult error, resultcode: " + resultCode);
       callback.error("Unable to add event (" + resultCode + ").");
     }
   }

@@ -427,10 +427,9 @@ public abstract class AbstractCalendarAccessor {
     return nrDeletedRecords > 0;
   }
 
-  public void createEvent(Uri eventsUri, String title, long startTime, long endTime, String description,
-                          String location, Long firstReminderMinutes, Long secondReminderMinutes,
-                          String recurrence, Long recurrenceEndTime, Integer calendarId,
-                          String url) {
+  public String createEvent(Uri eventsUri, String title, long startTime, long endTime, String description,
+                            String location, Long firstReminderMinutes, Long secondReminderMinutes,
+                            String recurrence, int recurrenceInterval, Long recurrenceEndTime, Integer calendarId, String url) {
     ContentResolver cr = this.cordova.getActivity().getContentResolver();
     ContentValues values = new ContentValues();
     final boolean allDayEvent = isAllDayEvent(new Date(startTime), new Date(endTime));
@@ -461,35 +460,38 @@ public abstract class AbstractCalendarAccessor {
 
     if (recurrence != null) {
       if (recurrenceEndTime == null) {
-        values.put(Events.RRULE, "FREQ=" + recurrence.toUpperCase());
+        values.put(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";INTERVAL=" + recurrenceInterval);
       } else {
         final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        values.put(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";UNTIL=" + sdf.format(new Date(recurrenceEndTime))+"T000000Z");
+        values.put(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";INTERVAL=" + recurrenceInterval + ";UNTIL=" + sdf.format(new Date(recurrenceEndTime))+"T000000Z");
       }
     }
 
+    // runtime exceptions are dealt with by the caller
     Uri uri = cr.insert(eventsUri, values);
-//    long eventID = Long.parseLong(uri.getLastPathSegment());
-//    Log.d(LOG_TAG, "Created event with ID " + eventID);
+    String createdEventID = uri.getLastPathSegment();
+    Log.d(LOG_TAG, "Created event with ID " + createdEventID);
 
-    // TODO ?
-//    getActiveCalendarIds();
+    try {
+      if (firstReminderMinutes != null) {
+        ContentValues reminderValues = new ContentValues();
+        reminderValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
+        reminderValues.put("minutes", firstReminderMinutes);
+        reminderValues.put("method", 1);
+        cr.insert(Uri.parse(CONTENT_PROVIDER + CONTENT_PROVIDER_PATH_REMINDERS), reminderValues);
+      }
 
-    if (firstReminderMinutes != null) {
-      ContentValues reminderValues = new ContentValues();
-      reminderValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
-      reminderValues.put("minutes", firstReminderMinutes);
-      reminderValues.put("method", 1);
-      cr.insert(Uri.parse(CONTENT_PROVIDER + CONTENT_PROVIDER_PATH_REMINDERS), reminderValues);
+      if (secondReminderMinutes != null) {
+        ContentValues reminderValues = new ContentValues();
+        reminderValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
+        reminderValues.put("minutes", secondReminderMinutes);
+        reminderValues.put("method", 1);
+        cr.insert(Uri.parse(CONTENT_PROVIDER + CONTENT_PROVIDER_PATH_REMINDERS), reminderValues);
+      }
+    } catch (Exception e) {
+      Log.e(LOG_TAG, "Creating reminders failed, ignoring since the event was created.", e);
     }
-
-    if (secondReminderMinutes != null) {
-      ContentValues reminderValues = new ContentValues();
-      reminderValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
-      reminderValues.put("minutes", secondReminderMinutes);
-      reminderValues.put("method", 1);
-      cr.insert(Uri.parse(CONTENT_PROVIDER + CONTENT_PROVIDER_PATH_REMINDERS), reminderValues);
-    }
+    return createdEventID;
   }
 
   public void createCalendar(String calendarName) {
