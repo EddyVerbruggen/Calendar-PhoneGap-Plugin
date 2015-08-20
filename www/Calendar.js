@@ -49,6 +49,7 @@ Calendar.prototype.getCalendarOptions = function () {
     firstReminderMinutes: 60,
     secondReminderMinutes: null,
     recurrence: null, // options are: 'daily', 'weekly', 'monthly', 'yearly'
+    interval: 1,
     recurrenceEndDate: null,
     calendarName: null,
     calendarId: null,
