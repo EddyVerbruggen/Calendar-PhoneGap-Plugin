@@ -455,7 +455,7 @@ public abstract class AbstractCalendarAccessor {
       }
     }
     values.put(Events.DESCRIPTION, description);
-    values.put(Events.HAS_ALARM, 1);
+    values.put(Events.HAS_ALARM, (firstReminderMinutes == null && secondReminderMinutes == null) ? 0 : 1);
     values.put(Events.CALENDAR_ID, calendarId);
     values.put(Events.EVENT_LOCATION, location);
 
@@ -469,11 +469,11 @@ public abstract class AbstractCalendarAccessor {
     }
 
     Uri uri = cr.insert(eventsUri, values);
-
-    Log.d(LOG_TAG, "Added to ContentResolver");
+//    long eventID = Long.parseLong(uri.getLastPathSegment());
+//    Log.d(LOG_TAG, "Created event with ID " + eventID);
 
     // TODO ?
-    getActiveCalendarIds();
+//    getActiveCalendarIds();
 
     if (firstReminderMinutes != null) {
       ContentValues reminderValues = new ContentValues();
