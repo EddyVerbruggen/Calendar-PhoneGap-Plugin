@@ -47,34 +47,42 @@ public class Calendar extends CordovaPlugin {
 
     if (ACTION_OPEN_CALENDAR.equals(action)) {
       if (hasLimitedSupport) {
-        return openCalendarLegacy(args);
+        openCalendarLegacy(args);
       } else {
-        return openCalendar(args);
+        openCalendar(args);
       }
+      return true;
     } else if (ACTION_CREATE_EVENT_WITH_OPTIONS.equals(action)) {
       if (hasLimitedSupport) {
         // TODO investigate this option some day: http://stackoverflow.com/questions/3721963/how-to-add-calendar-events-in-android
-        return createEventInteractively(args);
+        createEventInteractively(args);
       } else {
-        return createEvent(args);
+        createEvent(args);
       }
+      return true;
     } else if (ACTION_CREATE_EVENT_INTERACTIVELY.equals(action)) {
-      return createEventInteractively(args);
+      createEventInteractively(args);
+      return true;
     } else if (ACTION_LIST_EVENTS_IN_RANGE.equals(action)) {
-      return listEventsInRange(args);
+      listEventsInRange(args);
+      return true;
     } else if (!hasLimitedSupport && ACTION_FIND_EVENT_WITH_OPTIONS.equals(action)) {
-      return findEvents(args);
+      findEvents(args);
+      return true;
     } else if (!hasLimitedSupport && ACTION_DELETE_EVENT.equals(action)) {
-      return deleteEvent(args);
+      deleteEvent(args);
+      return true;
     } else if (ACTION_LIST_CALENDARS.equals(action)) {
-      return listCalendars();
+      listCalendars();
+      return true;
     } else if (!hasLimitedSupport && ACTION_CREATE_CALENDAR.equals(action)) {
-      return createCalendar(args);
+      createCalendar(args);
+      return true;
     }
     return false;
   }
 
-  private boolean openCalendarLegacy(JSONArray args) {
+  private void openCalendarLegacy(JSONArray args) {
     try {
       final Long millis = args.getJSONObject(0).optLong("date");
 
@@ -90,16 +98,14 @@ public class Calendar extends CordovaPlugin {
           callback.success();
         }
       });
-      return true;
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
       callback.error(e.getMessage());
-      return false;
     }
   }
 
   @TargetApi(14)
-  private boolean openCalendar(JSONArray args) {
+  private void openCalendar(JSONArray args) {
     try {
       final Long millis = args.getJSONObject(0).optLong("date");
 
@@ -115,15 +121,13 @@ public class Calendar extends CordovaPlugin {
           callback.success();
         }
       });
-      return true;
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
       callback.error(e.getMessage());
-      return false;
     }
   }
 
-  private boolean listCalendars() {
+  private void listCalendars() {
     cordova.getThreadPool().execute(new Runnable() {
       @Override
       public void run() {
@@ -138,15 +142,13 @@ public class Calendar extends CordovaPlugin {
         callback.sendPluginResult(res);
       }
     });
-
-    return true;
   }
 
   // note: not quite ready for primetime yet
-  private boolean createCalendar(JSONArray args) {
+  private void createCalendar(JSONArray args) {
     if (args.length() == 0) {
       System.err.println("Exception: No Arguments passed");
-      return false;
+      return;
     }
 
     try {
@@ -163,15 +165,13 @@ public class Calendar extends CordovaPlugin {
           callback.sendPluginResult(res);
         }
       });
-      return true;
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
       callback.error(e.getMessage());
-      return false;
     }
   }
 
-  private boolean createEventInteractively(JSONArray args) {
+  private void createEventInteractively(JSONArray args) {
     try {
       final JSONObject jsonFilter = args.getJSONObject(0);
       final JSONObject argOptionsObject = jsonFilter.getJSONObject("options");
@@ -210,11 +210,9 @@ public class Calendar extends CordovaPlugin {
           Calendar.this.cordova.startActivityForResult(Calendar.this, calIntent, RESULT_CODE_CREATE);
         }
       });
-      return true;
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
       callback.error(e.getMessage());
-      return false;
     }
   }
 
@@ -234,10 +232,10 @@ public class Calendar extends CordovaPlugin {
     return this.calendarAccessor;
   }
 
-  private boolean deleteEvent(JSONArray args) {
+  private void deleteEvent(JSONArray args) {
     if (args.length() == 0) {
       System.err.println("Exception: No Arguments passed");
-      return false;
+      return;
     }
 
     try {
@@ -258,18 +256,16 @@ public class Calendar extends CordovaPlugin {
           callback.sendPluginResult(res);
         }
       });
-      return true;
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
       callback.error(e.getMessage());
-      return false;
     }
   }
 
-  private boolean findEvents(JSONArray args) {
+  private void findEvents(JSONArray args) {
     if (args.length() == 0) {
       System.err.println("Exception: No Arguments passed");
-      return false;
+      return;
     }
 
     try {
@@ -289,15 +285,13 @@ public class Calendar extends CordovaPlugin {
           callback.sendPluginResult(res);
         }
       });
-      return true;
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
       callback.error(e.getMessage());
-      return false;
     }
   }
 
-  private boolean createEvent(JSONArray args) {
+  private void createEvent(JSONArray args) {
     try {
       final JSONObject argObject = args.getJSONObject(0);
       final JSONObject argOptionsObject = argObject.getJSONObject("options");
@@ -325,15 +319,13 @@ public class Calendar extends CordovaPlugin {
           }
         }
       });
-      return true;
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
       callback.error(e.getMessage());
-      return false;
     }
   }
 
-  private boolean listEventsInRange(JSONArray args) {
+  private void listEventsInRange(JSONArray args) {
     try {
       final Uri l_eventUri;
       if (Build.VERSION.SDK_INT >= 8) {
@@ -402,11 +394,9 @@ public class Calendar extends CordovaPlugin {
           callback.sendPluginResult(res);
         }
       });
-      return true;
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
       callback.error(e.getMessage());
-      return false;
     }
   }
 
