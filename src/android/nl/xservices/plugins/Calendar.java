@@ -153,7 +153,11 @@ public class Calendar extends CordovaPlugin {
 
     try {
       final JSONObject jsonFilter = args.getJSONObject(0);
-      final String calendarName = jsonFilter.getString("calendarName");
+      final String calendarName = getPossibleNullString("calendarName", jsonFilter);
+      if (calendarName == null) {
+        callback.error("calendarName is mandatory");
+        return;
+      }
 
       cordova.getThreadPool().execute(new Runnable() {
         @Override
@@ -181,7 +185,7 @@ public class Calendar extends CordovaPlugin {
         public void run() {
           final Intent calIntent = new Intent(Intent.ACTION_EDIT)
               .setType("vnd.android.cursor.item/event")
-              .putExtra("title", jsonFilter.optString("title"))
+              .putExtra("title", getPossibleNullString("title", jsonFilter))
               .putExtra("beginTime", jsonFilter.optLong("startTime"))
               .putExtra("endTime", jsonFilter.optLong("endTime"))
               .putExtra("hasAlarm", 1)
@@ -249,8 +253,8 @@ public class Calendar extends CordovaPlugin {
               null,
               jsonFilter.optLong("startTime"),
               jsonFilter.optLong("endTime"),
-              jsonFilter.optString("title"),
-              jsonFilter.optString("location"));
+              getPossibleNullString("title", jsonFilter),
+              getPossibleNullString("location", jsonFilter));
           PluginResult res = new PluginResult(PluginResult.Status.OK, deleteResult);
           res.setKeepCallback(true);
           callback.sendPluginResult(res);
@@ -275,8 +279,8 @@ public class Calendar extends CordovaPlugin {
         @Override
         public void run() {
           JSONArray jsonEvents = getCalendarAccessor().findEvents(
-              jsonFilter.optString("title"),
-              jsonFilter.optString("location"),
+              getPossibleNullString("title", jsonFilter),
+              getPossibleNullString("location", jsonFilter),
               jsonFilter.optLong("startTime"),
               jsonFilter.optLong("endTime"));
 
@@ -302,18 +306,18 @@ public class Calendar extends CordovaPlugin {
           try {
             final String createdEventID = getCalendarAccessor().createEvent(
                 null,
-                argObject.getString("title"),
+                getPossibleNullString("title", argObject),
                 argObject.getLong("startTime"),
                 argObject.getLong("endTime"),
-                argObject.optString("notes"),
-                argObject.isNull("location") ? null : argObject.getString("location"),
+                getPossibleNullString("notes", argObject),
+                getPossibleNullString("location", argObject),
                 argOptionsObject.optLong("firstReminderMinutes"),
                 argOptionsObject.optLong("secondReminderMinutes"),
-                argOptionsObject.isNull("recurrence") ? null : argOptionsObject.getString("recurrence"),
+                getPossibleNullString("recurrence", argOptionsObject),
                 argOptionsObject.optInt("recurrenceInterval"),
                 argOptionsObject.optLong("recurrenceEndTime"),
                 argOptionsObject.optInt("calendarId", 1),
-                argOptionsObject.optString("url"));
+                getPossibleNullString("url", argOptionsObject));
             callback.success(createdEventID);
           } catch (JSONException e) {
             e.printStackTrace();
@@ -324,6 +328,10 @@ public class Calendar extends CordovaPlugin {
       Log.e(LOG_TAG, "Error creating event. Invoking error callback.", e);
       callback.error(e.getMessage());
     }
+  }
+
+  private static String getPossibleNullString(String param, JSONObject from) {
+    return from.isNull(param) ? null : from.optString("name");
   }
 
   private void listEventsInRange(JSONArray args) {
