@@ -2,7 +2,8 @@
 
 for iOS and Android, by [Eddy Verbruggen](http://www.x-services.nl)
 
-[<img scr="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif"/>](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=eddyverbruggen%40gmail%2ecom&lc=US&item_name=cordova%2dplugin%2dcalendar&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
+
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=eddyverbruggen%40gmail%2ecom&lc=US&item_name=cordova%2dplugin%2dcalendar&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
 Every now and then I get a request for donation.
 Of course I'm happy to receive any amount but I'm just as happy if you simply 'star' this project.
 
