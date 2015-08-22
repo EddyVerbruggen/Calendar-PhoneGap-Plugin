@@ -4,7 +4,7 @@ for iOS and Android, by [Eddy Verbruggen](http://www.x-services.nl)
 
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=eddyverbruggen%40gmail%2ecom&lc=US&item_name=cordova%2dplugin%2dcalendar&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
-Every now and then I get a request for donation.
+Every now and then kind folks ask me how they can give me all their money.
 Of course I'm happy to receive any amount but I'm just as happy if you simply 'star' this project.
 
 <table width="100%">
@@ -16,7 +16,7 @@ Of course I'm happy to receive any amount but I'm just as happy if you simply 's
 
 1. [Description](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#1-description)
 2. [Installation](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#2-installation)
-	2. [Automatically (CLI / Plugman)](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#automatically-cli--plugman)
+	2. [Automatically](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#automatically)
 	2. [Manually](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#manually)
 	2. [PhoneGap Build](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#phonegap-build)
 3. [Usage](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#3-usage)
@@ -43,19 +43,15 @@ This plugin allows you to add events to the Calendar of the mobile device.
 
 ## 2. Installation
 
-### Automatically (CLI / Plugman)
-Calendar is compatible with [Cordova Plugman](https://github.com/apache/cordova-plugman) and ready for the [PhoneGap 3.0 CLI](http://docs.phonegap.com/en/3.0.0/guide_cli_index.md.html#The%20Command-line%20Interface_add_features), here's how it works with the CLI:
+### Automatically
+Latest release on npm:
+```
+$ cordova plugin add cordova-plugin-calendar
+```
 
-```
-$ phonegap local plugin add https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin.git
-```
-or
+Bleeding edge, from github:
 ```
 $ cordova plugin add https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin.git
-```
-and run this command afterwards:
-```
-$ cordova build
 ```
 
 ### Manually
