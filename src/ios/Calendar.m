@@ -582,24 +582,32 @@
     myEvent.URL = myUrl;
   }
   
-  NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
-  NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
+  if (startTime != (id)[NSNull null]) {
+    NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
+    NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
+    myEvent.startDate = myStartDate;
+  }
   
-  NSTimeInterval _endInterval = [endTime doubleValue] / 1000; // strip millis
+  if (endTime != (id)[NSNull null]) {
+    NSTimeInterval _endInterval = [endTime doubleValue] / 1000; // strip millis
+    if (startTime != (id)[NSNull null]) {
+      NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
+      int duration = _endInterval - _startInterval;
+      int moduloDay = duration % (60 * 60 * 24);
+      if (moduloDay == 0) {
+        myEvent.allDay = YES;
+        myEvent.endDate = [NSDate dateWithTimeIntervalSince1970:_endInterval - 1];
+      } else {
+        myEvent.endDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
+      }
+    } else {
+      myEvent.endDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
+    }
+  }
   
   myEvent.title = title;
   myEvent.location = location;
   myEvent.notes = notes;
-  myEvent.startDate = myStartDate;
-  
-  int duration = _endInterval - _startInterval;
-  int moduloDay = duration % (60 * 60 * 24);
-  if (moduloDay == 0) {
-    myEvent.allDay = YES;
-    myEvent.endDate = [NSDate dateWithTimeIntervalSince1970:_endInterval - 1];
-  } else {
-    myEvent.endDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
-  }
   
   [self.commandDelegate runInBackground: ^{
     EKCalendar* calendar = nil;
