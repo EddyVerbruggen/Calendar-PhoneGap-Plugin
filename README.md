@@ -109,13 +109,9 @@ use one function of this plugin: `createEventInteractively`.
 
 ### PhoneGap Build
 
-Add the following xml to your `config.xml` to always use the latest version of this plugin:
+Add the following xml to your `config.xml` to always use the latest npm version of this plugin:
 ```xml
-<gap:plugin name="nl.x-services.plugins.calendar" />
-```
-or to use a specific version:
-```xml
-<gap:plugin name="nl.x-services.plugins.calendar" version="4.2.8" />
+<gap:plugin name="cordova-plugin-calendar" source="npm" />
 ```
 
 
