@@ -199,7 +199,7 @@ public abstract class AbstractCalendarAccessor {
     if (title != null) {
       //selection += Events.TITLE + "=?";
       selection += Events.TITLE + " LIKE ?";
-      selectionList.add(title+"%");
+      selectionList.add("%" + title + "%");
     }
     if (location != null && !location.equals("")) {
       if (!"".equals(selection)) {
