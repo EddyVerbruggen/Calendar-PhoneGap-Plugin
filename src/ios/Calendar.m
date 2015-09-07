@@ -132,10 +132,10 @@
 
 
   [self.commandDelegate runInBackground: ^{
-      NSArray<EKCalendar *>* calendars = nil;
+      NSArray *calendars = nil;
       
       if (calendarName == (id)[NSNull null]) {
-          calendars = self.eventStore.calendars;
+          calendars = [self.eventStore calendarsForEntityType:EKEntityTypeEvent];
           if (calendars.count == 0) {
               CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No default calendar found. Is access to the Calendar blocked for this app?"];
               [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -303,7 +303,7 @@
                            notes: (NSString *)notes
                        startDate: (NSDate *)startDate
                          endDate: (NSDate *)endDate
-                       calendars: (NSArray<EKCalendar *>*)  calendars {
+                       calendars: (NSArray*)calendars {
 
   NSMutableArray *predicateStrings = [NSMutableArray arrayWithCapacity:3];
   if (title != (id)[NSNull null] && title.length > 0) {
@@ -735,7 +735,7 @@
     NSTimeInterval _endInterval = [endTime doubleValue] / 1000; // strip millis
     NSDate *myEndDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
 
-    NSArray<EKCalendar *>* calendars = nil;
+    NSArray* calendars = nil;
 
     if (calendarName == (id)[NSNull null]) {
         calendars = [self.eventStore calendarsForEntityType:EKEntityTypeEvent];
