@@ -15,7 +15,7 @@
                            notes: (NSString *)notes
                        startDate: (NSDate *)startDate
                          endDate: (NSDate *)endDate
-                        calendar: (EKCalendar *) calendar;
+                       calendars: (EKCalendar *) calendar;
 
 - (void)openCalendar:(CDVInvokedUrlCommand*)command;
 - (void)createCalendar:(CDVInvokedUrlCommand*)command;
