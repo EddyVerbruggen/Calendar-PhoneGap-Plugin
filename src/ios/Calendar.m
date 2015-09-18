@@ -733,8 +733,18 @@
     NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
     NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
 
-    NSTimeInterval _endInterval = [endTime doubleValue] / 1000; // strip millis
-    NSDate *myEndDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
+    NSDate* myEndDate;
+    if ([endTime doubleValue] > 0) {
+      NSTimeInterval _endInterval = [endTime doubleValue] / 1000; // strip millis
+      myEndDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
+    } else {
+      // an enddate is mandatory for iOS, so using now+1y if it's not passed in
+      NSDateComponents *oneYearFromNowComponents = [[NSDateComponents alloc] init];
+      oneYearFromNowComponents.year = 1;
+      myEndDate = [[NSCalendar currentCalendar] dateByAddingComponents:oneYearFromNowComponents
+                                                                toDate:[NSDate date]
+                                                               options:0];
+    }
 
     NSArray* calendars = nil;
 
