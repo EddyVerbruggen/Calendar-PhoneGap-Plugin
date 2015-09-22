@@ -133,7 +133,7 @@
 
   [self.commandDelegate runInBackground: ^{
       NSArray *calendars = nil;
-      
+
       if (calendarName == (id)[NSNull null]) {
           calendars = [self.eventStore calendarsForEntityType:EKEntityTypeEvent];
           if (calendars.count == 0) {
@@ -143,7 +143,7 @@
           }
       } else {
           EKCalendar * calendar = [self findEKCalendar:calendarName];
-          
+
           if (calendar == nil) {
               CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Could not find calendar"];
               [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -152,9 +152,9 @@
               calendars = [NSArray arrayWithObject:calendar];
           }
       }
-      
+
       EKEvent *theEvent = nil;
-      
+
       // Find matches
       if (calEventID != nil) {
           theEvent = [self.eventStore calendarItemWithIdentifier:calEventID];
@@ -221,7 +221,7 @@
 
       NSString* recurrence = [newCalOptions objectForKey:@"recurrence"];
       NSNumber* intervalAmount = [newCalOptions objectForKey:@"interval"];
-      
+
       if (recurrence != (id)[NSNull null]) {
         EKRecurrenceRule *rule = [[EKRecurrenceRule alloc] initRecurrenceWithFrequency: [self toEKRecurrenceFrequency:recurrence]
                                                                               interval: intervalAmount.integerValue
@@ -327,12 +327,12 @@
 
   if (predicateString.length > 0) {
     matches = [NSPredicate predicateWithFormat:predicateString];
- 
+
     datedEvents = [self.eventStore eventsMatchingPredicate:[eventStore predicateForEventsWithStartDate:startDate endDate:endDate calendars:calendars]];
 
     matchingEvents = [datedEvents filteredArrayUsingPredicate:matches];
   } else {
- 
+
     datedEvents = [self.eventStore eventsMatchingPredicate:[eventStore predicateForEventsWithStartDate:startDate endDate:endDate calendars:calendars]];
 
     matchingEvents = datedEvents;
@@ -408,7 +408,7 @@
       }
       [entry setObject:attendees forKey:@"attendees"];
     }
-    
+
     [entry setObject:event.calendarItemIdentifier forKey:@"id"];
     [results addObject:entry];
   }
@@ -577,7 +577,7 @@
   NSString* recurrenceEndTime = [calOptions objectForKey:@"recurrenceEndTime"];
   NSString* calendarName = [calOptions objectForKey:@"calendarName"];
   NSString* url = [calOptions objectForKey:@"url"];
-  NSNumber* intervalAmount = [calOptions objectForKey:@"interval"];
+  NSNumber* intervalAmount = [calOptions objectForKey:@"recurrenceInterval"];
 
   EKEvent *myEvent = [EKEvent eventWithEventStore: self.eventStore];
   if (url != (id)[NSNull null]) {
@@ -611,7 +611,7 @@
   myEvent.title = title;
   myEvent.location = location;
   myEvent.notes = notes;
-  
+
   [self.commandDelegate runInBackground: ^{
     EKCalendar* calendar = nil;
 
