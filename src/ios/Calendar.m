@@ -220,7 +220,7 @@
       }
 
       NSString* recurrence = [newCalOptions objectForKey:@"recurrence"];
-      NSNumber* intervalAmount = [newCalOptions objectForKey:@"interval"];
+      NSNumber* intervalAmount = [newCalOptions objectForKey:@"recurrenceInterval"];
 
       if (recurrence != (id)[NSNull null]) {
         EKRecurrenceRule *rule = [[EKRecurrenceRule alloc] initRecurrenceWithFrequency: [self toEKRecurrenceFrequency:recurrence]
