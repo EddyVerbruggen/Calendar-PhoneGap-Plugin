@@ -36,13 +36,16 @@ public class Calendar extends CordovaPlugin {
   public static final Integer RESULT_CODE_CREATE = 0;
   public static final Integer RESULT_CODE_OPENCAL = 1;
 
-  private CallbackContext callback;
+  private CallbackContext instanceCallbackContext;
 
   private static final String LOG_TAG = AbstractCalendarAccessor.LOG_TAG;
 
   @Override
   public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-    callback = callbackContext;
+	// Keep a copy of the callbackContext for use with non-reentrant functions that use startActivityForResult()
+	// which will cause onActivityResult() to be called asynchonously
+    instanceCallbackContext = callbackContext;
+    
     final boolean hasLimitedSupport = Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH;
 
     if (ACTION_OPEN_CALENDAR.equals(action)) {
@@ -57,26 +60,26 @@ public class Calendar extends CordovaPlugin {
         // TODO investigate this option some day: http://stackoverflow.com/questions/3721963/how-to-add-calendar-events-in-android
         createEventInteractively(args);
       } else {
-        createEvent(args);
+        createEvent(args, callbackContext);
       }
       return true;
     } else if (ACTION_CREATE_EVENT_INTERACTIVELY.equals(action)) {
       createEventInteractively(args);
       return true;
     } else if (ACTION_LIST_EVENTS_IN_RANGE.equals(action)) {
-      listEventsInRange(args);
+      listEventsInRange(args, callbackContext);
       return true;
     } else if (!hasLimitedSupport && ACTION_FIND_EVENT_WITH_OPTIONS.equals(action)) {
-      findEvents(args);
+      findEvents(args, callbackContext);
       return true;
     } else if (!hasLimitedSupport && ACTION_DELETE_EVENT.equals(action)) {
-      deleteEvent(args);
+      deleteEvent(args, callbackContext);
       return true;
     } else if (ACTION_LIST_CALENDARS.equals(action)) {
-      listCalendars();
+      listCalendars(callbackContext);
       return true;
     } else if (!hasLimitedSupport && ACTION_CREATE_CALENDAR.equals(action)) {
-      createCalendar(args);
+      createCalendar(args, callbackContext);
       return true;
     }
     return false;
@@ -95,12 +98,12 @@ public class Calendar extends CordovaPlugin {
           calendarIntent.setClassName("com.android.calendar", "com.android.calendar.AgendaActivity");
           Calendar.this.cordova.startActivityForResult(Calendar.this, calendarIntent, RESULT_CODE_OPENCAL);
 
-          callback.success();
+          instanceCallbackContext.success();
         }
       });
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
-      callback.error(e.getMessage());
+      instanceCallbackContext.error(e.getMessage());
     }
   }
 
@@ -118,16 +121,16 @@ public class Calendar extends CordovaPlugin {
           final Intent intent = new Intent(Intent.ACTION_VIEW).setData(builder.build());
           Calendar.this.cordova.startActivityForResult(Calendar.this, intent, RESULT_CODE_OPENCAL);
 
-          callback.success();
+          instanceCallbackContext.success();
         }
       });
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
-      callback.error(e.getMessage());
+      instanceCallbackContext.error(e.getMessage());
     }
   }
 
-  private void listCalendars() {
+  private void listCalendars(final CallbackContext callbackContext) {
     cordova.getThreadPool().execute(new Runnable() {
       @Override
       public void run() {
@@ -136,16 +139,16 @@ public class Calendar extends CordovaPlugin {
           jsonObject = Calendar.this.getCalendarAccessor().getActiveCalendars();
         } catch (JSONException e) {
           System.err.println("Exception: " + e.getMessage());
-          callback.error(e.getMessage());
+          callbackContext.error(e.getMessage());
         }
         PluginResult res = new PluginResult(PluginResult.Status.OK, jsonObject);
-        callback.sendPluginResult(res);
+        callbackContext.sendPluginResult(res);
       }
     });
   }
 
   // note: not quite ready for primetime yet
-  private void createCalendar(JSONArray args) {
+  private void createCalendar(JSONArray args, final CallbackContext callbackContext) {
     if (args.length() == 0) {
       System.err.println("Exception: No Arguments passed");
       return;
@@ -155,7 +158,7 @@ public class Calendar extends CordovaPlugin {
       final JSONObject jsonFilter = args.getJSONObject(0);
       final String calendarName = getPossibleNullString("calendarName", jsonFilter);
       if (calendarName == null) {
-        callback.error("calendarName is mandatory");
+        callbackContext.error("calendarName is mandatory");
         return;
       }
 
@@ -165,13 +168,12 @@ public class Calendar extends CordovaPlugin {
           getCalendarAccessor().createCalendar(calendarName);
 
           PluginResult res = new PluginResult(PluginResult.Status.OK, "yes");
-          res.setKeepCallback(true);
-          callback.sendPluginResult(res);
+          callbackContext.sendPluginResult(res);
         }
       });
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
-      callback.error(e.getMessage());
+      callbackContext.error(e.getMessage());
     }
   }
 
@@ -216,7 +218,7 @@ public class Calendar extends CordovaPlugin {
       });
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
-      callback.error(e.getMessage());
+      instanceCallbackContext.error(e.getMessage());
     }
   }
 
@@ -236,7 +238,7 @@ public class Calendar extends CordovaPlugin {
     return this.calendarAccessor;
   }
 
-  private void deleteEvent(JSONArray args) {
+  private void deleteEvent(JSONArray args, final CallbackContext callbackContext) {
     if (args.length() == 0) {
       System.err.println("Exception: No Arguments passed");
       return;
@@ -256,17 +258,16 @@ public class Calendar extends CordovaPlugin {
               getPossibleNullString("title", jsonFilter),
               getPossibleNullString("location", jsonFilter));
           PluginResult res = new PluginResult(PluginResult.Status.OK, deleteResult);
-          res.setKeepCallback(true);
-          callback.sendPluginResult(res);
+          callbackContext.sendPluginResult(res);
         }
       });
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
-      callback.error(e.getMessage());
+      callbackContext.error(e.getMessage());
     }
   }
 
-  private void findEvents(JSONArray args) {
+  private void findEvents(JSONArray args, final CallbackContext callbackContext) {
     if (args.length() == 0) {
       System.err.println("Exception: No Arguments passed");
       return;
@@ -285,17 +286,16 @@ public class Calendar extends CordovaPlugin {
               jsonFilter.optLong("endTime"));
 
           PluginResult res = new PluginResult(PluginResult.Status.OK, jsonEvents);
-          res.setKeepCallback(true);
-          callback.sendPluginResult(res);
+          callbackContext.sendPluginResult(res);
         }
       });
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
-      callback.error(e.getMessage());
+      callbackContext.error(e.getMessage());
     }
   }
 
-  private void createEvent(JSONArray args) {
+  private void createEvent(JSONArray args, final CallbackContext callbackContext) {
     try {
       final JSONObject argObject = args.getJSONObject(0);
       final JSONObject argOptionsObject = argObject.getJSONObject("options");
@@ -318,7 +318,7 @@ public class Calendar extends CordovaPlugin {
                 argOptionsObject.optLong("recurrenceEndTime"),
                 argOptionsObject.optInt("calendarId", 1),
                 getPossibleNullString("url", argOptionsObject));
-            callback.success(createdEventID);
+            callbackContext.success(createdEventID);
           } catch (JSONException e) {
             e.printStackTrace();
           }
@@ -326,7 +326,7 @@ public class Calendar extends CordovaPlugin {
       });
     } catch (Exception e) {
       Log.e(LOG_TAG, "Error creating event. Invoking error callback.", e);
-      callback.error(e.getMessage());
+      callbackContext.error(e.getMessage());
     }
   }
 
@@ -334,7 +334,7 @@ public class Calendar extends CordovaPlugin {
     return from.isNull(param) ? null : from.optString(param);
   }
 
-  private void listEventsInRange(JSONArray args) {
+  private void listEventsInRange(JSONArray args, final CallbackContext callbackContext) {
     try {
       final Uri l_eventUri;
       if (Build.VERSION.SDK_INT >= 8) {
@@ -400,12 +400,12 @@ public class Calendar extends CordovaPlugin {
           }
 
           PluginResult res = new PluginResult(PluginResult.Status.OK, result);
-          callback.sendPluginResult(res);
+          callbackContext.sendPluginResult(res);
         }
       });
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
-      callback.error(e.getMessage());
+      callbackContext.error(e.getMessage());
     }
   }
 
@@ -414,18 +414,18 @@ public class Calendar extends CordovaPlugin {
       if (resultCode == Activity.RESULT_OK || resultCode == Activity.RESULT_CANCELED) {
         // resultCode may be 0 (RESULT_CANCELED) even when it was created, so passing nothing is the clearest option here
         Log.d(LOG_TAG, "onActivityResult resultcode: " + resultCode);
-        callback.success();
+        instanceCallbackContext.success();
       } else {
         // odd case
         Log.d(LOG_TAG, "onActivityResult weird resultcode: " + resultCode);
-        callback.success();
+        instanceCallbackContext.success();
       }
     } else if (requestCode == RESULT_CODE_OPENCAL) {
       Log.d(LOG_TAG, "onActivityResult requestCode: " + RESULT_CODE_OPENCAL);
-      callback.success();
+      instanceCallbackContext.success();
     } else {
       Log.d(LOG_TAG, "onActivityResult error, resultcode: " + resultCode);
-      callback.error("Unable to add event (" + resultCode + ").");
+      instanceCallbackContext.error("Unable to add event (" + resultCode + ").");
     }
   }
 }
