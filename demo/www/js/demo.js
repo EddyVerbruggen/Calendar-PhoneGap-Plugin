@@ -30,6 +30,30 @@ function onError(msg) {
   alert('Calendar error: ' + JSON.stringify(msg));
 }
 
+function hasReadPermission() {
+  window.plugins.calendar.hasReadPermission(onSuccess);
+}
+
+function requestReadPermission() {
+  window.plugins.calendar.requestReadPermission(onSuccess);
+}
+
+function hasWritePermission() {
+  window.plugins.calendar.hasWritePermission(onSuccess);
+}
+
+function requestWritePermission() {
+  window.plugins.calendar.requestWritePermission(onSuccess);
+}
+
+function hasReadWritePermission() {
+  window.plugins.calendar.hasReadWritePermission(onSuccess);
+}
+
+function requestReadWritePermission() {
+  window.plugins.calendar.requestReadWritePermission(onSuccess);
+}
+
 function openCalendar() {
   // today + 3 days
   var d = new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000);

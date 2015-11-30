@@ -11,6 +11,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.CalendarContract;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import nl.xservices.plugins.accessor.AbstractCalendarAccessor;
 import nl.xservices.plugins.accessor.CalendarProviderAccessor;
@@ -155,7 +157,7 @@ public class Calendar extends CordovaPlugin {
       ActivityCompat.requestPermissions(
           this.cordova.getActivity(),
           types,
-          444);
+          555);
     }
     // this method executes async and we seem to have no known way to receive the result, so simply returning ok now
     this.callback.success();
