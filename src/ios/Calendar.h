@@ -17,6 +17,15 @@
                          endDate: (NSDate *)endDate
                        calendars: (NSArray *)calendars;
 
+- (void)hasReadPermission:(CDVInvokedUrlCommand*)command;
+- (void)requestReadPermission:(CDVInvokedUrlCommand*)command;
+
+- (void)hasWritePermission:(CDVInvokedUrlCommand*)command;
+- (void)requestWritePermission:(CDVInvokedUrlCommand*)command;
+
+- (void)hasReadWritePermission:(CDVInvokedUrlCommand*)command;
+- (void)requestReadWritePermission:(CDVInvokedUrlCommand*)command;
+
 - (void)openCalendar:(CDVInvokedUrlCommand*)command;
 - (void)createCalendar:(CDVInvokedUrlCommand*)command;
 - (void)deleteCalendar:(CDVInvokedUrlCommand*)command;

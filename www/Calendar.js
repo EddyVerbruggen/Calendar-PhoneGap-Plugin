@@ -9,6 +9,30 @@ Calendar.prototype.getCreateCalendarOptions = function () {
   };
 };
 
+Calendar.prototype.hasReadPermission = function (callback) {
+  cordova.exec(callback, null, "Calendar", "hasReadPermission", []);
+};
+
+Calendar.prototype.requestReadPermission = function (callback) {
+  cordova.exec(callback, null, "Calendar", "requestReadPermission", []);
+};
+
+Calendar.prototype.hasWritePermission = function (callback) {
+  cordova.exec(callback, null, "Calendar", "hasWritePermission", []);
+};
+
+Calendar.prototype.requestWritePermission = function (callback) {
+  cordova.exec(callback, null, "Calendar", "requestWritePermission", []);
+};
+
+Calendar.prototype.hasReadWritePermission = function (callback) {
+  cordova.exec(callback, null, "Calendar", "hasReadWritePermission", []);
+};
+
+Calendar.prototype.requestReadWritePermission = function (callback) {
+  cordova.exec(callback, null, "Calendar", "requestReadWritePermission", []);
+};
+
 Calendar.prototype.createCalendar = function (calendarNameOrOptionsObject, successCallback, errorCallback) {
   var options;
   if (typeof calendarNameOrOptionsObject == "string") {

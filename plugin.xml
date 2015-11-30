@@ -3,7 +3,7 @@
     xmlns="http://apache.org/cordova/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="cordova-plugin-calendar"
-    version="4.4.4">
+    version="4.4.5">
 
   <name>Calendar</name>
 
@@ -63,5 +63,6 @@
                  target-dir="src/nl/xservices/plugins/accessor"/>
     <source-file src="src/android/nl/xservices/plugins/accessor/LegacyCalendarAccessor.java"
                  target-dir="src/nl/xservices/plugins/accessor"/>
+    <framework src="com.android.support:support-v4:+" />
   </platform>
 </plugin>
