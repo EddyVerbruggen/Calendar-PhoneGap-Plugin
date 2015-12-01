@@ -257,6 +257,40 @@ Creating an event for 3 full days
   var endDate = new Date(2014,2,27,0,0,0,0,0);
 ```
 
+### Android 6 (M) Permissions
+On Android 6 you need to request permission to use the Calenda at runtime when targeting API level 23+.
+Even if the uses-permission tags the Calendar are present in `AndroidManifest.xml`.
+
+Note that the hasPermission functions will return true when:
+
+- You're running this on iOS, or
+- You're targeting an API level lower than 23, or
+- You're using Android < 6, or
+- You've already granted permission.
+
+```js
+  function hasReadWritePermission() {
+    window.plugins.calendar.hasReadWritePermission(
+      function(result) {
+        // if this is 'false' you probably want to call 'requestReadWritePermission' now
+        alert(result);
+      }
+    )
+  }
+
+  function requestReadWritePermission() {
+    // no callbacks required as this opens a popup which returns async
+    window.plugins.calendar.requestReadWritePermission();
+  }
+```
+
+There are similar methods for Read and Write access only (`hasReadPermission`, etc),
+although it looks like that if you request read permission you can write as well,
+so you might as well stick with the example above.
+
+Note that backward compatibility was added by checking for read or write permission in the relevant plugins functions.
+If permission is needed the plugin will now show the permission request popup.
+The user will then need to allow access and invoke the same method again after doing so.
 
 ## 4. CREDITS ##
 

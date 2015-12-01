@@ -209,6 +209,13 @@ public class Calendar extends CordovaPlugin {
   }
 
   private void listCalendars() {
+    // note that if the dev didn't call requestReadPermission before calling this method and calendarPermissionGranted returns false,
+    // the app will ask permission and this method needs to be invoked again (done for backward compat).
+    if (!calendarPermissionGranted(Manifest.permission.READ_CALENDAR)) {
+      requestReadPermission();
+      this.callback.error("Please allow Read access to the Calendar and try again.");
+      return;
+    }
     cordova.getThreadPool().execute(new Runnable() {
       @Override
       public void run() {
@@ -229,6 +236,14 @@ public class Calendar extends CordovaPlugin {
   private void createCalendar(JSONArray args) {
     if (args.length() == 0) {
       System.err.println("Exception: No Arguments passed");
+      return;
+    }
+
+    // note that if the dev didn't call requestWritePermission before calling this method and calendarPermissionGranted returns false,
+    // the app will ask permission and this method needs to be invoked again (done for backward compat).
+    if (!calendarPermissionGranted(Manifest.permission.WRITE_CALENDAR)) {
+      requestWritePermission();
+      this.callback.error("Please allow Write access to the Calendar and try again.");
       return;
     }
 
@@ -323,6 +338,14 @@ public class Calendar extends CordovaPlugin {
       return;
     }
 
+    // note that if the dev didn't call requestWritePermission before calling this method and calendarPermissionGranted returns false,
+    // the app will ask permission and this method needs to be invoked again (done for backward compat).
+    if (!calendarPermissionGranted(Manifest.permission.WRITE_CALENDAR)) {
+      requestWritePermission();
+      this.callback.error("Please allow Write access to the Calendar and try again.");
+      return;
+    }
+
     try {
       final JSONObject jsonFilter = args.getJSONObject(0);
 
@@ -353,6 +376,14 @@ public class Calendar extends CordovaPlugin {
       return;
     }
 
+    // note that if the dev didn't call requestReadPermission before calling this method and calendarPermissionGranted returns false,
+    // the app will ask permission and this method needs to be invoked again (done for backward compat).
+    if (!calendarPermissionGranted(Manifest.permission.READ_CALENDAR)) {
+      requestReadPermission();
+      this.callback.error("Please allow Read access to the Calendar and try again.");
+      return;
+    }
+
     try {
       final JSONObject jsonFilter = args.getJSONObject(0);
 
@@ -377,6 +408,14 @@ public class Calendar extends CordovaPlugin {
   }
 
   private void createEvent(JSONArray args) {
+    // note that if the dev didn't call requestWritePermission before calling this method and calendarPermissionGranted returns false,
+    // the app will ask permission and this method needs to be invoked again (done for backward compat).
+    if (!calendarPermissionGranted(Manifest.permission.WRITE_CALENDAR)) {
+      requestWritePermission();
+      this.callback.error("Please allow Write access to the Calendar and try again.");
+      return;
+    }
+
     try {
       final JSONObject argObject = args.getJSONObject(0);
       final JSONObject argOptionsObject = argObject.getJSONObject("options");
@@ -416,6 +455,13 @@ public class Calendar extends CordovaPlugin {
   }
 
   private void listEventsInRange(JSONArray args) {
+    // note that if the dev didn't call requestReadPermission before calling this method and calendarPermissionGranted returns false,
+    // the app will ask permission and this method needs to be invoked again (done for backward compat).
+    if (!calendarPermissionGranted(Manifest.permission.READ_CALENDAR)) {
+      requestReadPermission();
+      this.callback.error("Please allow Read access to the Calendar and try again.");
+      return;
+    }
     try {
       final Uri l_eventUri;
       if (Build.VERSION.SDK_INT >= 8) {
@@ -479,6 +525,7 @@ public class Calendar extends CordovaPlugin {
               e.printStackTrace();
             }
           }
+          cursor.close();
 
           PluginResult res = new PluginResult(PluginResult.Status.OK, result);
           callback.sendPluginResult(res);
