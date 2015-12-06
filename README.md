@@ -111,9 +111,13 @@ use one function of this plugin: `createEventInteractively`.
 
 Add the following xml to your `config.xml` to always use the latest npm version of this plugin:
 ```xml
-<gap:plugin name="cordova-plugin-calendar" source="npm" />
+<plugin name="cordova-plugin-calendar" />
 ```
 
+Also, make sure you're building with Gradle by adding this to your `config.xml` file:
+```xml
+<preference name="android-build-tool" value="gradle" />
+```
 
 ## 3. Usage
 
