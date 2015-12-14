@@ -451,7 +451,7 @@ public class Calendar extends CordovaPlugin {
   }
 
   private static String getPossibleNullString(String param, JSONObject from) {
-    return from.isNull(param) ? null : from.optString(param);
+    return from.isNull(param) || "null".equals(from.optString(param)) ? null : from.optString(param);
   }
 
   private void listEventsInRange(JSONArray args) {
