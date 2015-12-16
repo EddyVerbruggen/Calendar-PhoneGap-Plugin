@@ -21,10 +21,10 @@
 
 - (void) initEventStoreWithCalendarCapabilities {
   __block BOOL accessGranted = NO;
-  eventStore= [[EKEventStore alloc] init];
-  if([eventStore respondsToSelector:@selector(requestAccessToEntityType:completion:)]) {
+  EKEventStore* eventStoreCandidate = [[EKEventStore alloc] init];
+  if([eventStoreCandidate respondsToSelector:@selector(requestAccessToEntityType:completion:)]) {
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    [eventStore requestAccessToEntityType:EKEntityTypeEvent completion:^(BOOL granted, NSError *error) {
+    [eventStoreCandidate requestAccessToEntityType:EKEntityTypeEvent completion:^(BOOL granted, NSError *error) {
       accessGranted = granted;
       dispatch_semaphore_signal(sema);
     }];
@@ -32,9 +32,9 @@
   } else { // we're on iOS 5 or older
     accessGranted = YES;
   }
-
+    
   if (accessGranted) {
-    self.eventStore = eventStore;
+    self.eventStore = eventStoreCandidate;
   }
 }
 
@@ -891,34 +891,44 @@
   [self.commandDelegate sendPluginResult:pluginResult callbackId:self.interactiveCallbackId];
 }
 
+
+/* There is no distingtion between read and write access in iOS */
 - (void)hasReadPermission:(CDVInvokedUrlCommand*)command {
-  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:YES];
+  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:(self.eventStore != nil)];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 - (void)requestReadPermission:(CDVInvokedUrlCommand*)command {
-  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:[self requestCalendarAccess]];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 - (void)hasWritePermission:(CDVInvokedUrlCommand*)command {
-  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:YES];
+  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:(self.eventStore != nil)];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 - (void)requestWritePermission:(CDVInvokedUrlCommand*)command {
-  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:[self requestCalendarAccess]];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 - (void)hasReadWritePermission:(CDVInvokedUrlCommand*)command {
-  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:YES];
+  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:(self.eventStore != nil)];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 - (void)requestReadWritePermission:(CDVInvokedUrlCommand*)command {
-  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:[self requestCalendarAccess]];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
+
+-(CDVCommandStatus)requestCalendarAccess{
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    [self initEventStoreWithCalendarCapabilities];
+    dispatch_semaphore_signal(sema);
+    return (self.eventStore != nil) ? CDVCommandStatus_OK : CDVCommandStatus_ERROR;
+}
+
 
 @end
