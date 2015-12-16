@@ -924,9 +924,7 @@
 }
 
 -(CDVCommandStatus)requestCalendarAccess{
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     [self initEventStoreWithCalendarCapabilities];
-    dispatch_semaphore_signal(sema);
     return (self.eventStore != nil) ? CDVCommandStatus_OK : CDVCommandStatus_ERROR;
 }
 
