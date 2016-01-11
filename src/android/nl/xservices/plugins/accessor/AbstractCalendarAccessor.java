@@ -205,8 +205,8 @@ public abstract class AbstractCalendarAccessor {
       if (!"".equals(selection)) {
         selection += " AND ";
       }
-      selection += Events.EVENT_LOCATION + "=?";
-      selectionList.add(location);
+      selection += Events.EVENT_LOCATION + " LIKE ?";
+      selectionList.add("%" + location + "%");
     }
 
     String[] selectionArgs = new String[selectionList.size()];

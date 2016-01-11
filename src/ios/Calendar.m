@@ -9,14 +9,10 @@
 @synthesize eventStore;
 @synthesize interactiveCallbackId;
 
-#pragma mark Initialisation functions
+#pragma mark Initialization functions
 
-- (CDVPlugin*) initWithWebView:(UIWebView*)theWebView {
-  self = (Calendar*)[super initWithWebView:theWebView];
-  if (self) {
+- (void) pluginInitialize {
     [self initEventStoreWithCalendarCapabilities];
-  }
-  return self;
 }
 
 - (void) initEventStoreWithCalendarCapabilities {
@@ -313,11 +309,11 @@
   }
   if (location != (id)[NSNull null] && location.length > 0) {
     location = [location stringByReplacingOccurrencesOfString:@"'" withString:@"\\'"];
-    [predicateStrings addObject:[NSString stringWithFormat:@"location == '%@'", location]];
+    [predicateStrings addObject:[NSString stringWithFormat:@"location contains[c] '%@'", location]];
   }
   if (notes != (id)[NSNull null] && notes.length > 0) {
     notes = [notes stringByReplacingOccurrencesOfString:@"'" withString:@"\\'"];
-    [predicateStrings addObject:[NSString stringWithFormat:@"notes == '%@'", notes]];
+    [predicateStrings addObject:[NSString stringWithFormat:@"notes contains[c] '%@'", notes]];
   }
 
   NSString *predicateString = [predicateStrings componentsJoinedByString:@" AND "];
