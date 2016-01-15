@@ -453,7 +453,7 @@ public class Calendar extends CordovaPlugin {
   private static String getPossibleNullString(String param, JSONObject from) {
     return from.isNull(param) || "null".equals(from.optString(param)) ? null : from.optString(param);
   }
-
+  
   private void listEventsInRange(JSONArray args) {
     // note that if the dev didn't call requestReadPermission before calling this method and calendarPermissionGranted returns false,
     // the app will ask permission and this method needs to be invoked again (done for backward compat).
@@ -463,14 +463,18 @@ public class Calendar extends CordovaPlugin {
       return;
     }
     try {
+    final JSONObject jsonFilter = args.getJSONObject(0);
+      JSONArray result = new JSONArray();
+      long input_start_date = jsonFilter.optLong("startTime");
+      long input_end_date = jsonFilter.optLong("endTime");
+
       final Uri l_eventUri;
       if (Build.VERSION.SDK_INT >= 8) {
-        l_eventUri = Uri.parse("content://com.android.calendar/events");
+        l_eventUri = Uri.parse("content://com.android.calendar/instances/when/" + String.valueOf(input_start_date) + "/" + String.valueOf(input_end_date));
       } else {
-        l_eventUri = Uri.parse("content://calendar/events");
+        l_eventUri = Uri.parse("content://calendar/instances/when/" + String.valueOf(input_start_date) + "/" + String.valueOf(input_end_date));
       }
-
-      final JSONObject jsonFilter = args.getJSONObject(0);
+    
       cordova.getThreadPool().execute(new Runnable() {
         @Override
         public void run() {
@@ -491,7 +495,7 @@ public class Calendar extends CordovaPlugin {
           calendar_end.setTime(date_end);
 
           //projection of DB columns
-          String[] l_projection = new String[]{"calendar_id", "title", "dtstart", "dtend", "eventLocation", "allDay"};
+          String[] l_projection = new String[]{"calendar_id", "title", "begin", "end", "eventLocation", "allDay"};
 
           //actual query
           Cursor cursor = contentResolver.query(
@@ -500,13 +504,13 @@ public class Calendar extends CordovaPlugin {
               "(deleted = 0 AND" +
                   "   (" +
                   // all day events are stored in UTC, others in the user's timezone
-                  "     (eventTimezone  = 'UTC' AND dtstart >=" + (calendar_start.getTimeInMillis() + TimeZone.getDefault().getOffset(calendar_start.getTimeInMillis())) + " AND dtend <=" + (calendar_end.getTimeInMillis() + TimeZone.getDefault().getOffset(calendar_end.getTimeInMillis())) + ")" +
+                  "     (eventTimezone  = 'UTC' AND begin >=" + (calendar_start.getTimeInMillis() + TimeZone.getDefault().getOffset(calendar_start.getTimeInMillis())) + " AND end <=" + (calendar_end.getTimeInMillis() + TimeZone.getDefault().getOffset(calendar_end.getTimeInMillis())) + ")" +
                   "     OR " +
-                  "     (eventTimezone <> 'UTC' AND dtstart >=" + calendar_start.getTimeInMillis() + " AND dtend <=" + calendar_end.getTimeInMillis() + ")" +
+                  "     (eventTimezone <> 'UTC' AND begin >=" + calendar_start.getTimeInMillis() + " AND end <=" + calendar_end.getTimeInMillis() + ")" +
                   "   )" +
                   ")",
               null,
-              "dtstart ASC");
+              "begin ASC");
 
           int i = 0;
           while (cursor.moveToNext()) {
@@ -516,8 +520,8 @@ public class Calendar extends CordovaPlugin {
                   new JSONObject()
                       .put("calendar_id", cursor.getString(cursor.getColumnIndex("calendar_id")))
                       .put("title", cursor.getString(cursor.getColumnIndex("title")))
-                      .put("dtstart", cursor.getLong(cursor.getColumnIndex("dtstart")))
-                      .put("dtend", cursor.getLong(cursor.getColumnIndex("dtend")))
+                      .put("dtstart", cursor.getLong(cursor.getColumnIndex("begin")))
+                      .put("dtend", cursor.getLong(cursor.getColumnIndex("end")))
                       .put("eventLocation", cursor.getString(cursor.getColumnIndex("eventLocation")) != null ? cursor.getString(cursor.getColumnIndex("eventLocation")) : "")
                       .put("allDay", cursor.getInt(cursor.getColumnIndex("allDay")))
               );
@@ -536,7 +540,7 @@ public class Calendar extends CordovaPlugin {
       callback.error(e.getMessage());
     }
   }
-
+  
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (requestCode == RESULT_CODE_CREATE) {
       if (resultCode == Activity.RESULT_OK || resultCode == Activity.RESULT_CANCELED) {
