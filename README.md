@@ -262,8 +262,8 @@ Creating an event for 3 full days
 ```
 
 ### Android 6 (M) Permissions
-On Android 6 you need to request permission to use the Calenda at runtime when targeting API level 23+.
-Even if the uses-permission tags the Calendar are present in `AndroidManifest.xml`.
+On Android 6 you need to request permission to use the Calendar at runtime when targeting API level 23+.
+Even if the `uses-permission` tags for the Calendar are present in `AndroidManifest.xml`.
 
 Note that the hasPermission functions will return true when:
 
