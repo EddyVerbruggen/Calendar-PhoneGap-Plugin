@@ -454,7 +454,7 @@ public abstract class AbstractCalendarAccessor {
       }
     }
     values.put(Events.DESCRIPTION, description);
-    values.put(Events.HAS_ALARM, (firstReminderMinutes == null && secondReminderMinutes == null) ? 0 : 1);
+    values.put(Events.HAS_ALARM, firstReminderMinutes > -1 || secondReminderMinutes > -1 ? 1 : 0);
     values.put(Events.CALENDAR_ID, calendarId);
     values.put(Events.EVENT_LOCATION, location);
 
@@ -473,7 +473,7 @@ public abstract class AbstractCalendarAccessor {
     Log.d(LOG_TAG, "Created event with ID " + createdEventID);
 
     try {
-      if (firstReminderMinutes != null) {
+      if (firstReminderMinutes > -1) {
         ContentValues reminderValues = new ContentValues();
         reminderValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
         reminderValues.put("minutes", firstReminderMinutes);
@@ -481,7 +481,7 @@ public abstract class AbstractCalendarAccessor {
         cr.insert(Uri.parse(CONTENT_PROVIDER + CONTENT_PROVIDER_PATH_REMINDERS), reminderValues);
       }
 
-      if (secondReminderMinutes != null) {
+      if (secondReminderMinutes > -1) {
         ContentValues reminderValues = new ContentValues();
         reminderValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
         reminderValues.put("minutes", secondReminderMinutes);
