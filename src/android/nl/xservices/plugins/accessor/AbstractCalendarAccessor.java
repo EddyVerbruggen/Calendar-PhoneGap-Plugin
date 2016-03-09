@@ -462,8 +462,8 @@ public abstract class AbstractCalendarAccessor {
       if (recurrenceEndTime == null) {
         values.put(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";INTERVAL=" + recurrenceInterval);
       } else {
-        final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        values.put(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";INTERVAL=" + recurrenceInterval + ";UNTIL=" + sdf.format(new Date(recurrenceEndTime))+"T000000Z");
+        final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'hhmmss'Z'");
+        values.put(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";INTERVAL=" + recurrenceInterval + ";UNTIL=" + sdf.format(new Date(recurrenceEndTime)));
       }
     }
 
