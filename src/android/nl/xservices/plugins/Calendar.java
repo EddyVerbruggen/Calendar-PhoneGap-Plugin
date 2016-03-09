@@ -26,6 +26,9 @@ import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.TimeZone;
+import java.text.SimpleDateFormat;
+
+import static android.provider.CalendarContract.Events;
 
 public class Calendar extends CordovaPlugin {
   private static final String HAS_READ_PERMISSION = "hasReadPermission";
@@ -306,6 +309,19 @@ public class Calendar extends CordovaPlugin {
           }
           calIntent.putExtra("description", description);
           calIntent.putExtra("calendar_id", argOptionsObject.optInt("calendarId", 1));
+
+          //set recurrence
+          String recurrence = getPossibleNullString("recurrence", argOptionsObject);
+          Long recurrenceEndTime = argOptionsObject.isNull("recurrenceEndTime") ? null : argOptionsObject.optLong("recurrenceEndTime");
+          int recurrenceInterval = argOptionsObject.optInt("recurrenceInterval");
+          if (recurrence != null) {
+            if (recurrenceEndTime == null) {
+              calIntent.putExtra(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";INTERVAL=" + recurrenceInterval);
+            } else {
+              final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'hhmmss'Z'");
+              calIntent.putExtra(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";INTERVAL=" + recurrenceInterval + ";UNTIL=" + sdf.format(new Date(recurrenceEndTime)));
+            }
+          }
 
           Calendar.this.cordova.startActivityForResult(Calendar.this, calIntent, RESULT_CODE_CREATE);
         }
