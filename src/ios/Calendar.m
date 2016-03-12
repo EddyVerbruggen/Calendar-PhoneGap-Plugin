@@ -659,7 +659,9 @@
     controller.event = myEvent;
     controller.eventStore = self.eventStore;
     controller.editViewDelegate = self;
-    [self.viewController presentViewController:controller animated:YES completion:nil];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.viewController presentViewController:controller animated:YES completion:nil];
+    });
   }];
 }
 
