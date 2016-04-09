@@ -85,7 +85,7 @@ function createCalendarEventInteractivelyWithOptions() {
 }
 
 function createCalendarEventWithOptions() {
-  window.plugins.calendar.createEventWithOptions(title, loc, notes, startDate, endDate, options, onSuccess, onError)
+  window.plugins.calendar.createEventWithOptions(title, loc, notes, startDate, endDate, options, onSuccess, onError);
 }
 
 function findEventWithFilter() {
