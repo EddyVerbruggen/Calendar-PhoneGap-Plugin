@@ -39,6 +39,16 @@
         <param name="ios-package" value="Calendar"/>
       </feature>
     </config-file>
+    <!-- Localization of the interactive Calendar widget -->
+    <config-file target="*-Info.plist" parent="CFBundleLocalizations">
+      <array>
+        <string>en</string>
+        <string>de</string>
+        <string>nl</string>
+        <string>fr</string>
+        <string>it</string>
+      </array>
+    </config-file>
     <header-file src="src/ios/Calendar.h"/>
     <source-file src="src/ios/Calendar.m"/>
     <framework src="EventKit.framework"/>
