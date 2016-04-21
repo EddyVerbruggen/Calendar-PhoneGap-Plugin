@@ -377,6 +377,7 @@
                                   event.calendar.title, @"calendar",
                                   [df stringFromDate:event.startDate], @"startDate",
                                   [df stringFromDate:event.endDate], @"endDate",
+                                  [df stringFromDate:event.lastModifiedDate], @"lastModifiedDate",
                                   nil];
     // optional fields
     if (event.location != nil) {
