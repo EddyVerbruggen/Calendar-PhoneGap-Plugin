@@ -262,6 +262,9 @@ public abstract class AbstractCalendarAccessor {
         },
         this.getKey(KeyIndex.CALENDARS_VISIBLE) + "=1", null, null
     );
+    if (cursor == null) {
+      return null;
+    }
     JSONArray calendarsWrapper = new JSONArray();
     if (cursor.moveToFirst()) {
       do {

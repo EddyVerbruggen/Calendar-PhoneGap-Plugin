@@ -222,15 +222,17 @@ public class Calendar extends CordovaPlugin {
     cordova.getThreadPool().execute(new Runnable() {
       @Override
       public void run() {
-        JSONArray jsonObject = new JSONArray();
         try {
-          jsonObject = Calendar.this.getCalendarAccessor().getActiveCalendars();
+          JSONArray activeCalendars = Calendar.this.getCalendarAccessor().getActiveCalendars();
+          if (activeCalendars == null) {
+            activeCalendars = new JSONArray();
+          }
+          PluginResult res = new PluginResult(PluginResult.Status.OK, activeCalendars);
+          callback.sendPluginResult(res);
         } catch (JSONException e) {
           System.err.println("Exception: " + e.getMessage());
           callback.error(e.getMessage());
         }
-        PluginResult res = new PluginResult(PluginResult.Status.OK, jsonObject);
-        callback.sendPluginResult(res);
       }
     });
   }
@@ -469,7 +471,7 @@ public class Calendar extends CordovaPlugin {
   private static String getPossibleNullString(String param, JSONObject from) {
     return from.isNull(param) || "null".equals(from.optString(param)) ? null : from.optString(param);
   }
-  
+
   private void listEventsInRange(JSONArray args) {
     // note that if the dev didn't call requestReadPermission before calling this method and calendarPermissionGranted returns false,
     // the app will ask permission and this method needs to be invoked again (done for backward compat).
@@ -479,7 +481,7 @@ public class Calendar extends CordovaPlugin {
       return;
     }
     try {
-    final JSONObject jsonFilter = args.getJSONObject(0);
+      final JSONObject jsonFilter = args.getJSONObject(0);
       JSONArray result = new JSONArray();
       long input_start_date = jsonFilter.optLong("startTime");
       long input_end_date = jsonFilter.optLong("endTime");
@@ -490,7 +492,7 @@ public class Calendar extends CordovaPlugin {
       } else {
         l_eventUri = Uri.parse("content://calendar/instances/when/" + String.valueOf(input_start_date) + "/" + String.valueOf(input_end_date));
       }
-    
+
       cordova.getThreadPool().execute(new Runnable() {
         @Override
         public void run() {
@@ -557,7 +559,7 @@ public class Calendar extends CordovaPlugin {
       callback.error(e.getMessage());
     }
   }
-  
+
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (requestCode == RESULT_CODE_CREATE) {
       if (resultCode == Activity.RESULT_OK || resultCode == Activity.RESULT_CANCELED) {
