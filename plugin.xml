@@ -1,37 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" id="nl.x-services.plugins.calendar" version="3.2">
-   <name>Calendar</name>
-   <description>This plugin allows allows you to manipulate the native calendar.</description>
-   <license>MIT</license>
+<plugin
+    xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    id="cordova-plugin-calendar"
+    version="4.4.8-dev">
 
-   <engines>
-      <engine name="cordova" version=">=3.0.0" />
-   </engines>
+  <name>Calendar</name>
 
-   <js-module src="www/Calendar.js" name="Calendar">
-      <clobbers target="Calendar" />
-   </js-module>
+  <description>
+    This plugin allows you to manipulate the native calendar.
+  </description>
 
-   <!-- ios -->
-   <platform name="ios">
-      <config-file target="config.xml" parent="/*">
-         <feature name="Calendar">
-            <param name="ios-package" value="Calendar" />
-         </feature>
-      </config-file>
-      <header-file src="src/ios/Calendar.h" />
-      <source-file src="src/ios/Calendar.m" />
-      <framework src="EventKit.framework" />
-      <framework src="EventKitUI.framework" />
-   </platform>
-   
-   <!-- android -->
-   <platform name="android">
-      <config-file target="config.xml" parent="/*">
-         <feature name="Calendar">
-            <param name="android-package" value="nl.xservices.plugins.Calendar" />
-         </feature>
-      </config-file>
-      <source-file src="src/android/nl/xservices/plugins/Calendar.java" target-dir="src/nl/xservices/plugins" />
-   </platform>
+  <author>Eddy Verbruggen</author>
+
+  <license>MIT</license>
+
+  <keywords>Calendar, Agenda, Event</keywords>
+
+  <repo>https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin.git</repo>
+
+  <issue>https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin/issues</issue>
+
+  <engines>
+    <engine name="cordova" version=">=3.0.0"/>
+  </engines>
+
+  <js-module src="www/Calendar.js" name="Calendar">
+    <clobbers target="Calendar"/>
+  </js-module>
+
+  <js-module src="test/tests.js" name="tests">
+  </js-module>
+
+  <!-- ios -->
+  <platform name="ios">
+    <config-file target="config.xml" parent="/*">
+      <feature name="Calendar">
+        <param name="ios-package" value="Calendar"/>
+      </feature>
+    </config-file>
+    <!-- Localization of the interactive Calendar widget -->
+    <config-file target="*-Info.plist" parent="CFBundleLocalizations">
+      <array>
+        <string>en</string>
+        <string>de</string>
+        <string>nl</string>
+        <string>fr</string>
+        <string>it</string>
+      </array>
+    </config-file>
+    <header-file src="src/ios/Calendar.h"/>
+    <source-file src="src/ios/Calendar.m"/>
+    <framework src="EventKit.framework"/>
+    <framework src="EventKitUI.framework"/>
+  </platform>
+
+  <!-- android -->
+  <platform name="android">
+    <config-file target="res/xml/config.xml" parent="/*">
+      <feature name="Calendar">
+        <param name="android-package" value="nl.xservices.plugins.Calendar"/>
+      </feature>
+    </config-file>
+    <config-file target="AndroidManifest.xml" parent="/manifest">
+      <uses-permission android:name="android.permission.READ_CALENDAR"/>
+      <uses-permission android:name="android.permission.WRITE_CALENDAR"/>
+    </config-file>
+    <source-file src="src/android/nl/xservices/plugins/Calendar.java" target-dir="src/nl/xservices/plugins"/>
+    <source-file src="src/android/nl/xservices/plugins/accessor/AbstractCalendarAccessor.java"
+                 target-dir="src/nl/xservices/plugins/accessor"/>
+    <source-file src="src/android/nl/xservices/plugins/accessor/CalendarProviderAccessor.java"
+                 target-dir="src/nl/xservices/plugins/accessor"/>
+    <source-file src="src/android/nl/xservices/plugins/accessor/LegacyCalendarAccessor.java"
+                 target-dir="src/nl/xservices/plugins/accessor"/>
+    <framework src="com.android.support:support-v4:+" />
+  </platform>
 </plugin>
