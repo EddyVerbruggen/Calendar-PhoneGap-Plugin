@@ -186,8 +186,21 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   calOptions.url = "https://www.google.com";
 
   // on iOS the success handler receives the event ID (since 4.3.6)
+  //To add meeting attendees jut add a JSON object similar to the following structure to the calOptionsParamater:
+  /*
+  
+  {
+  "attendeesList": {
+    "ID": {
+      "firstName": "SOME",
+      "lastName": "ONE",
+      "emailAddress": "SOME_ONE@SOME_DOMAIN.com"
+    },
+   }
+  
+  */
   window.plugins.calendar.createEventWithOptions(title,eventLocation,notes,startDate,endDate,calOptions,success,error);
-
+  
   // create an event interactively
   window.plugins.calendar.createEventInteractively(title,eventLocation,notes,startDate,endDate,success,error);
 

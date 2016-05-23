@@ -36,6 +36,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import org.apache.cordova.CordovaInterface;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.EnumMap;
 
@@ -124,10 +126,10 @@ public class LegacyCalendarAccessor extends AbstractCalendarAccessor {
   public String createEvent(Uri eventsUri, String title, long startTime, long endTime,
                           String description, String location, Long firstReminderMinutes, Long secondReminderMinutes,
                           String recurrence, int recurrenceInterval, Long recurrenceEndTime, Integer calendarId,
-                          String url) {
+                          String url, JSONObject attendeesList) throws JSONException{
     eventsUri = eventsUri == null ? Uri.parse(CONTENT_PROVIDER_PRE_FROYO + CONTENT_PROVIDER_PATH_EVENTS) : eventsUri;
     return super.createEvent(eventsUri, title, startTime, endTime, description, location,
-        firstReminderMinutes, secondReminderMinutes, recurrence, recurrenceInterval, recurrenceEndTime, calendarId, url);
+        firstReminderMinutes, secondReminderMinutes, recurrence, recurrenceInterval, recurrenceEndTime, calendarId, url, attendeesList);
   }
 
 }

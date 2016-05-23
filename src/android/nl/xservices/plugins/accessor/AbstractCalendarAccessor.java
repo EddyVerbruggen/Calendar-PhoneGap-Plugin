@@ -262,9 +262,6 @@ public abstract class AbstractCalendarAccessor {
         },
         this.getKey(KeyIndex.CALENDARS_VISIBLE) + "=1", null, null
     );
-    if (cursor == null) {
-      return null;
-    }
     JSONArray calendarsWrapper = new JSONArray();
     if (cursor.moveToFirst()) {
       do {
@@ -432,7 +429,8 @@ public abstract class AbstractCalendarAccessor {
 
   public String createEvent(Uri eventsUri, String title, long startTime, long endTime, String description,
                             String location, Long firstReminderMinutes, Long secondReminderMinutes,
-                            String recurrence, int recurrenceInterval, Long recurrenceEndTime, Integer calendarId, String url) {
+                            String recurrence, int recurrenceInterval, Long recurrenceEndTime, Integer calendarId, String url,
+                            JSONObject attendeesList) throws JSONException{
     ContentResolver cr = this.cordova.getActivity().getContentResolver();
     ContentValues values = new ContentValues();
     final boolean allDayEvent = isAllDayEvent(new Date(startTime), new Date(endTime));
@@ -457,7 +455,7 @@ public abstract class AbstractCalendarAccessor {
       }
     }
     values.put(Events.DESCRIPTION, description);
-    values.put(Events.HAS_ALARM, firstReminderMinutes > -1 || secondReminderMinutes > -1 ? 1 : 0);
+    values.put(Events.HAS_ALARM, (firstReminderMinutes == null && secondReminderMinutes == null) ? 0 : 1);
     values.put(Events.CALENDAR_ID, calendarId);
     values.put(Events.EVENT_LOCATION, location);
 
@@ -465,18 +463,36 @@ public abstract class AbstractCalendarAccessor {
       if (recurrenceEndTime == null) {
         values.put(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";INTERVAL=" + recurrenceInterval);
       } else {
-        final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'hhmmss'Z'");
-        values.put(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";INTERVAL=" + recurrenceInterval + ";UNTIL=" + sdf.format(new Date(recurrenceEndTime)));
+        final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        values.put(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";INTERVAL=" + recurrenceInterval + ";UNTIL=" + sdf.format(new Date(recurrenceEndTime))+"T000000Z");
       }
     }
+
+
 
     // runtime exceptions are dealt with by the caller
     Uri uri = cr.insert(eventsUri, values);
     String createdEventID = uri.getLastPathSegment();
+
+    if(attendeesList != null){
+      Iterator keys = attendeesList.keys();
+      values.clear();
+      values.put(CalendarContract.Attendees.EVENT_ID, createdEventID);
+      values.put(CalendarContract.Attendees.ATTENDEE_TYPE, CalendarContract.Attendees.TYPE_REQUIRED);
+
+      while(keys.hasNext()){
+        JSONObject attendee = attendeesList.getJSONObject(keys.next().toString());
+        values.put(CalendarContract.Attendees.ATTENDEE_NAME, attendee.getString("firstName") + " " + attendee.getString("lastName"));
+        values.put(CalendarContract.Attendees.ATTENDEE_EMAIL, attendee.getString("emailAddress"));
+        cr.insert(CalendarContract.Attendees.CONTENT_URI, values);
+      }
+
+    }
+
     Log.d(LOG_TAG, "Created event with ID " + createdEventID);
 
     try {
-      if (firstReminderMinutes > -1) {
+      if (firstReminderMinutes != null) {
         ContentValues reminderValues = new ContentValues();
         reminderValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
         reminderValues.put("minutes", firstReminderMinutes);
@@ -484,7 +500,7 @@ public abstract class AbstractCalendarAccessor {
         cr.insert(Uri.parse(CONTENT_PROVIDER + CONTENT_PROVIDER_PATH_REMINDERS), reminderValues);
       }
 
-      if (secondReminderMinutes > -1) {
+      if (secondReminderMinutes != null) {
         ContentValues reminderValues = new ContentValues();
         reminderValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
         reminderValues.put("minutes", secondReminderMinutes);

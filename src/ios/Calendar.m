@@ -377,7 +377,6 @@
                                   event.calendar.title, @"calendar",
                                   [df stringFromDate:event.startDate], @"startDate",
                                   [df stringFromDate:event.endDate], @"endDate",
-                                  [df stringFromDate:event.lastModifiedDate], @"lastModifiedDate",
                                   nil];
     // optional fields
     if (event.location != nil) {
@@ -459,6 +458,7 @@
   NSNumber* startTime  = [options objectForKey:@"startTime"];
   NSNumber* endTime    = [options objectForKey:@"endTime"];
 
+
   NSDictionary* calOptions = [options objectForKey:@"options"];
   NSNumber* firstReminderMinutes = [calOptions objectForKey:@"firstReminderMinutes"];
   NSNumber* secondReminderMinutes = [calOptions objectForKey:@"secondReminderMinutes"];
@@ -467,6 +467,7 @@
   NSNumber* recurrenceIntervalAmount = [calOptions objectForKey:@"recurrenceInterval"];
   NSString* calendarName = [calOptions objectForKey:@"calendarName"];
   NSString* url = [calOptions objectForKey:@"url"];
+  NSDictionary* attendeesList = [calOptions objectForKey:@"attendees"];
 
   [self.commandDelegate runInBackground: ^{
     EKEvent *myEvent = [EKEvent eventWithEventStore: self.eventStore];
@@ -484,7 +485,7 @@
     myEvent.location = location;
     myEvent.notes = notes;
     myEvent.startDate = myStartDate;
-
+    
     int duration = _endInterval - _startInterval;
     int moduloDay = duration % (60*60*24);
     if (moduloDay == 0) {
@@ -493,6 +494,7 @@
     } else {
       myEvent.endDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
     }
+    
 
     EKCalendar* calendar = nil;
     CDVPluginResult *pluginResult = nil;
@@ -545,8 +547,29 @@
       }
       [myEvent addRecurrenceRule:rule];
     }
+    
+    if (attendeesList != (id)[NSNull null]) {
+        NSMutableArray *attendees = [NSMutableArray new];
+        for(id attendee in attendeesList){
+            //Initialize a EKAttendee object, which is not accessible and inherits from EKParticipant
+            Class className = NSClassFromString(@"EKAttendee");
+            id attendeeObject = [className new];
+            //Set the properties of this attendee using setValue:forKey:
+            [attendeeObject setValue:[[attendeesList objectForKey:attendee] objectForKey:@"firstName"] forKey:@"firstName"];
+            [attendeeObject setValue:[[attendeesList objectForKey:attendee] objectForKey:@"lastName"] forKey:@"lastName"];
+            [attendeeObject setValue:[[attendeesList objectForKey:attendee] objectForKey:@"emailAddress"] forKey:@"emailAddress"];
+            [attendees addObject:attendeeObject];
+        }
+
+        //Finally, add the invitees to the event
+        [myEvent setValue:attendees forKey:@"attendees"];
+    }
+    
+    
 
     NSError *error = nil;
+    
+    
     [self.eventStore saveEvent:myEvent span:EKSpanThisEvent error:&error];
 
     if (error) {
@@ -660,9 +683,7 @@
     controller.event = myEvent;
     controller.eventStore = self.eventStore;
     controller.editViewDelegate = self;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.viewController presentViewController:controller animated:YES completion:nil];
-    });
+    [self.viewController presentViewController:controller animated:YES completion:nil];
   }];
 }
 
