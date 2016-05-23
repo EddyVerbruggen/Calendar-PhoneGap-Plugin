@@ -26,9 +26,6 @@ import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.TimeZone;
-import java.text.SimpleDateFormat;
-
-import static android.provider.CalendarContract.Events;
 
 public class Calendar extends CordovaPlugin {
   private static final String HAS_READ_PERMISSION = "hasReadPermission";
@@ -222,17 +219,15 @@ public class Calendar extends CordovaPlugin {
     cordova.getThreadPool().execute(new Runnable() {
       @Override
       public void run() {
+        JSONArray jsonObject = new JSONArray();
         try {
-          JSONArray activeCalendars = Calendar.this.getCalendarAccessor().getActiveCalendars();
-          if (activeCalendars == null) {
-            activeCalendars = new JSONArray();
-          }
-          PluginResult res = new PluginResult(PluginResult.Status.OK, activeCalendars);
-          callback.sendPluginResult(res);
+          jsonObject = Calendar.this.getCalendarAccessor().getActiveCalendars();
         } catch (JSONException e) {
           System.err.println("Exception: " + e.getMessage());
           callback.error(e.getMessage());
         }
+        PluginResult res = new PluginResult(PluginResult.Status.OK, jsonObject);
+        callback.sendPluginResult(res);
       }
     });
   }
@@ -311,19 +306,6 @@ public class Calendar extends CordovaPlugin {
           }
           calIntent.putExtra("description", description);
           calIntent.putExtra("calendar_id", argOptionsObject.optInt("calendarId", 1));
-
-          //set recurrence
-          String recurrence = getPossibleNullString("recurrence", argOptionsObject);
-          Long recurrenceEndTime = argOptionsObject.isNull("recurrenceEndTime") ? null : argOptionsObject.optLong("recurrenceEndTime");
-          int recurrenceInterval = argOptionsObject.optInt("recurrenceInterval");
-          if (recurrence != null) {
-            if (recurrenceEndTime == null) {
-              calIntent.putExtra(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";INTERVAL=" + recurrenceInterval);
-            } else {
-              final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'hhmmss'Z'");
-              calIntent.putExtra(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";INTERVAL=" + recurrenceInterval + ";UNTIL=" + sdf.format(new Date(recurrenceEndTime)));
-            }
-          }
 
           Calendar.this.cordova.startActivityForResult(Calendar.this, calIntent, RESULT_CODE_CREATE);
         }
@@ -443,19 +425,19 @@ public class Calendar extends CordovaPlugin {
         public void run() {
           try {
             final String createdEventID = getCalendarAccessor().createEvent(
-                null,
-                getPossibleNullString("title", argObject),
-                argObject.getLong("startTime"),
-                argObject.getLong("endTime"),
-                getPossibleNullString("notes", argObject),
-                getPossibleNullString("location", argObject),
-                argOptionsObject.optLong("firstReminderMinutes", -1),
-                argOptionsObject.optLong("secondReminderMinutes", -1),
-                getPossibleNullString("recurrence", argOptionsObject),
-                argOptionsObject.optInt("recurrenceInterval"),
-                argOptionsObject.optLong("recurrenceEndTime"),
-                argOptionsObject.optInt("calendarId", 1),
-                getPossibleNullString("url", argOptionsObject));
+                    null,
+                    getPossibleNullString("title", argObject),
+                    argObject.getLong("startTime"),
+                    argObject.getLong("endTime"),
+                    getPossibleNullString("notes", argObject),
+                    getPossibleNullString("location", argObject),
+                    argOptionsObject.optLong("firstReminderMinutes"),
+                    argOptionsObject.optLong("secondReminderMinutes"),
+                    getPossibleNullString("recurrence", argOptionsObject),
+                    argOptionsObject.optInt("recurrenceInterval"),
+                    argOptionsObject.optLong("recurrenceEndTime"),
+                    argOptionsObject.optInt("calendarId", 1),
+                    getPossibleNullString("url", argOptionsObject), argOptionsObject.optJSONObject("attendees"));
             callback.success(createdEventID);
           } catch (JSONException e) {
             e.printStackTrace();
@@ -471,7 +453,7 @@ public class Calendar extends CordovaPlugin {
   private static String getPossibleNullString(String param, JSONObject from) {
     return from.isNull(param) || "null".equals(from.optString(param)) ? null : from.optString(param);
   }
-
+  
   private void listEventsInRange(JSONArray args) {
     // note that if the dev didn't call requestReadPermission before calling this method and calendarPermissionGranted returns false,
     // the app will ask permission and this method needs to be invoked again (done for backward compat).
@@ -481,7 +463,7 @@ public class Calendar extends CordovaPlugin {
       return;
     }
     try {
-      final JSONObject jsonFilter = args.getJSONObject(0);
+    final JSONObject jsonFilter = args.getJSONObject(0);
       JSONArray result = new JSONArray();
       long input_start_date = jsonFilter.optLong("startTime");
       long input_end_date = jsonFilter.optLong("endTime");
@@ -492,7 +474,7 @@ public class Calendar extends CordovaPlugin {
       } else {
         l_eventUri = Uri.parse("content://calendar/instances/when/" + String.valueOf(input_start_date) + "/" + String.valueOf(input_end_date));
       }
-
+    
       cordova.getThreadPool().execute(new Runnable() {
         @Override
         public void run() {
@@ -513,7 +495,7 @@ public class Calendar extends CordovaPlugin {
           calendar_end.setTime(date_end);
 
           //projection of DB columns
-          String[] l_projection = new String[]{"calendar_id", "title", "begin", "end", "eventLocation", "allDay", "_id"};
+          String[] l_projection = new String[]{"calendar_id", "title", "begin", "end", "eventLocation", "allDay"};
 
           //actual query
           Cursor cursor = contentResolver.query(
@@ -537,7 +519,6 @@ public class Calendar extends CordovaPlugin {
                   i++,
                   new JSONObject()
                       .put("calendar_id", cursor.getString(cursor.getColumnIndex("calendar_id")))
-                      .put("event_id", cursor.getString(cursor.getColumnIndex("_id")))
                       .put("title", cursor.getString(cursor.getColumnIndex("title")))
                       .put("dtstart", cursor.getLong(cursor.getColumnIndex("begin")))
                       .put("dtend", cursor.getLong(cursor.getColumnIndex("end")))
@@ -559,7 +540,7 @@ public class Calendar extends CordovaPlugin {
       callback.error(e.getMessage());
     }
   }
-
+  
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (requestCode == RESULT_CODE_CREATE) {
       if (resultCode == Activity.RESULT_OK || resultCode == Activity.RESULT_CANCELED) {
