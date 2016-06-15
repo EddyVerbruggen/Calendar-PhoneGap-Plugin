@@ -143,8 +143,7 @@ deleteEventFromNamedCalendar        |             | yes |
 openCalendar                        |             | yes | yes
 
 Basic operations, you'll want to copy-paste this for testing purposes:
-
-```javascript
+```js
   // prep some variables
   var startDate = new Date(2015,2,15,18,30,0,0,0); // beware: month 0 = january, 11 = december
   var endDate = new Date(2015,2,15,19,30,0,0,0);
@@ -246,19 +245,54 @@ Basic operations, you'll want to copy-paste this for testing purposes:
 ```
 
 Creating an all day event:
-
-```javascript
+```js
   // set the startdate to midnight and set the enddate to midnight the next day
   var startDate = new Date(2014,2,15,0,0,0,0,0);
   var endDate = new Date(2014,2,16,0,0,0,0,0);
 ```
 
 Creating an event for 3 full days
-
-```javascript
+```js
   // set the startdate to midnight and set the enddate to midnight 3 days later
   var startDate = new Date(2014,2,24,0,0,0,0,0);
   var endDate = new Date(2014,2,27,0,0,0,0,0);
+```
+
+Example Response IOS getCalendarOptions
+```js
+{
+calendarId: null,
+calendarName: "calendar",
+firstReminderMinutes: 60,
+recurrence: null,
+recurrenceEndDate: null,
+recurrenceInterval: 1,
+secondReminderMinutes: null,
+url: null
+}
+```
+
+Exmaple Response IOS Calendars
+```js
+{
+id: "258B0D99-394C-4189-9250-9488F75B399D",
+name: "standard calendar",
+type: "Local"
+}
+```
+
+Exmaple Response IOS Event
+```js
+{
+calendar: "Kalender",
+endDate: "2016-06-10 23:59:59",
+id: "0F9990EB-05A7-40DB-B082-424A85B59F90",
+lastModifiedDate: "2016-06-13 09:14:02",
+location: "",
+message: "my description",
+startDate: "2016-06-10 00:00:00",
+title: "myEvent"
+}
 ```
 
 ### Android 6 (M) Permissions
