@@ -317,8 +317,8 @@ public class Calendar extends CordovaPlugin {
           final Intent calIntent = new Intent(Intent.ACTION_EDIT)
               .setType("vnd.android.cursor.item/event")
               .putExtra("title", getPossibleNullString("title", jsonFilter))
-              .putExtra("beginTime", jsonFilter.optLong("startTime"))
-              .putExtra("endTime", jsonFilter.optLong("endTime"))
+              .putExtra("beginTime", jsonFilter.optLong("startTime") + TimeZone.getDefault().getOffset(jsonFilter.optLong("startTime")))
+              .putExtra("endTime", jsonFilter.optLong("endTime") + TimeZone.getDefault().getOffset(jsonFilter.optLong("endTime")))
               .putExtra("hasAlarm", 1)
               .putExtra("allDay", AbstractCalendarAccessor.isAllDayEvent(new Date(jsonFilter.optLong("startTime")), new Date(jsonFilter.optLong("endTime"))));
           // TODO can we pass a reminder here?
