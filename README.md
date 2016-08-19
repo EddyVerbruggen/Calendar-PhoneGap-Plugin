@@ -20,8 +20,9 @@ Of course I'm happy to receive any amount but I'm just as happy if you simply 's
 	2. [Manually](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#manually)
 	2. [PhoneGap Build](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#phonegap-build)
 3. [Usage](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#3-usage)
-4. [Credits](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#4-credits)
-5. [License](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#5-license)
+4. [Promises](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#4-promises)
+5. [Credits](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#5-credits)
+6. [License](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#6-license)
 
 ## 1. Description
 
@@ -337,7 +338,13 @@ Note that backward compatibility was added by checking for read or write permiss
 If permission is needed the plugin will now show the permission request popup.
 The user will then need to allow access and invoke the same method again after doing so.
 
-## 4. CREDITS ##
+## 4. Promises
+If you like to use promises instead of callbacks, or struggle to create a lot of
+events asynchronously with this plugin then I encourage you to take a look at
+[this awesome wrapper](https://github.com/poetic-labs/native-calender-api) for
+this plugin. Kudos to [John Rodney](https://github.com/JohnRodney) for this piece of art!
+
+## 5. Credits
 
 This plugin was enhanced for Plugman / PhoneGap Build by [Eddy Verbruggen](http://www.x-services.nl). I fixed some issues in the native code (mainly for iOS) and changed the JS-Native functions a little in order to make a universal JS API for both platforms.
 * Inspired by [this nice blog of Devgirl](http://devgirl.org/2013/07/17/tutorial-how-to-write-a-phonegap-plugin-for-android/).
@@ -345,7 +352,7 @@ This plugin was enhanced for Plugman / PhoneGap Build by [Eddy Verbruggen](http:
 * Credits for the original Android code go to [Ten Forward Consulting](https://github.com/tenforwardconsulting/Phonegap-Calendar-Plugin-android) and [twistandshout](https://github.com/twistandshout/phonegap-calendar-plugin).
 * Special thanks to [four32c.com](http://four32c.com) for sponsoring part of the implementation, while keeping the plugin opensource.
 
-## 5. License
+## 6. License
 
 [The MIT License (MIT)](http://www.opensource.org/licenses/mit-license.html)
 
