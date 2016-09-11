@@ -1,41 +1,10 @@
-/**
- * Copyright (c) 2012, Twist and Shout, Inc. http://www.twist.com/
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- * IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
-
-/**
- * @author yvonne@twist.com (Yvonne Yip)
- */
-
 package nl.xservices.plugins.accessor;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.provider.CalendarContract;
 import android.text.TextUtils;
@@ -497,27 +466,109 @@ public abstract class AbstractCalendarAccessor {
     return createdEventID;
   }
 
-  public void createCalendar(String calendarName) {
-    Uri calUri = CalendarContract.Calendars.CONTENT_URI;
-    ContentValues cv = new ContentValues();
-//    cv.put(CalendarContract.Calendars.ACCOUNT_NAME, yourAccountName);
-//    cv.put(CalendarContract.Calendars.ACCOUNT_TYPE, CalendarContract.ACCOUNT_TYPE_LOCAL);
-//    cv.put(CalendarContract.Calendars.NAME, "myname");
-    cv.put(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME, calendarName);
-//    cv.put(CalendarContract.Calendars.CALENDAR_COLOR, yourColor);
-//    cv.put(CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL, CalendarContract.Calendars.CAL_ACCESS_OWNER);
-//    cv.put(CalendarContract.Calendars.OWNER_ACCOUNT, true);
-    cv.put(CalendarContract.Calendars.VISIBLE, 1);
-    cv.put(CalendarContract.Calendars.SYNC_EVENTS, 0);
+  @SuppressWarnings("MissingPermission") // already requested in calling method
+  public String createCalendar(String calendarName, String calendarColor) {
+    try {
+      // don't create if it already exists
+      Uri evuri = CalendarContract.Calendars.CONTENT_URI;
+      final ContentResolver contentResolver = cordova.getActivity().getContentResolver();
+      Cursor result = contentResolver.query(evuri, new String[] {CalendarContract.Calendars._ID, CalendarContract.Calendars.NAME, CalendarContract.Calendars.CALENDAR_DISPLAY_NAME}, null, null, null);
+      if (result != null) {
+        while (result.moveToNext()) {
+          if (result.getString(1).equals(calendarName) || result.getString(2).equals(calendarName)) {
+            result.close();
+            return null;
+          }
+        }
+        result.close();
+      }
 
-    calUri = calUri.buildUpon()
-//        .appendQueryParameter(CalendarContract.CALLER_IS_SYNCADAPTER, "false")
-//        .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_NAME, ACCOUNT_NAME)
-//        .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, CalendarContract.ACCOUNT_TYPE_LOCAL)
+      // doesn't exist yet, so create
+      Uri calUri = CalendarContract.Calendars.CONTENT_URI;
+      ContentValues cv = new ContentValues();
+      cv.put(CalendarContract.Calendars.ACCOUNT_NAME, "AccountName");
+      cv.put(CalendarContract.Calendars.ACCOUNT_TYPE, CalendarContract.ACCOUNT_TYPE_LOCAL);
+      cv.put(CalendarContract.Calendars.NAME, calendarName);
+      cv.put(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME, calendarName);
+      if (calendarColor != null) {
+        cv.put(CalendarContract.Calendars.CALENDAR_COLOR, Color.parseColor(calendarColor));
+      }
+      cv.put(CalendarContract.Calendars.VISIBLE, 1);
+      cv.put(CalendarContract.Calendars.SYNC_EVENTS, 0);
+
+      calUri = calUri.buildUpon()
+          .appendQueryParameter(CalendarContract.CALLER_IS_SYNCADAPTER, "true")
+          .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_NAME, "AccountName")
+          .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, CalendarContract.ACCOUNT_TYPE_LOCAL)
+          .build();
+
+      Uri created = contentResolver.insert(calUri, cv);
+      if (created != null) {
+        return created.getLastPathSegment();
+      }
+    } catch (Throwable t) {
+      System.err.println(t.getMessage());
+      t.printStackTrace();
+    }
+    return null;
+  };
+
+  @SuppressWarnings("MissingPermission") // already requested in calling method
+  public void deleteCalendar(String calendarName) {
+    try {
+      Uri evuri = CalendarContract.Calendars.CONTENT_URI;
+      final ContentResolver contentResolver = cordova.getActivity().getContentResolver();
+      Cursor result = contentResolver.query(evuri, new String[] {CalendarContract.Calendars._ID, CalendarContract.Calendars.NAME, CalendarContract.Calendars.CALENDAR_DISPLAY_NAME}, null, null, null);
+      if (result != null) {
+        while (result.moveToNext()) {
+          if (result.getString(1).equals(calendarName) || result.getString(2).equals(calendarName)) {
+            long calid = result.getLong(0);
+            Uri deleteUri = ContentUris.withAppendedId(evuri, calid);
+            contentResolver.delete(deleteUri, null, null);
+          }
+        }
+        result.close();
+      }
+
+      // also delete previously crashing calendars, see https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin/issues/241
+      deleteCrashingCalendars(contentResolver);
+    } catch (Throwable t) {
+      System.err.println(t.getMessage());
+      t.printStackTrace();
+    }
+  }
+
+  @SuppressWarnings("MissingPermission") // already requested in calling method
+  private void deleteCrashingCalendars(ContentResolver contentResolver) {
+    // first find any faulty Calendars
+    final String fixingAccountName = "FixingAccountName";
+    String selection = CalendarContract.Calendars.ACCOUNT_NAME + " IS NULL";
+    Uri uri = CalendarContract.Calendars.CONTENT_URI;
+    uri = uri.buildUpon()
+        .appendQueryParameter(CalendarContract.CALLER_IS_SYNCADAPTER, "true")
+        .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_NAME, fixingAccountName)
+        .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, CalendarContract.ACCOUNT_TYPE_LOCAL)
         .build();
+    ContentValues values = new ContentValues();
+    values.put(CalendarContract.Calendars.ACCOUNT_NAME, fixingAccountName);
+    values.put(CalendarContract.Calendars.ACCOUNT_TYPE, CalendarContract.ACCOUNT_TYPE_LOCAL);
+    int count = contentResolver.update(uri, values, selection, null);
 
-    Uri result = this.cordova.getActivity().getApplicationContext().getContentResolver().insert(calUri, cv);
-    int i=0;
+    // now delete any faulty Calendars
+    if (count > 0) {
+      Uri evuri = CalendarContract.Calendars.CONTENT_URI;
+      Cursor result = contentResolver.query(evuri, new String[] {CalendarContract.Calendars._ID, CalendarContract.Calendars.ACCOUNT_NAME}, null, null, null);
+      if (result != null) {
+        while (result.moveToNext()) {
+          if (result.getString(1).equals(fixingAccountName)) {
+            long calid = result.getLong(0);
+            Uri deleteUri = ContentUris.withAppendedId(evuri, calid);
+            contentResolver.delete(deleteUri, null, null);
+          }
+        }
+        result.close();
+      }
+    }
   }
 
   public static boolean isAllDayEvent(final Date startDate, final Date endDate) {

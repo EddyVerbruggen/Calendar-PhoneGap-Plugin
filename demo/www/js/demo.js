@@ -65,7 +65,14 @@ function listCalendars() {
 }
 
 function createCalendar() {
-  window.plugins.calendar.createCalendar(calendarName, onSuccess, onError);
+  var options = window.plugins.calendar.getCreateCalendarOptions();
+  options.calendarName = "MyCordovaCalendar";
+  options.calendarColor = "#FF0000"; // red
+  window.plugins.calendar.createCalendar(options, onSuccess, onError);
+}
+
+function deleteCalendar() {
+  window.plugins.calendar.deleteCalendar("MyCordovaCalendar", onSuccess, onError);
 }
 
 function deleteEvent() {

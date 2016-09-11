@@ -127,8 +127,8 @@ The table gives an overview of basic operation compatibility:
 
 Operation                           | Comment     | iOS | Android
 ----------------------------------- | ----------- | --- | -------
-createCalendar                      |             | yes | 
-deleteCalendar                      |             | yes | 
+createCalendar                      |             | yes | yes
+deleteCalendar                      |             | yes | yes
 createEvent                         | silent      | yes | yes (on Android < 4 dialog is shown)
 createEventWithOptions              | silent      | yes | yes (on Android < 4 dialog is shown)
 createEventInteractively            | interactive | yes | yes
@@ -163,7 +163,7 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   createCalOptions.calendarColor = "#FF0000"; // an optional hex color (with the # char), default is null, so the OS picks a color
   window.plugins.calendar.createCalendar(createCalOptions,success,error);
 
-  // delete a calendar (iOS only for now)
+  // delete a calendar
   window.plugins.calendar.deleteCalendar(calendarName,success,error);
 
   // create an event silently (on Android < 4 an interactive dialog is shown)
