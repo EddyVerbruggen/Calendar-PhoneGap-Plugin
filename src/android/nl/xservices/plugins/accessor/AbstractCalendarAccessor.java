@@ -187,6 +187,9 @@ public abstract class AbstractCalendarAccessor {
 
     String[] selectionArgs = new String[selectionList.size()];
     Cursor cursor = queryEventInstances(startFrom, startTo, projection, selection, selectionList.toArray(selectionArgs), sortOrder);
+    if (cursor == null) {
+      return null;
+    }
     Event[] instances = null;
     if (cursor.moveToFirst()) {
       int idCol = cursor.getColumnIndex(this.getKey(KeyIndex.INSTANCES_ID));
