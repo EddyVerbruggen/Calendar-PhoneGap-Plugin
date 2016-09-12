@@ -150,7 +150,7 @@ public abstract class AbstractCalendarAccessor {
                                                 String[] projection, String selection, String[] selectionArgs,
                                                 String sortOrder);
 
-  private Event[] fetchEventInstances(String title, String location, long startFrom, long startTo) {
+  private Event[] fetchEventInstances(String title, String location, String notes, long startFrom, long startTo) {
     String[] projection = {
         this.getKey(KeyIndex.INSTANCES_ID),
         this.getKey(KeyIndex.INSTANCES_EVENT_ID),
@@ -176,6 +176,13 @@ public abstract class AbstractCalendarAccessor {
       }
       selection += Events.EVENT_LOCATION + " LIKE ?";
       selectionList.add("%" + location + "%");
+    }
+    if (notes != null && !notes.equals("")) {
+      if (!"".equals(selection)) {
+        selection += " AND ";
+      }
+      selection += Events.DESCRIPTION + " LIKE ?";
+      selectionList.add("%" + notes + "%");
     }
 
     String[] selectionArgs = new String[selectionList.size()];
@@ -355,10 +362,10 @@ public abstract class AbstractCalendarAccessor {
     return attendeeMap;
   }
 
-  public JSONArray findEvents(String title, String location, long startFrom, long startTo) {
+  public JSONArray findEvents(String title, String location, String notes, long startFrom, long startTo) {
     JSONArray result = new JSONArray();
     // Fetch events from the instance table.
-    Event[] instances = fetchEventInstances(title, location, startFrom, startTo);
+    Event[] instances = fetchEventInstances(title, location, notes, startFrom, startTo);
     if (instances == null) {
       return result;
     }
@@ -388,7 +395,7 @@ public abstract class AbstractCalendarAccessor {
 
   public boolean deleteEvent(Uri eventsUri, long startFrom, long startTo, String title, String location) {
     ContentResolver resolver = this.cordova.getActivity().getApplicationContext().getContentResolver();
-    Event[] events = fetchEventInstances(title, location,startFrom, startTo);
+    Event[] events = fetchEventInstances(title, location, "", startFrom, startTo);
     int nrDeletedRecords = 0;
     if (events != null) {
       for (Event event : events) {
