@@ -516,9 +516,8 @@ public abstract class AbstractCalendarAccessor {
       if (created != null) {
         return created.getLastPathSegment();
       }
-    } catch (Throwable t) {
-      System.err.println(t.getMessage());
-      t.printStackTrace();
+    } catch (Exception e) {
+      Log.e(LOG_TAG, "Creating calendar failed.", e);
     }
     return null;
   };
