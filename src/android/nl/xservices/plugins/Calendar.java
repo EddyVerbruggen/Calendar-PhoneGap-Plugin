@@ -524,7 +524,11 @@ public class Calendar extends CordovaPlugin {
                 argOptionsObject.optLong("recurrenceEndTime"),
                 argOptionsObject.optInt("calendarId", 1),
                 getPossibleNullString("url", argOptionsObject));
-            callback.success(createdEventID);
+            if (createdEventID != null) {
+              callback.success(createdEventID);
+            } else {
+              callback.error("Fail to create an event");
+            }
           } catch (JSONException e) {
             e.printStackTrace();
           }

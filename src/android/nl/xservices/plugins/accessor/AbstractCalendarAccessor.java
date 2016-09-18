@@ -187,6 +187,9 @@ public abstract class AbstractCalendarAccessor {
 
     String[] selectionArgs = new String[selectionList.size()];
     Cursor cursor = queryEventInstances(startFrom, startTo, projection, selection, selectionList.toArray(selectionArgs), sortOrder);
+    if (cursor == null) {
+      return null;
+    }
     Event[] instances = null;
     if (cursor.moveToFirst()) {
       int idCol = cursor.getColumnIndex(this.getKey(KeyIndex.INSTANCES_ID));
@@ -446,12 +449,12 @@ public abstract class AbstractCalendarAccessor {
       }
     }
 
-    // runtime exceptions are dealt with by the caller
-    Uri uri = cr.insert(eventsUri, values);
-    String createdEventID = uri.getLastPathSegment();
-    Log.d(LOG_TAG, "Created event with ID " + createdEventID);
-
+    String createdEventID = null;
     try {
+      Uri uri = cr.insert(eventsUri, values);
+      createdEventID = uri.getLastPathSegment();
+      Log.d(LOG_TAG, "Created event with ID " + createdEventID);
+
       if (firstReminderMinutes > -1) {
         ContentValues reminderValues = new ContentValues();
         reminderValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
@@ -513,9 +516,8 @@ public abstract class AbstractCalendarAccessor {
       if (created != null) {
         return created.getLastPathSegment();
       }
-    } catch (Throwable t) {
-      System.err.println(t.getMessage());
-      t.printStackTrace();
+    } catch (Exception e) {
+      Log.e(LOG_TAG, "Creating calendar failed.", e);
     }
     return null;
   };
