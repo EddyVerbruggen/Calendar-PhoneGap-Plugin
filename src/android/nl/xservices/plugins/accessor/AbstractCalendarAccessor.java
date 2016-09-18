@@ -449,12 +449,12 @@ public abstract class AbstractCalendarAccessor {
       }
     }
 
-    // runtime exceptions are dealt with by the caller
-    Uri uri = cr.insert(eventsUri, values);
-    String createdEventID = uri.getLastPathSegment();
-    Log.d(LOG_TAG, "Created event with ID " + createdEventID);
-
+    String createdEventID = null;
     try {
+      Uri uri = cr.insert(eventsUri, values);
+      createdEventID = uri.getLastPathSegment();
+      Log.d(LOG_TAG, "Created event with ID " + createdEventID);
+
       if (firstReminderMinutes > -1) {
         ContentValues reminderValues = new ContentValues();
         reminderValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
