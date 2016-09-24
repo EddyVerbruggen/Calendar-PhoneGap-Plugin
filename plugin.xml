@@ -50,8 +50,9 @@
       </array>
     </config-file>
     <!-- Usage description of the Calendar for iOS 6+, mandatory since iOS 10 -->
+    <preference name="CALENDAR_USAGE_DESCRIPTION" default=" " />
     <config-file target="*-Info.plist" parent="NSCalendarsUsageDescription">
-      <string/>
+      <string>$CALENDAR_USAGE_DESCRIPTION</string>
     </config-file>
     <header-file src="src/ios/Calendar.h"/>
     <source-file src="src/ios/Calendar.m"/>

@@ -1,4 +1,4 @@
-# PhoneGap Calendar plugin 
+# PhoneGap Calendar plugin
 
 for iOS and Android, by [Eddy Verbruggen](http://www.x-services.nl)
 
@@ -37,7 +37,11 @@ This plugin allows you to add events to the Calendar of the mobile device.
 * Supported methods: `find`, `create`, `modify`, `delete`, ..
 * All methods work without showing the native calendar. Your app never loses control.
 * Tested on iOS 6+.
-* On iOS 10+ you need to provide a reason to the user for Calendar access. This plugin adds an empty `NSCalendarsUsageDescription` key to the /platforms/ios/*-Info.plist file which you can override with your custom string [per Apple's guideline](https://developer.apple.com/library/prerelease/content/documentation/General/Reference/InfoPlistKeyReference/Articles/CocoaKeys.html#//apple_ref/doc/uid/TP40009251-SW15).
+* On iOS 10+ you need to provide a reason to the user for Calendar access. This plugin adds an empty `NSCalendarsUsageDescription` key to the /platforms/ios/*-Info.plist file which you can override with your custom string. To do so, pass the following variable when installing the plugin:
+
+```
+cordova plugin add cordova-plugin-calendar --variable CALENDAR_USAGE_DESCRIPTION="This app uses your calendar"
+```
 
 ### Android specifics
 * Supported methods on Android 4: `find`, `create` (silent and interactive), `delete`, ..
@@ -137,11 +141,11 @@ findEvent                           |             | yes | yes
 findEventWithOptions                |             | yes | yes
 listEventsInRange                   |             |     | yes
 listCalendars                       |             | yes | yes
-findAllEventsInNamedCalendars       |             | yes | 
-modifyEvent                         |             | yes | 
-modifyEventWithOptions              |             | yes | 
+findAllEventsInNamedCalendars       |             | yes |
+modifyEvent                         |             | yes |
+modifyEventWithOptions              |             | yes |
 deleteEvent                         |             | yes | yes
-deleteEventFromNamedCalendar        |             | yes | 
+deleteEventFromNamedCalendar        |             | yes |
 openCalendar                        |             | yes | yes
 
 Basic operations, you'll want to copy-paste this for testing purposes:
@@ -168,7 +172,7 @@ Basic operations, you'll want to copy-paste this for testing purposes:
 
   // create an event silently (on Android < 4 an interactive dialog is shown)
   window.plugins.calendar.createEvent(title,eventLocation,notes,startDate,endDate,success,error);
-  
+
   // create an event silently (on Android < 4 an interactive dialog is shown which doesn't use this options) with options:
   var calOptions = window.plugins.calendar.getCalendarOptions(); // grab the defaults
   calOptions.firstReminderMinutes = 120; // default is 60, pass in null for no reminder (alarm)
