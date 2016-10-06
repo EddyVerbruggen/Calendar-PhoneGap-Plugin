@@ -891,7 +891,7 @@
 }
 
 
-/* There is no distingtion between read and write access in iOS */
+/* There is no distinction between read and write access in iOS */
 - (void)hasReadPermission:(CDVInvokedUrlCommand*)command {
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:(self.eventStore != nil)];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
