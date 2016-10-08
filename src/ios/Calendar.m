@@ -407,7 +407,9 @@
       [entry setObject:attendees forKey:@"attendees"];
     }
 
-    
+    if (event.recurrenceRules != nil) {
+      [entry setObject:event.recurrenceRules forKey:@"rrule"];
+    }
 
     [entry setObject:event.calendarItemIdentifier forKey:@"id"];
     [results addObject:entry];
