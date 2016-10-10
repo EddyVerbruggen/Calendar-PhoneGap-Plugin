@@ -103,6 +103,11 @@ function findEventNoFilter() {
   window.plugins.calendar.findEvent(null, null, null, startDate, endDate, onSuccess, onError);
 }
 
+function listEventsInRange() {
+  startDate.setHours(startDate.getHours() - 12);
+  window.plugins.calendar.listEventsInRange(startDate, endDate, onSuccess, onError);
+}
+
 window.onerror = function(msg, file, line) {
   alert(msg + '; ' + file + '; ' + line);
 };
