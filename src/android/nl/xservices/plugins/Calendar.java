@@ -585,7 +585,7 @@ public class Calendar extends CordovaPlugin {
           calendar_end.setTime(date_end);
 
           //projection of DB columns
-          String[] l_projection = new String[]{"calendar_id", "title", "begin", "end", "eventLocation", "allDay", "_id"};
+          String[] l_projection = new String[]{"calendar_id", "title", "begin", "end", "eventLocation", "allDay", "_id", "rrule", "rdate", "exdate", "event_id"};
 
           //actual query
           Cursor cursor = contentResolver.query(
@@ -610,7 +610,11 @@ public class Calendar extends CordovaPlugin {
                     i++,
                     new JSONObject()
                         .put("calendar_id", cursor.getString(cursor.getColumnIndex("calendar_id")))
-                        .put("event_id", cursor.getString(cursor.getColumnIndex("_id")))
+                        .put("id", cursor.getString(cursor.getColumnIndex("_id")))
+                        .put("event_id", cursor.getString(cursor.getColumnIndex("event_id")))
+                        .put("rrule", cursor.getString(cursor.getColumnIndex("rrule")))
+                        .put("rdate", cursor.getString(cursor.getColumnIndex("rdate")))
+                        .put("exdate", cursor.getString(cursor.getColumnIndex("exdate")))
                         .put("title", cursor.getString(cursor.getColumnIndex("title")))
                         .put("dtstart", cursor.getLong(cursor.getColumnIndex("begin")))
                         .put("dtend", cursor.getLong(cursor.getColumnIndex("end")))

@@ -28,7 +28,7 @@
   } else { // we're on iOS 5 or older
     accessGranted = YES;
   }
-    
+
   if (accessGranted) {
     self.eventStore = eventStoreCandidate;
   }
@@ -375,6 +375,7 @@
     NSMutableDictionary *entry = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                   event.title, @"title",
                                   event.calendar.title, @"calendar",
+                                  event.eventIdentifier, @"id",
                                   [df stringFromDate:event.startDate], @"startDate",
                                   [df stringFromDate:event.endDate], @"endDate",
                                   [df stringFromDate:event.lastModifiedDate], @"lastModifiedDate",
@@ -404,6 +405,10 @@
         [attendees addObject:attendeeEntry];
       }
       [entry setObject:attendees forKey:@"attendees"];
+    }
+
+    if (event.recurrenceRules != nil) {
+      [entry setObject:event.recurrenceRules forKey:@"rrule"];
     }
 
     [entry setObject:event.calendarItemIdentifier forKey:@"id"];
