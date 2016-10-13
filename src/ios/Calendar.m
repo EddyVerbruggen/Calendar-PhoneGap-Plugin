@@ -338,10 +338,13 @@
 }
 
 - (EKCalendar*) findEKCalendar: (NSString *)calendarName {
-  for (EKCalendar *thisCalendar in [self.eventStore calendarsForEntityType:EKEntityTypeEvent]){
-    NSLog(@"Calendar: %@", thisCalendar.title);
-    if ([thisCalendar.title isEqualToString:calendarName]) {
-      return thisCalendar;
+  NSArray<EKCalendar *> *calendars = [self.eventStore calendarsForEntityType:EKEntityTypeEvent];
+  if (calendars != nil && calendars.count > 0) {
+    for (EKCalendar *thisCalendar in calendars) {
+      NSLog(@"Calendar: %@", thisCalendar.title);
+      if ([thisCalendar.title isEqualToString:calendarName]) {
+        return thisCalendar;
+      }
     }
   }
   NSLog(@"No match found for calendar with name: %@", calendarName);
