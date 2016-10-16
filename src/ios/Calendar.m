@@ -411,7 +411,7 @@
     }
 
     if (event.recurrenceRules != nil) {
-      [entry setObject:event.recurrenceRules forKey:@"rrule"];
+//      [entry setObject:event.recurrenceRules forKey:@"rrule"];
     }
 
     [entry setObject:event.calendarItemIdentifier forKey:@"id"];
