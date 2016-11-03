@@ -7,6 +7,7 @@ import android.provider.CalendarContract.Attendees;
 import android.provider.CalendarContract.Calendars;
 import android.provider.CalendarContract.Events;
 import android.provider.CalendarContract.Instances;
+
 import org.apache.cordova.CordovaInterface;
 
 import java.lang.Integer;
@@ -21,7 +22,7 @@ public class CalendarProviderAccessor extends AbstractCalendarAccessor {
   @Override
   protected EnumMap<KeyIndex, String> initContentProviderKeys() {
     EnumMap<KeyIndex, String> keys = new EnumMap<KeyIndex, String>(
-        KeyIndex.class);
+            KeyIndex.class);
     keys.put(KeyIndex.CALENDARS_ID, Calendars._ID);
     keys.put(KeyIndex.CALENDARS_NAME, Calendars.NAME);
     keys.put(KeyIndex.CALENDARS_VISIBLE, Calendars.VISIBLE);
@@ -50,23 +51,23 @@ public class CalendarProviderAccessor extends AbstractCalendarAccessor {
   protected Cursor queryAttendees(String[] projection, String selection,
                                   String[] selectionArgs, String sortOrder) {
     return this.cordova.getActivity().getContentResolver().query(
-        Attendees.CONTENT_URI, projection, selection, selectionArgs,
-        sortOrder);
+            Attendees.CONTENT_URI, projection, selection, selectionArgs,
+            sortOrder);
   }
 
   @Override
   protected Cursor queryCalendars(String[] projection, String selection,
                                   String[] selectionArgs, String sortOrder) {
     return this.cordova.getActivity().getContentResolver().query(
-        Calendars.CONTENT_URI, projection, selection, selectionArgs,
-        sortOrder);
+            Calendars.CONTENT_URI, projection, selection, selectionArgs,
+            sortOrder);
   }
 
   @Override
   protected Cursor queryEvents(String[] projection, String selection,
                                String[] selectionArgs, String sortOrder) {
     return this.cordova.getActivity().getContentResolver().query(
-        Events.CONTENT_URI, projection, selection, selectionArgs, sortOrder);
+            Events.CONTENT_URI, projection, selection, selectionArgs, sortOrder);
   }
 
   @Override
@@ -77,7 +78,7 @@ public class CalendarProviderAccessor extends AbstractCalendarAccessor {
     ContentUris.appendId(builder, startFrom);
     ContentUris.appendId(builder, startTo);
     return this.cordova.getActivity().getContentResolver().query(
-        builder.build(), projection, selection, selectionArgs, sortOrder);
+            builder.build(), projection, selection, selectionArgs, sortOrder);
   }
 
   @Override
@@ -88,11 +89,13 @@ public class CalendarProviderAccessor extends AbstractCalendarAccessor {
 
   @Override
   public String createEvent(Uri eventsUri, String title, long startTime, long endTime,
-                          String description, String location, Long firstReminderMinutes, Long secondReminderMinutes,
-                          String recurrence, int recurrenceInterval, Long recurrenceEndTime, Integer calendarId,
-                          String url) {
+                            String description, String location, Long firstReminderMinutes, Long secondReminderMinutes,
+                            String recurrence, int recurrenceInterval, String recurrenceWeekstart,
+                            String recurrenceByDay, String recurrenceByMonthDay, Long recurrenceEndTime, Long recurrenceCount,
+                            String allday, Integer calendarId, String url) {
     eventsUri = eventsUri == null ? Uri.parse(CONTENT_PROVIDER + CONTENT_PROVIDER_PATH_EVENTS) : eventsUri;
     return super.createEvent(eventsUri, title, startTime, endTime, description, location,
-        firstReminderMinutes, secondReminderMinutes, recurrence, recurrenceInterval, recurrenceEndTime, calendarId, url);
+            firstReminderMinutes, secondReminderMinutes, recurrence, recurrenceInterval, recurrenceWeekstart,
+            recurrenceByDay, recurrenceByMonthDay, recurrenceEndTime, recurrenceCount, allday, calendarId, url);
   }
 }
