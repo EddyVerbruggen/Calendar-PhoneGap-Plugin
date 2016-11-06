@@ -153,7 +153,7 @@
 
       // Find matches
       if (calEventID != nil) {
-          theEvent = [self.eventStore calendarItemWithIdentifier:calEventID];
+          theEvent = (EKEvent *)[self.eventStore calendarItemWithIdentifier:calEventID];
       }
 
     if (theEvent == nil) {
