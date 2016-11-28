@@ -411,7 +411,50 @@
     }
 
     if (event.recurrenceRules != nil) {
-//      [entry setObject:event.recurrenceRules forKey:@"rrule"];
+      for (EKRecurrenceRule *rule in event.recurrenceRules) {
+        NSMutableDictionary *rrule = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+            rule.calendarIdentifier, @"calendar", nil];
+
+        switch (rule.frequency) {
+          case EKRecurrenceFrequencyDaily:
+              [rrule setObject:@"daily" forKey:@"freq"];
+          break;
+
+          case EKRecurrenceFrequencyWeekly:
+              [rrule setObject:@"weekly" forKey:@"freq"];
+          break;
+
+          case EKRecurrenceFrequencyMonthly:
+              [rrule setObject:@"monthly" forKey:@"freq"];
+          break;
+
+          case EKRecurrenceFrequencyYearly:
+              [rrule setObject:@"yearly" forKey:@"freq"];
+          break;
+
+          default:
+              [rrule setObject:@"none" forKey:@"freq"];
+          break;
+        }
+
+        NSNumber *interval = [NSNumber numberWithInteger: rule.interval];
+        [rrule setObject:interval forKey:@"interval"];
+
+      if (rule.recurrenceEnd != nil) {
+        NSMutableDictionary *until = [[NSMutableDictionary alloc] init];
+
+        if (rule.recurrenceEnd.endDate != nil) {
+          [until setObject:[df stringFromDate:rule.recurrenceEnd.endDate] forKey:@"date"];
+        }
+
+      NSNumber *count = [NSNumber numberWithInteger: rule.recurrenceEnd.occurrenceCount];
+      [until setObject:count forKey:@"count"];
+
+        [rrule setObject:until forKey:@"until"];
+      }
+
+        [entry setObject:rrule forKey:@"rrule"];
+      }
     }
 
     [entry setObject:event.calendarItemIdentifier forKey:@"id"];
