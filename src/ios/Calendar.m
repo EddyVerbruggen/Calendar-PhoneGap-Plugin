@@ -818,7 +818,7 @@
     }
 
     // Find matches
-    EKCalendarItem *theEvent;
+    EKCalendarItem *theEvent = nil;
     if (calEventID != nil) {
       theEvent = [self.eventStore calendarItemWithIdentifier:calEventID];
     }
