@@ -3,6 +3,7 @@ package nl.xservices.plugins.accessor;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+
 import org.apache.cordova.CordovaInterface;
 
 import java.util.EnumMap;
@@ -53,7 +54,7 @@ public class LegacyCalendarAccessor extends AbstractCalendarAccessor {
                                   String[] selectionArgs, String sortOrder) {
     String uri = getContentProviderUri(CONTENT_PROVIDER_PATH_ATTENDEES);
     return this.cordova.getActivity().managedQuery(Uri.parse(uri), projection,
-        selection, selectionArgs, sortOrder);
+            selection, selectionArgs, sortOrder);
   }
 
   @Override
@@ -61,7 +62,7 @@ public class LegacyCalendarAccessor extends AbstractCalendarAccessor {
                                   String[] selectionArgs, String sortOrder) {
     String uri = getContentProviderUri(CONTENT_PROVIDER_PATH_CALENDARS);
     return this.cordova.getActivity().managedQuery(Uri.parse(uri), projection,
-        selection, selectionArgs, sortOrder);
+            selection, selectionArgs, sortOrder);
   }
 
   @Override
@@ -69,7 +70,7 @@ public class LegacyCalendarAccessor extends AbstractCalendarAccessor {
                                String[] selectionArgs, String sortOrder) {
     String uri = getContentProviderUri(CONTENT_PROVIDER_PATH_EVENTS);
     return this.cordova.getActivity().managedQuery(Uri.parse(uri), projection,
-        selection, selectionArgs, sortOrder);
+            selection, selectionArgs, sortOrder);
   }
 
   @Override
@@ -77,9 +78,9 @@ public class LegacyCalendarAccessor extends AbstractCalendarAccessor {
                                        String[] projection, String selection, String[] selectionArgs,
                                        String sortOrder) {
     String uri = getContentProviderUri(CONTENT_PROVIDER_PATH_INSTANCES_WHEN) +
-        "/" + Long.toString(startFrom) + "/" + Long.toString(startTo);
+            "/" + Long.toString(startFrom) + "/" + Long.toString(startTo);
     return this.cordova.getActivity().managedQuery(Uri.parse(uri), projection,
-        selection, selectionArgs, sortOrder);
+            selection, selectionArgs, sortOrder);
   }
 
   @Override
@@ -90,12 +91,14 @@ public class LegacyCalendarAccessor extends AbstractCalendarAccessor {
 
   @Override
   public String createEvent(Uri eventsUri, String title, long startTime, long endTime,
-                          String description, String location, Long firstReminderMinutes, Long secondReminderMinutes,
-                          String recurrence, int recurrenceInterval, Long recurrenceEndTime, Integer calendarId,
-                          String url) {
+                            String description, String location, Long firstReminderMinutes, Long secondReminderMinutes,
+                            String recurrence, int recurrenceInterval, String recurrenceWeekstart,
+                            String recurrenceByDay, String recurrenceByMonthDay, Long recurrenceEndTime, Long recurrenceCount,
+                            String allday, Integer calendarId, String url) {
     eventsUri = eventsUri == null ? Uri.parse(CONTENT_PROVIDER_PRE_FROYO + CONTENT_PROVIDER_PATH_EVENTS) : eventsUri;
     return super.createEvent(eventsUri, title, startTime, endTime, description, location,
-        firstReminderMinutes, secondReminderMinutes, recurrence, recurrenceInterval, recurrenceEndTime, calendarId, url);
+            firstReminderMinutes, secondReminderMinutes, recurrence, recurrenceInterval, recurrenceWeekstart,
+            recurrenceByDay, recurrenceByMonthDay, recurrenceEndTime, recurrenceCount, allday, calendarId, url);
   }
 
 }
