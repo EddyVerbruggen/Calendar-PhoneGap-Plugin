@@ -19,6 +19,7 @@ public class LegacyCalendarAccessor extends AbstractCalendarAccessor {
     EnumMap<KeyIndex, String> keys = new EnumMap<KeyIndex, String>(KeyIndex.class);
     keys.put(KeyIndex.CALENDARS_ID, "_id");
     keys.put(KeyIndex.CALENDARS_NAME, "name");
+	keys.put(KeyIndex.CALENDARS_DISPLAY_NAME, "displayname");
     keys.put(KeyIndex.CALENDARS_VISIBLE, "selected");
     keys.put(KeyIndex.EVENTS_ID, "_id");
     keys.put(KeyIndex.EVENTS_CALENDAR_ID, "calendar_id");

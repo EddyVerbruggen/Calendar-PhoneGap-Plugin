@@ -132,6 +132,7 @@ public abstract class AbstractCalendarAccessor {
         CALENDARS_ID,
         CALENDARS_NAME,
         CALENDARS_VISIBLE,
+		CALENDARS_DISPLAY_NAME,
         EVENTS_ID,
         EVENTS_CALENDAR_ID,
         EVENTS_DESCRIPTION,
@@ -269,7 +270,8 @@ public abstract class AbstractCalendarAccessor {
         Cursor cursor = queryCalendars(
                 new String[]{
                         this.getKey(KeyIndex.CALENDARS_ID),
-                        this.getKey(KeyIndex.CALENDARS_NAME)
+                        this.getKey(KeyIndex.CALENDARS_NAME),
+						this.getKey(KeyIndex.CALENDARS_DISPLAY_NAME)
                 },
                 this.getKey(KeyIndex.CALENDARS_VISIBLE) + "=1", null, null
         );
@@ -282,6 +284,7 @@ public abstract class AbstractCalendarAccessor {
                 JSONObject calendar = new JSONObject();
                 calendar.put("id", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_ID))));
                 calendar.put("name", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_NAME))));
+				calendar.put("displayname", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_DISPLAY_NAME))));
                 calendarsWrapper.put(calendar);
             } while (cursor.moveToNext());
             cursor.close();
