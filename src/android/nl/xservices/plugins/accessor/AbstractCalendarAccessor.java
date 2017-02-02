@@ -495,7 +495,7 @@ public abstract class AbstractCalendarAccessor {
                               Integer calendarId, String url) {
         ContentResolver cr = this.cordova.getActivity().getContentResolver();
         ContentValues values = new ContentValues();
-        final boolean allDayEvent = allday.equals("true") && isAllDayEvent(new Date(startTime), new Date(endTime));
+        final boolean allDayEvent = "true".equals(allday) && isAllDayEvent(new Date(startTime), new Date(endTime));
         if (allDayEvent) {
             //all day events must be in UTC time zone per Android specification, getOffset accounts for daylight savings time
             values.put(Events.EVENT_TIMEZONE, "UTC");
