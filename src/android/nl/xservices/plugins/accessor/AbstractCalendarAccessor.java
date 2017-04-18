@@ -589,6 +589,8 @@ public abstract class AbstractCalendarAccessor {
                 cv.put(CalendarContract.Calendars.CALENDAR_COLOR, Color.parseColor(calendarColor));
             }
             cv.put(CalendarContract.Calendars.VISIBLE, 1);
+			cv.put(CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL, CalendarContract.Calendars.CAL_ACCESS_OWNER);
+			cv.put(CalendarContract.Calendars.OWNER_ACCOUNT, "AccountName" );
             cv.put(CalendarContract.Calendars.SYNC_EVENTS, 0);
 
             calUri = calUri.buildUpon()
