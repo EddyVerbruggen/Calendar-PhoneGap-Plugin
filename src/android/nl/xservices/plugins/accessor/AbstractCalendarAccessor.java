@@ -132,7 +132,7 @@ public abstract class AbstractCalendarAccessor {
         CALENDARS_ID,
         CALENDARS_NAME,
         CALENDARS_VISIBLE,
-		CALENDARS_DISPLAY_NAME,
+        CALENDARS_DISPLAY_NAME,
         EVENTS_ID,
         EVENTS_CALENDAR_ID,
         EVENTS_DESCRIPTION,
@@ -271,7 +271,7 @@ public abstract class AbstractCalendarAccessor {
                 new String[]{
                         this.getKey(KeyIndex.CALENDARS_ID),
                         this.getKey(KeyIndex.CALENDARS_NAME),
-						this.getKey(KeyIndex.CALENDARS_DISPLAY_NAME)
+                        this.getKey(KeyIndex.CALENDARS_DISPLAY_NAME)
                 },
                 this.getKey(KeyIndex.CALENDARS_VISIBLE) + "=1", null, null
         );
@@ -284,7 +284,7 @@ public abstract class AbstractCalendarAccessor {
                 JSONObject calendar = new JSONObject();
                 calendar.put("id", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_ID))));
                 calendar.put("name", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_NAME))));
-				calendar.put("displayname", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_DISPLAY_NAME))));
+                calendar.put("displayname", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_DISPLAY_NAME))));
                 calendarsWrapper.put(calendar);
             } while (cursor.moveToNext());
             cursor.close();
@@ -440,11 +440,13 @@ public abstract class AbstractCalendarAccessor {
         // Fetch event attendees
         Map<String, ArrayList<Attendee>> attendeeMap =
                 fetchAttendeesForEventsAsMap(eventMap.keySet().toArray(new String[0]));
-        // Merge the event info with the instances and turn it into a JSONArray.
-        for (Event event : eventMap.values()) {
-            result.put(event.toJSONObject());
-        }
         
+        /*for (Event event : eventMap.values()) {
+            result.put(event.toJSONObject());
+        }*/
+
+        // TODO lost instance id and other data...
+        // Merge the event info with the instances and turn it into a JSONArray.
         for (Event instance : instances) {
             Event event = eventMap.get(instance.eventId);
             if (event != null) {
