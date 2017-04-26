@@ -444,7 +444,7 @@ public abstract class AbstractCalendarAccessor {
         for (Event event : eventMap.values()) {
             result.put(event.toJSONObject());
         }
-        /*
+        
         for (Event instance : instances) {
             Event event = eventMap.get(instance.eventId);
             if (event != null) {
@@ -469,7 +469,7 @@ public abstract class AbstractCalendarAccessor {
                 instance.attendees = attendeeMap.get(instance.eventId);
                 result.put(instance.toJSONObject());
             }
-        }*/
+        }
 
         return result;
     }
