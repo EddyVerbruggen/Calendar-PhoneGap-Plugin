@@ -485,7 +485,9 @@ public class Calendar extends CordovaPlugin {
                   getPossibleNullString("location", jsonFilter),
                   getPossibleNullString("notes", jsonFilter),
                   jsonFilter.optLong("startTime"),
-                  jsonFilter.optLong("endTime"));
+                  jsonFilter.optLong("endTime"),
+                  getPossibleNullString("calendarId", argOptionsObject))
+          ;
 
           callback.sendPluginResult(new PluginResult(PluginResult.Status.OK, jsonEvents));
         }
