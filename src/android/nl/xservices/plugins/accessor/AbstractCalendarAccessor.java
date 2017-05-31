@@ -311,6 +311,10 @@ public abstract class AbstractCalendarAccessor {
             calendarsToSearch = activeCalendarIds;
         }
 
+        if(calendarsToSearch.isEmpty()){
+            return null;
+        }
+
 
         String[] projection = new String[]{
                 this.getKey(KeyIndex.EVENTS_ID),
