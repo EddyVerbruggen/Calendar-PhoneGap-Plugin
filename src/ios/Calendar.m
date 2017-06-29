@@ -499,6 +499,32 @@
 }
 
 - (void) listEventsInRange:(CDVInvokedUrlCommand*)command {
+  NSDictionary* options = [command.arguments objectAtIndex:0];
+  NSNumber* startTime  = [options objectForKey:@"startTime"];
+  NSNumber* endTime    = [options objectForKey:@"endTime"];
+
+  [self.commandDelegate runInBackground: ^{
+      NSLog(@"listEventsInRange invoked");
+      NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
+      NSDate *startDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
+
+      NSTimeInterval _endInterval = [endTime doubleValue] / 1000; // strip millis
+      NSDate *endDate = [NSDate dateWithTimeIntervalSince1970:_endInterval];
+
+      NSLog(@"startDate: %@", startDate);
+      NSLog(@"endDate: %@", endDate);
+
+      CDVPluginResult *pluginResult = nil;
+
+      NSArray *calendarArray = nil;
+      NSPredicate *fetchCalendarEvents = [eventStore predicateForEventsWithStartDate:startDate endDate:endDate calendars:calendarArray];
+      NSArray *matchingEvents = [eventStore eventsMatchingPredicate:fetchCalendarEvents];
+      NSMutableArray * eventsDataArray = [self eventsToDataArray:matchingEvents];
+
+      pluginResult = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:eventsDataArray];
+
+      [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+  }];  
 }
 
 - (void)createEventWithOptions:(CDVInvokedUrlCommand*)command {
