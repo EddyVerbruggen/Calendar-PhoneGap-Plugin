@@ -345,6 +345,9 @@
       if ([thisCalendar.title isEqualToString:calendarName]) {
         return thisCalendar;
       }
+      if ([thisCalendar.calendarIdentifier isEqualToString:calendarName]) {
+        return thisCalendar;
+      }
     }
   }
   NSLog(@"No match found for calendar with name: %@", calendarName);
