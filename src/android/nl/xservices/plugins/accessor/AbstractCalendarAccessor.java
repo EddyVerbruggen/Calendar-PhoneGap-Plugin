@@ -132,7 +132,7 @@ public abstract class AbstractCalendarAccessor {
         CALENDARS_ID,
         CALENDARS_NAME,
         CALENDARS_VISIBLE,
-		CALENDARS_DISPLAY_NAME,
+        CALENDARS_DISPLAY_NAME,
         EVENTS_ID,
         EVENTS_CALENDAR_ID,
         EVENTS_DESCRIPTION,
@@ -271,7 +271,7 @@ public abstract class AbstractCalendarAccessor {
                 new String[]{
                         this.getKey(KeyIndex.CALENDARS_ID),
                         this.getKey(KeyIndex.CALENDARS_NAME),
-						this.getKey(KeyIndex.CALENDARS_DISPLAY_NAME)
+                        this.getKey(KeyIndex.CALENDARS_DISPLAY_NAME)
                 },
                 this.getKey(KeyIndex.CALENDARS_VISIBLE) + "=1", null, null
         );
@@ -284,7 +284,7 @@ public abstract class AbstractCalendarAccessor {
                 JSONObject calendar = new JSONObject();
                 calendar.put("id", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_ID))));
                 calendar.put("name", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_NAME))));
-				calendar.put("displayname", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_DISPLAY_NAME))));
+                calendar.put("displayname", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_DISPLAY_NAME))));
                 calendarsWrapper.put(calendar);
             } while (cursor.moveToNext());
             cursor.close();
@@ -292,12 +292,30 @@ public abstract class AbstractCalendarAccessor {
         return calendarsWrapper;
     }
 
-    private Map<String, Event> fetchEventsAsMap(Event[] instances) {
+    private Map<String, Event> fetchEventsAsMap(Event[] instances, String calendarId) {
         // Only selecting from active calendars, no active calendars = no events.
-        String[] activeCalendarIds = getActiveCalendarIds();
-        if (activeCalendarIds.length == 0) {
+        List<String> activeCalendarIds = Arrays.asList(getActiveCalendarIds());
+        if (activeCalendarIds.isEmpty()) {
             return null;
         }
+
+        List<String> calendarsToSearch;
+
+        if(calendarId!=null){
+            calendarsToSearch = new ArrayList<String>();
+            if(activeCalendarIds.contains(calendarId)){
+                calendarsToSearch.add(calendarId);
+            }
+
+        }else{
+            calendarsToSearch = activeCalendarIds;
+        }
+
+        if(calendarsToSearch.isEmpty()){
+            return null;
+        }
+
+
         String[] projection = new String[]{
                 this.getKey(KeyIndex.EVENTS_ID),
                 this.getKey(KeyIndex.EVENTS_DESCRIPTION),
@@ -318,11 +336,14 @@ public abstract class AbstractCalendarAccessor {
         }
         select.append(") AND " + this.getKey(KeyIndex.EVENTS_CALENDAR_ID) +
                 " IN (");
-        select.append(activeCalendarIds[0]);
-        for (int i = 1; i < activeCalendarIds.length; i++) {
-            select.append(",");
-            select.append(activeCalendarIds[i]);
+
+        String prefix ="";
+        for (String calendarToFilterId:calendarsToSearch) {
+            select.append(prefix);
+            prefix = ",";
+            select.append(calendarToFilterId);
         }
+
         select.append(")");
         Cursor cursor = queryEvents(projection, select.toString(), null, null);
         Map<String, Event> eventsMap = new HashMap<String, Event>();
@@ -428,7 +449,7 @@ public abstract class AbstractCalendarAccessor {
         return attendeeMap;
     }
 
-    public JSONArray findEvents(String eventId, String title, String location, String notes, long startFrom, long startTo) {
+    public JSONArray findEvents(String eventId, String title, String location, String notes, long startFrom, long startTo, String calendarId) {
         JSONArray result = new JSONArray();
         // Fetch events from the instance table.
         Event[] instances = fetchEventInstances(eventId, title, location, notes, startFrom, startTo);
@@ -436,15 +457,15 @@ public abstract class AbstractCalendarAccessor {
             return result;
         }
         // Fetch events from the events table for more event info.
-        Map<String, Event> eventMap = fetchEventsAsMap(instances);
+        Map<String, Event> eventMap = fetchEventsAsMap(instances, calendarId);
         // Fetch event attendees
         Map<String, ArrayList<Attendee>> attendeeMap =
                 fetchAttendeesForEventsAsMap(eventMap.keySet().toArray(new String[0]));
         // Merge the event info with the instances and turn it into a JSONArray.
-        for (Event event : eventMap.values()) {
+        /*for (Event event : eventMap.values()) {
             result.put(event.toJSONObject());
-        }
-        /*
+        }*/
+
         for (Event instance : instances) {
             Event event = eventMap.get(instance.eventId);
             if (event != null) {
@@ -469,7 +490,7 @@ public abstract class AbstractCalendarAccessor {
                 instance.attendees = attendeeMap.get(instance.eventId);
                 result.put(instance.toJSONObject());
             }
-        }*/
+        }
 
         return result;
     }
