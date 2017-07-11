@@ -329,8 +329,13 @@ public class Calendar extends CordovaPlugin {
       cordova.getThreadPool().execute(new Runnable() {
         @Override
         public void run() {
-          getCalendarAccessor().deleteCalendar(calendarName);
-          callback.sendPluginResult(new PluginResult(PluginResult.Status.OK, "yes"));
+          try {
+            getCalendarAccessor().deleteCalendar(calendarName);
+            callback.sendPluginResult(new PluginResult(PluginResult.Status.OK, "yes"));
+          } catch (Exception e) {
+            System.err.println("Exception: " + e.getMessage());
+            callback.error(e.getMessage());
+          }
         }
       });
     } catch (JSONException e) {
