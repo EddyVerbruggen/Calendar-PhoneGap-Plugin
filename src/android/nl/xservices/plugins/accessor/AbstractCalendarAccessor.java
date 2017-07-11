@@ -591,7 +591,7 @@ public abstract class AbstractCalendarAccessor {
             Cursor result = contentResolver.query(evuri, new String[]{CalendarContract.Calendars._ID, CalendarContract.Calendars.NAME, CalendarContract.Calendars.CALENDAR_DISPLAY_NAME}, null, null, null);
             if (result != null) {
                 while (result.moveToNext()) {
-                    if (result.getString(1).equals(calendarName) || result.getString(2).equals(calendarName)) {
+                    if ((result.getString(1) != null && result.getString(1).equals(calendarName)) || (result.getString(2) != null && result.getString(2).equals(calendarName))) {
                         result.close();
                         return null;
                     }
@@ -640,7 +640,7 @@ public abstract class AbstractCalendarAccessor {
             Cursor result = contentResolver.query(evuri, new String[]{CalendarContract.Calendars._ID, CalendarContract.Calendars.NAME, CalendarContract.Calendars.CALENDAR_DISPLAY_NAME}, null, null, null);
             if (result != null) {
                 while (result.moveToNext()) {
-                    if (result.getString(1).equals(calendarName) || result.getString(2).equals(calendarName)) {
+                    if (result.getString(1) != null && result.getString(1).equals(calendarName) || result.getString(2) != null && result.getString(2).equals(calendarName)) {
                         long calid = result.getLong(0);
                         Uri deleteUri = ContentUris.withAppendedId(evuri, calid);
                         contentResolver.delete(deleteUri, null, null);
@@ -679,7 +679,7 @@ public abstract class AbstractCalendarAccessor {
             Cursor result = contentResolver.query(evuri, new String[]{CalendarContract.Calendars._ID, CalendarContract.Calendars.ACCOUNT_NAME}, null, null, null);
             if (result != null) {
                 while (result.moveToNext()) {
-                    if (result.getString(1).equals(fixingAccountName)) {
+                    if (result.getString(1) != null && result.getString(1).equals(fixingAccountName)) {
                         long calid = result.getLong(0);
                         Uri deleteUri = ContentUris.withAppendedId(evuri, calid);
                         contentResolver.delete(deleteUri, null, null);
