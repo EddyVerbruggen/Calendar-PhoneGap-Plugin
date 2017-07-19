@@ -47,6 +47,9 @@ cordova plugin add cordova-plugin-calendar --variable CALENDAR_USAGE_DESCRIPTION
 * Supported methods on Android 4: `find`, `create` (silent and interactive), `delete`, ..
 * Supported methods on Android 2 and 3: `create` interactive only: the user is presented a prefilled Calendar event. Pressing the hardware back button will give control back to your app.
 
+### Windows 10 Mobile
+* Supported methods: `createEvent`, `createEventWithOptions`, `createEventInteractively`, `createEventInteractivelyWithOptions` only interactively
+
 ## 2. Installation
 
 ### Automatically
