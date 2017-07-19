@@ -80,4 +80,14 @@
                  target-dir="src/nl/xservices/plugins/accessor"/>
     <dependency id="cordova-plugin-compat" version="^1.0.0" />
   </platform>
+  
+  <!-- windows -->
+  <platform name="windows">
+    <js-module src="src/windows/appointment.js" name="appointment">
+      <merges target="" />
+    </js-module>
+    <config-file target="config.xml" parent="/*">
+      <feature name="Calendar" value="Calendar" />
+    </config-file>
+  </platform>
 </plugin>

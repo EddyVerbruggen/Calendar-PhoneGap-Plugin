@@ -129,24 +129,27 @@ Also, make sure you're building with Gradle by adding this to your `config.xml` 
 
 The table gives an overview of basic operation compatibility:
 
-Operation                           | Comment     | iOS | Android
------------------------------------ | ----------- | --- | -------
-createCalendar                      |             | yes | yes
-deleteCalendar                      |             | yes | yes
-createEvent                         | silent      | yes | yes (on Android < 4 dialog is shown)
-createEventWithOptions              | silent      | yes | yes (on Android < 4 dialog is shown)
-createEventInteractively            | interactive | yes | yes
-createEventInteractivelyWithOptions | interactive | yes | yes
-findEvent                           |             | yes | yes
-findEventWithOptions                |             | yes | yes
-listEventsInRange                   |             |     | yes
-listCalendars                       |             | yes | yes
-findAllEventsInNamedCalendars       |             | yes |
-modifyEvent                         |             | yes |
-modifyEventWithOptions              |             | yes |
-deleteEvent                         |             | yes | yes
-deleteEventFromNamedCalendar        |             | yes |
-openCalendar                        |             | yes | yes
+Operation                           | Comment     | iOS | Android | Windows |
+----------------------------------- | ----------- | --- | ------- | ------- |
+createCalendar                      |             | yes | yes     |         |
+deleteCalendar                      |             | yes | yes     |         |
+createEvent                         | silent      | yes | yes *   | yes **  |
+createEventWithOptions              | silent      | yes | yes *   | yes **  |
+createEventInteractively            | interactive | yes | yes     | yes **  |
+createEventInteractivelyWithOptions | interactive | yes | yes     | yes **  |
+findEvent                           |             | yes | yes     |         |
+findEventWithOptions                |             | yes | yes     |         |
+listEventsInRange                   |             |     | yes     |         |
+listCalendars                       |             | yes | yes     |         |
+findAllEventsInNamedCalendars       |             | yes |         |         |
+modifyEvent                         |             | yes |         |         |
+modifyEventWithOptions              |             | yes |         |         |
+deleteEvent                         |             | yes | yes     |         |
+deleteEventFromNamedCalendar        |             | yes |         |         |
+openCalendar                        |             | yes | yes     |         |
+
+* \* on Android < 4 dialog is shown
+* \** only interactively on windows mobile
 
 Basic operations, you'll want to copy-paste this for testing purposes:
 ```js
