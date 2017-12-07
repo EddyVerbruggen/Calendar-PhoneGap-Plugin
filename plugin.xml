@@ -3,7 +3,7 @@
     xmlns="http://apache.org/cordova/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="cordova-plugin-calendar"
-    version="4.6.0">
+    version="4.6.1">
 
   <name>Calendar</name>
 
@@ -22,7 +22,7 @@
   <issue>https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin/issues</issue>
 
   <engines>
-    <engine name="cordova" version=">=3.0.0"/>
+      <engine name="cordova-android" version=">=6.3.0" />
   </engines>
 
   <js-module src="www/Calendar.js" name="Calendar">
@@ -78,7 +78,6 @@
                  target-dir="src/nl/xservices/plugins/accessor"/>
     <source-file src="src/android/nl/xservices/plugins/accessor/LegacyCalendarAccessor.java"
                  target-dir="src/nl/xservices/plugins/accessor"/>
-    <dependency id="cordova-plugin-compat" version="^1.0.0" />
   </platform>
   
   <!-- windows -->
