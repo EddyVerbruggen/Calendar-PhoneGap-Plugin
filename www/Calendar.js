@@ -270,6 +270,14 @@ Calendar.prototype.listCalendars = function (successCallback, errorCallback) {
   cordova.exec(successCallback, errorCallback, "Calendar", "listCalendars", []);
 };
 
+Calendar.prototype.parseEventDate = function (dateStr) {
+	var spl;
+	// Handle yyyy-MM-dd HH:mm:ss format returned by AbstractCalendarAccessor.java L66, Calendar.m L378, and most similar formats
+	return (spl = /^\s*(\d{4})\D?(\d{2})\D?(\d{2})\D?(\d{2})\D?(\d{2})\D?(\d{2})\s*$/.exec(dateStr))
+		&& new Date(spl[1], spl[2] - 1, spl[3], spl[4], spl[5], spl[6])
+		|| new Date(dateStr);
+};
+
 Calendar.install = function () {
   if (!window.plugins) {
     window.plugins = {};
