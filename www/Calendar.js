@@ -278,11 +278,16 @@ Calendar.prototype.listCalendars = function (successCallback, errorCallback) {
 };
 
 Calendar.prototype.parseEventDate = function (dateStr) {
-	var spl;
-	// Handle yyyy-MM-dd HH:mm:ss format returned by AbstractCalendarAccessor.java L66, Calendar.m L378, and most similar formats
-	return (spl = /^\s*(\d{4})\D?(\d{2})\D?(\d{2})\D?(\d{2})\D?(\d{2})\D?(\d{2})\s*$/.exec(dateStr))
-		&& new Date(spl[1], spl[2] - 1, spl[3], spl[4], spl[5], spl[6])
-		|| new Date(dateStr);
+  // Handle yyyyMMddTHHmmssZ iCalendar UTC format
+  var icalRegExp = /\b(\d{4})(\d{2})(\d{2}T\d{2})(\d{2})(\d{2}Z)\b/;
+  if (icalRegExp.test(dateStr))
+    return new Date(String(dateStr).replace(icalRegExp, '$1-$2-$3:$4:$5'));
+
+  var spl;
+  // Handle yyyy-MM-dd HH:mm:ss format returned by AbstractCalendarAccessor.java L66 and Calendar.m L378, and yyyyMMddTHHmmss iCalendar local format, and similar
+  return (spl = /^\s*(\d{4})\D?(\d{2})\D?(\d{2})\D?(\d{2})\D?(\d{2})\D?(\d{2})\s*$/.exec(dateStr))
+    && new Date(spl[1], spl[2] - 1, spl[3], spl[4], spl[5], spl[6])
+    || new Date(dateStr);
 };
 
 Calendar.install = function () {

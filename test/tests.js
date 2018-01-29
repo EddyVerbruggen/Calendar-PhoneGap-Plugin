@@ -12,6 +12,11 @@ exports.defineAutoTests = function() {
   var runId = Math.floor((runTime - new Date(runTime).setHours(0, 0, 0, 0)) / 1000);
   var runTag = ' [cpctZQX' + runId + ']';
 
+  var delay = function (t, v) {
+    return new Promise(function (resolve) {
+      setTimeout(resolve.bind(null, v), t)
+    });
+  };
   var promisifyScbEcb = function (func) {
     if (typeof(func) != 'function')
       throw 'not a function: ' + func;
@@ -25,12 +30,23 @@ exports.defineAutoTests = function() {
   var deleteEventP = promisifyScbEcb(plugins.calendar.deleteEvent);
   var findEventP = promisifyScbEcb(plugins.calendar.findEvent);
   var createEventP = promisifyScbEcb(plugins.calendar.createEvent);
+  var createEventWithOptionsP = promisifyScbEcb(plugins.calendar.createEventWithOptions);
+  var deleteEventByIdP = promisifyScbEcb(plugins.calendar.deleteEventById);
+  var syncAndroidGoogleCalendarP = promisifyScbEcb(function(successCallback, errorCallback) {
+    if (cordova.platformId == 'android') {
+      cordova.exec(successCallback, errorCallback, "CalendarTestsUtility", "syncAndroidGoogleCalendar", []);
+    } else {
+      successCallback();
+    }
+  });
   var parseEventDate = plugins.calendar.parseEventDate;
 
   var newDate = function (dd, hh, mm) {
     return new Date(2018, 0, 21 + dd, hh || 0, mm || 0);
   };
 
+
+  jasmine.DEFAULT_TIMEOUT_INTERVAL= 60000;
 
   beforeEach(function (done) {
     /* clean up autotest data */
@@ -136,6 +152,129 @@ exports.defineAutoTests = function() {
 
           // delete the rest
           return deleteEventP(title, null, null, newDate(1, 0), newDate(2, 0));
+        });
+    });
+  });
+
+  describe('deleteEventById', function () {
+
+    var createRecurring = function (title, withCount) {
+      // create
+      var createOpts = withCount
+        ? { recurrence: "daily", recurrenceCount: 4 }
+        : { recurrence: "daily", recurrenceEndDate: newDate(6, 0) };
+      return createEventWithOptionsP(title, null, null, newDate(2, 18), newDate(2, 19), createOpts)
+        .then(function (id) {
+          // find
+          return findEventP(title, null, null, newDate(2, 0), newDate(8, 0))
+            .then(function (events) {
+              expect(events.length).toBe(4);
+              expect(events.every(function (x) { return x.id == id; })).toBe(true);
+
+              // pedantic checks
+              expect(parseEventDate(events[2].startDate)).toEqual(newDate(4, 18));
+              if (!withCount) {
+                var ev = events[0];
+                var until = ev.recurrence ? ev.recurrence.until : ev.rrule.until.date;
+                expect(parseEventDate(until)).toEqual(newDate(6, 0));
+              }
+
+              return id;
+            });
+        });
+    };
+
+    itP('should support removing all instances', function () {
+      var title = 'delIdAll event' + runTag;
+
+      return createRecurring(title)
+        .then(function (id) {
+          return deleteEventByIdP(id, null);
+        })
+        .then(function () {
+          return findEventP(title, null, null, newDate(2, 0), newDate(8, 0));
+        })
+        .then(function (events) {
+          expect(events.length).toBe(0);
+        });
+    });
+
+    itP('should support truncating series', function () {
+      var title = 'delIdDate event' + runTag;
+
+      return createRecurring(title)
+        .then(function (id) {
+          return deleteEventByIdP(id, newDate(4, 18));
+        })
+        .then(function () {
+          return syncAndroidGoogleCalendarP();
+        })
+        .then(function () {
+          return findEventP(title, null, null, newDate(2, 0), newDate(8, 0));
+        })
+        .then(function (events) {
+          expect(events.length).toBe(2);
+          expect(parseEventDate(events[1].startDate)).toEqual(newDate(3, 18));
+        });
+    });
+
+    itP('should fail on invalid id', function () {
+      var failed = false;
+      return deleteEventByIdP('3826806B-1678-46DE-96B5-0748014AD920', null)
+        .catch(function () {
+          failed = true;
+        })
+        .then(function () {
+          expect(failed).toBe(true);
+        });
+    });
+
+    itP('should succeed if already truncated', function () {
+      var title = 'delIdAgain event' + runTag;
+
+      return createRecurring(title)
+        .then(function (id) {
+          return deleteEventByIdP(id, newDate(5, 19));
+        })
+        .then(function () {
+          return findEventP(title, null, null, newDate(2, 0), newDate(8, 0));
+        })
+        .then(function (events) {
+          expect(events.length).toBe(4);
+        });
+    });
+
+    itP('should support truncating recurrences defined by a count', function() {
+      var title = 'delIdCtDate event' + runTag;
+
+      return createRecurring(title, true)
+        .then(function (id) {
+          return deleteEventByIdP(id, newDate(4, 18));
+        })
+        .then(function () {
+          return syncAndroidGoogleCalendarP();
+        })
+        .then(function () {
+          return findEventP(title, null, null, newDate(2, 0), newDate(8, 0));
+        })
+        .then(function (events) {
+          expect(events.length).toBe(2);
+          expect(parseEventDate(events[1].startDate)).toEqual(newDate(3, 18));
+        });
+    });
+
+    itP('should succeed if already truncated by a count', function () {
+      var title = 'delIdCtAgain event' + runTag;
+
+      return createRecurring(title, true)
+        .then(function (id) {
+          return deleteEventByIdP(id, newDate(5, 19));
+        })
+        .then(function () {
+          return findEventP(title, null, null, newDate(2, 0), newDate(8, 0));
+        })
+        .then(function (events) {
+          expect(events.length).toBe(4);
         });
     });
   });

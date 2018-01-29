@@ -28,4 +28,17 @@
 
     <js-module src="tests.js" name="tests">
     </js-module>
+
+    <platform name="android">
+      <config-file target="res/xml/config.xml" parent="/*">
+        <feature name="CalendarTestsUtility">
+          <param name="android-package" value="org.apache.cordova.calendartests.Utility"/>
+        </feature>
+      </config-file>
+      <config-file target="AndroidManifest.xml" parent="/manifest">
+        <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+        <uses-permission android:name="android.permission.READ_SYNC_STATS"/>
+      </config-file>
+      <source-file src="src/android/org/apache/cordova/calendartests/Utility.java" target-dir="src/org/apache/cordova/calendartests"/>
+    </platform>
 </plugin>
