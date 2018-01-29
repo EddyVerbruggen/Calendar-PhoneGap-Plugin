@@ -86,6 +86,58 @@ exports.defineAutoTests = function() {
             });
         });
     });
+
+    itP('should support delete by title or date', function () {
+      var title = 'DF event' + runTag + ' ';
+      var first, bytitle, bydate, last;
+
+      // create
+      return createEventP(title + 'first', null, null, newDate(1, 7), newDate(1, 8))
+        .then(function (id) {
+          first = id;
+          return createEventP(title + 'bytitle', null, null, newDate(1, 9), newDate(1, 10));
+        })
+        .then(function (id) {
+          bytitle = id;
+          return createEventP(title + 'bydate', null, null, newDate(1, 11), newDate(1, 13));
+        })
+        .then(function (id) {
+          bydate = id;
+          return createEventP(title + 'last', null, null, newDate(1, 14), newDate(1, 15));
+        })
+        .then(function (id) {
+          last = id;
+
+          // find
+          return findEventP(title, null, null, newDate(1, 0), newDate(2, 0));
+        })
+        .then(function (events) {
+          expect(events.length).toBe(4);
+
+          // delete by title
+          return deleteEventP(title + 'bytitle', null, null, newDate(1, 0), newDate(2, 0));
+        })
+        .then(function () {
+          // find
+          return findEventP(title, null, null, newDate(1, 0), newDate(2, 0));
+        })
+        .then(function (events) {
+          expect(events.map(function (e) { return e.id; })).toEqual([first, bydate, last]);
+
+          // delete by date
+          return deleteEventP(null, null, null, newDate(1, 11), newDate(1, 13));
+        })
+        .then(function () {
+          // find
+          return findEventP(title, null, null, newDate(1, 0), newDate(2, 0));
+        })
+        .then(function (events) {
+          expect(events.map(function (e) { return e.id; })).toEqual([first, last]);
+
+          // delete the rest
+          return deleteEventP(title, null, null, newDate(1, 0), newDate(2, 0));
+        });
+    });
   });
 
 };
