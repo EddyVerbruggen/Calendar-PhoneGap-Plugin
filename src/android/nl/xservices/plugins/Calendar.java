@@ -398,8 +398,7 @@ public class Calendar extends CordovaPlugin {
             if (recurrenceEndTime == null) {
               calIntent.putExtra(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";INTERVAL=" + recurrenceInterval);
             } else {
-              final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'hhmmss'Z'");
-              calIntent.putExtra(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";INTERVAL=" + recurrenceInterval + ";UNTIL=" + sdf.format(new Date(recurrenceEndTime)));
+              calIntent.putExtra(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";INTERVAL=" + recurrenceInterval + ";UNTIL=" + formatICalDateTime(new Date(recurrenceEndTime)));
             }
           }
 
@@ -667,5 +666,11 @@ public class Calendar extends CordovaPlugin {
       Log.d(LOG_TAG, "onActivityResult error, resultcode: " + resultCode);
       callback.error("Unable to add event (" + resultCode + ").");
     }
+  }
+
+  public static String formatICalDateTime(Date date) {
+    final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
+    sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+    return sdf.format(date);
   }
 }

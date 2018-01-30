@@ -543,14 +543,12 @@ public abstract class AbstractCalendarAccessor {
         values.put(Events.EVENT_LOCATION, location);
 
         if (recurrence != null) {
-            final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'hhmmss'Z'");
-
             String rrule = "FREQ=" + recurrence.toUpperCase() +
                     ((recurrenceInterval > -1) ? ";INTERVAL=" + recurrenceInterval : "") +
                     ((recurrenceWeekstart != null) ? ";WKST=" + recurrenceWeekstart : "") +
                     ((recurrenceByDay != null) ? ";BYDAY=" + recurrenceByDay : "") +
                     ((recurrenceByMonthDay != null) ? ";BYMONTHDAY=" + recurrenceByMonthDay : "") +
-                    ((recurrenceEndTime > -1) ? ";UNTIL=" + sdf.format(new Date(recurrenceEndTime)) : "") +
+                    ((recurrenceEndTime > -1) ? ";UNTIL=" + nl.xservices.plugins.Calendar.formatICalDateTime(new Date(recurrenceEndTime)) : "") +
                     ((recurrenceCount > -1) ? ";COUNT=" + recurrenceCount : "");
             values.put(Events.RRULE, rrule);
         }
