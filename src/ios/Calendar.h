@@ -41,6 +41,7 @@
 - (void)deleteEvent:(CDVInvokedUrlCommand*)command;
 - (void)deleteEventFromNamedCalendar:(CDVInvokedUrlCommand*)command;
 - (void)deleteEventFromCalendar:(CDVInvokedUrlCommand*)command calendar:(EKCalendar*)calendar;
+- (void)deleteEventById:(CDVInvokedUrlCommand*)command;
 - (void)eventEditViewController:(EKEventEditViewController*)controller didCompleteWithAction:(EKEventEditViewAction) action;
 
 @end
