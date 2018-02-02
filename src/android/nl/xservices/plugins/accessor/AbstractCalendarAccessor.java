@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static android.provider.CalendarContract.Events;
+import android.provider.CalendarContract.Instances;
 
 public abstract class AbstractCalendarAccessor {
 
@@ -506,6 +507,79 @@ public abstract class AbstractCalendarAccessor {
             }
         }
         return nrDeletedRecords > 0;
+    }
+
+    public boolean deleteEventById(Uri eventsUri, long id, long fromTime) {
+        if (id == -1)
+            throw new IllegalArgumentException("Event id not specified.");
+
+        // Find event
+        long evDtStart = -1;
+        String evRRule = null;
+        {
+            Cursor cur = queryEvents(new String[] { Events.DTSTART, Events.RRULE },
+                                     Events._ID + " = ?",
+                                     new String[] { Long.toString(id) },
+                                     Events.DTSTART);
+            if (cur.moveToNext()) {
+                evDtStart = cur.getLong(0);
+                evRRule = cur.getString(1);
+            }
+            cur.close();
+        }
+        if (evDtStart == -1)
+            throw new RuntimeException("Could not find event.");
+
+        // If targeted, delete initial event
+        if (fromTime == -1 || evDtStart >= fromTime) {
+            ContentResolver resolver = this.cordova.getActivity().getContentResolver();
+            int deleted = this.cordova.getActivity().getContentResolver()
+                              .delete(ContentUris.withAppendedId(eventsUri, id), null, null);
+            return deleted > 0;
+        }
+
+        // Find target instance
+        long targDtStart = -1;
+        {
+            Cursor cur = queryEventInstances(fromTime,
+                                             Long.MAX_VALUE,
+                                             new String[] { Instances.DTSTART },
+                                             Instances.EVENT_ID + " = ?",
+                                             new String[] { Long.toString(id) },
+                                             Instances.DTSTART);
+            if (cur.moveToNext()) {
+                targDtStart = cur.getLong(0);
+            }
+            cur.close();
+        }
+        if (targDtStart == -1) {
+            // Nothing to delete
+            return false;
+        }
+
+        // Set UNTIL
+        if (evRRule == null)
+            evRRule = "";
+
+        // Remove any existing COUNT or UNTIL
+        List<String> recurRuleParts = new ArrayList<String>(Arrays.asList(evRRule.split(";")));
+        Iterator<String> iter = recurRuleParts.iterator();
+        while (iter.hasNext()) {
+            String rulePart = iter.next();
+            if (rulePart.startsWith("COUNT=") || rulePart.startsWith("UNTIL=")) {
+                iter.remove();
+            }
+        }
+
+        evRRule = TextUtils.join(";", recurRuleParts) + ";UNTIL=" + nl.xservices.plugins.Calendar.formatICalDateTime(new Date(fromTime - 1000));
+
+        // Update event
+        ContentValues values = new ContentValues();
+        values.put(Events.RRULE, evRRule);
+        int updated = this.cordova.getActivity().getContentResolver()
+                          .update(ContentUris.withAppendedId(eventsUri, id), values, null, null);
+
+        return updated > 0;
     }
 
     public String createEvent(Uri eventsUri, String title, long startTime, long endTime, String description,
