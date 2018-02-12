@@ -606,9 +606,26 @@ public class Calendar extends CordovaPlugin {
                   "(deleted = 0 AND" +
                           "   (" +
                           // all day events are stored in UTC, others in the user's timezone
-                          "     (eventTimezone  = 'UTC' AND begin >=" + (calendar_start.getTimeInMillis() + TimeZone.getDefault().getOffset(calendar_start.getTimeInMillis())) + " AND end <=" + (calendar_end.getTimeInMillis() + TimeZone.getDefault().getOffset(calendar_end.getTimeInMillis())) + ")" +
+                          // first case: begin is in requested dates
+                          "     (eventTimezone  = 'UTC'" +
+                          "     AND begin >=" + (calendar_start.getTimeInMillis() + TimeZone.getDefault().getOffset(calendar_start.getTimeInMillis())) +
+                          "     AND begin <=" + (calendar_end.getTimeInMillis() + TimeZone.getDefault().getOffset(calendar_end.getTimeInMillis())) + ")" +
                           "     OR " +
-                          "     (eventTimezone <> 'UTC' AND begin >=" + calendar_start.getTimeInMillis() + " AND end <=" + calendar_end.getTimeInMillis() + ")" +
+                          "     (eventTimezone <> 'UTC' AND begin >=" + calendar_start.getTimeInMillis() + " AND begin <=" + calendar_end.getTimeInMillis() + ")" +
+                          // second case: end is in requested dates
+                          "     OR " +
+                          "     (eventTimezone  = 'UTC'" +
+                          "     AND end >=" + (calendar_start.getTimeInMillis() + TimeZone.getDefault().getOffset(calendar_start.getTimeInMillis())) +
+                          "     AND end <=" + (calendar_end.getTimeInMillis() + TimeZone.getDefault().getOffset(calendar_end.getTimeInMillis())) + ")" +
+                          "     OR " +
+                          "     (eventTimezone <> 'UTC' AND end >=" + calendar_start.getTimeInMillis() + " AND end <=" + calendar_end.getTimeInMillis() + ")" +
+                          // third case: begin is before && end is after requested dates
+                          "     OR " +
+                          "     (eventTimezone  = 'UTC'" +
+                          "     AND begin <" + (calendar_start.getTimeInMillis() + TimeZone.getDefault().getOffset(calendar_start.getTimeInMillis())) +
+                          "     AND end >" + (calendar_end.getTimeInMillis() + TimeZone.getDefault().getOffset(calendar_end.getTimeInMillis())) + ")" +
+                          "     OR " +
+                          "     (eventTimezone <> 'UTC' AND begin <" + calendar_start.getTimeInMillis() + " AND end >" + calendar_end.getTimeInMillis() + ")" +
                           "   )" +
                           ")",
                   null,
