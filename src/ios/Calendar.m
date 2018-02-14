@@ -381,7 +381,7 @@
     NSMutableDictionary *entry = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                   event.title, @"title",
                                   event.calendar.title, @"calendar",
-                                  event.eventIdentifier, @"id",
+                                  event.calendarItemIdentifier , @"id",
                                   [df stringFromDate:event.startDate], @"startDate",
                                   [df stringFromDate:event.endDate], @"endDate",
                                   [df stringFromDate:event.lastModifiedDate], @"lastModifiedDate",
@@ -460,7 +460,6 @@
       }
     }
 
-    [entry setObject:event.calendarItemIdentifier forKey:@"id"];
     [results addObject:entry];
   }
   return results;
