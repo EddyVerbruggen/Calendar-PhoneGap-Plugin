@@ -149,6 +149,7 @@ modifyEvent                         |             | yes |         |         |
 modifyEventWithOptions              |             | yes |         |         |
 deleteEvent                         |             | yes | yes     |         |
 deleteEventFromNamedCalendar        |             | yes |         |         |
+deleteEventById                     |             | yes | yes     |         |
 openCalendar                        |             | yes | yes     |         |
 
 * \* on Android < 4 dialog is shown
@@ -247,6 +248,9 @@ Basic operations, you'll want to copy-paste this for testing purposes:
 
   // delete an event, as above, but for a specific calendar (iOS only)
   window.plugins.calendar.deleteEventFromNamedCalendar(newTitle,eventLocation,notes,startDate,endDate,calendarName,success,error);
+
+  // delete an event by id. If the event has recurring instances, all will be deleted unless `fromDate` is specified, which will delete from that date onward. (iOS and android only)
+  window.plugins.calendar.deleteEventById(id,fromDate,success,error);
 
   // open the calendar app (added in 4.2.8):
   // - open it at 'today'
