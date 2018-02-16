@@ -74,6 +74,10 @@ exports.defineAutoTests = function() {
     });
   });
 
+  // subsequent tests cover functionality specific to iOS and android
+  if (cordova.platformId != 'android' && cordova.platformId != 'ios')
+    return;
+
   describe('createEvent / findEvent / deleteEvent', function () {
     itP('should create, find, then delete an event', function () {
       var title = 'CFD event' + runTag;
@@ -244,39 +248,41 @@ exports.defineAutoTests = function() {
         });
     });
 
-    itP('should support truncating recurrences defined by a count', function() {
-      var title = 'delIdCtDate event' + runTag;
+    if (cordova.platformId == 'android') {
+      itP('should support truncating recurrences defined by a count in android', function() {
+        var title = 'delIdCtDate event' + runTag;
 
-      return createRecurring(title, true)
-        .then(function (id) {
-          return deleteEventByIdP(id, newDate(4, 18));
-        })
-        .then(function () {
-          return syncAndroidGoogleCalendarP();
-        })
-        .then(function () {
-          return findEventP(title, null, null, newDate(2, 0), newDate(8, 0));
-        })
-        .then(function (events) {
-          expect(events.length).toBe(2);
-          expect(parseEventDate(events[1].startDate)).toEqual(newDate(3, 18));
-        });
-    });
+        return createRecurring(title, true)
+          .then(function (id) {
+            return deleteEventByIdP(id, newDate(4, 18));
+          })
+          .then(function () {
+            return syncAndroidGoogleCalendarP();
+          })
+          .then(function () {
+            return findEventP(title, null, null, newDate(2, 0), newDate(8, 0));
+          })
+          .then(function (events) {
+            expect(events.length).toBe(2);
+            expect(parseEventDate(events[1].startDate)).toEqual(newDate(3, 18));
+          });
+      });
 
-    itP('should succeed if already truncated by a count', function () {
-      var title = 'delIdCtAgain event' + runTag;
+      itP('should succeed if already truncated by a count in android', function () {
+        var title = 'delIdCtAgain event' + runTag;
 
-      return createRecurring(title, true)
-        .then(function (id) {
-          return deleteEventByIdP(id, newDate(5, 19));
-        })
-        .then(function () {
-          return findEventP(title, null, null, newDate(2, 0), newDate(8, 0));
-        })
-        .then(function (events) {
-          expect(events.length).toBe(4);
-        });
-    });
+        return createRecurring(title, true)
+          .then(function (id) {
+            return deleteEventByIdP(id, newDate(5, 19));
+          })
+          .then(function () {
+            return findEventP(title, null, null, newDate(2, 0), newDate(8, 0));
+          })
+          .then(function (events) {
+            expect(events.length).toBe(4);
+          });
+      });
+    };
   });
 
 };
