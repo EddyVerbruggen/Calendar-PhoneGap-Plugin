@@ -18,12 +18,16 @@ exports.defineAutoTests = function() {
     });
   };
   var promisifyScbEcb = function (func) {
-    if (typeof(func) != 'function')
+    if (typeof (func) != 'function')
       throw 'not a function: ' + func;
     return function () {
-      var args = arguments;
+      var args = Array.prototype.slice.call(arguments);
+      if (args.length > func.length - 2)
+        throw 'too many arguments; expected at most ' + func.length - 2;
       return new Promise(function (resolve, reject) {
-        func.apply(null, Array.prototype.slice.call(args).concat(resolve, reject));
+        args[func.length - 2] = resolve;
+        args[func.length - 1] = reject;
+        func.apply(null, args);
       });
     };
   };
@@ -193,7 +197,7 @@ exports.defineAutoTests = function() {
 
       return createRecurring(title)
         .then(function (id) {
-          return deleteEventByIdP(id, null);
+          return deleteEventByIdP(id);
         })
         .then(function () {
           return findEventP(title, null, null, newDate(2, 0), newDate(8, 0));
@@ -224,7 +228,7 @@ exports.defineAutoTests = function() {
 
     itP('should fail on invalid id', function () {
       var failed = false;
-      return deleteEventByIdP('3826806B-1678-46DE-96B5-0748014AD920', null)
+      return deleteEventByIdP('3826806B-1678-46DE-96B5-0748014AD920')
         .catch(function () {
           failed = true;
         })
