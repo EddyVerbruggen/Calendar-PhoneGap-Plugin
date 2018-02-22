@@ -541,8 +541,10 @@ public abstract class AbstractCalendarAccessor {
         // Find target instance
         long targDtStart = -1;
         {
+            // Scans just over a year.
+            // Not using a wider range because it can corrupt the Calendar Storage state! https://issuetracker.google.com/issues/36980229
             Cursor cur = queryEventInstances(fromTime,
-                                             Long.MAX_VALUE,
+                                             fromTime + 1000L * 60L * 60L * 24L * 367L,
                                              new String[] { Instances.DTSTART },
                                              Instances.EVENT_ID + " = ?",
                                              new String[] { Long.toString(id) },
