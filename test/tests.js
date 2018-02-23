@@ -91,6 +91,14 @@ exports.defineAutoTests = function() {
       var title = 'DF event' + runTag + ' ';
       var first, bytitle, bydate, last;
 
+      var expectedIds;
+      var removeExpectedId = function (id) {
+        expectedIds = expectedIds.filter(function (x) { return x != id; });
+      };
+      var expectIds = function (events) {
+        expect(events.map(function (e) { return e.id; })).toEqual(expectedIds);
+      };
+
       // create
       return createEventP(title + 'first', null, null, newDate(1, 7), newDate(1, 8))
         .then(function (id) {
@@ -109,12 +117,14 @@ exports.defineAutoTests = function() {
           last = id;
 
           // find
+          expectedIds = [first, bytitle, bydate, last];
           return findEventP(title, null, null, newDate(1, 0), newDate(2, 0));
         })
         .then(function (events) {
-          expect(events.length).toBe(4);
+          expectIds(events);
 
           // delete by title
+          removeExpectedId(bytitle);
           return deleteEventP(title + 'bytitle', null, null, newDate(1, 0), newDate(2, 0));
         })
         .then(function () {
@@ -122,9 +132,10 @@ exports.defineAutoTests = function() {
           return findEventP(title, null, null, newDate(1, 0), newDate(2, 0));
         })
         .then(function (events) {
-          expect(events.map(function (e) { return e.id; })).toEqual([first, bydate, last]);
+          expectIds(events);
 
           // delete by date
+          removeExpectedId(bydate);
           return deleteEventP(null, null, null, newDate(1, 11), newDate(1, 13));
         })
         .then(function () {
@@ -132,7 +143,7 @@ exports.defineAutoTests = function() {
           return findEventP(title, null, null, newDate(1, 0), newDate(2, 0));
         })
         .then(function (events) {
-          expect(events.map(function (e) { return e.id; })).toEqual([first, last]);
+          expectIds(events);
 
           // delete the rest
           return deleteEventP(title, null, null, newDate(1, 0), newDate(2, 0));
