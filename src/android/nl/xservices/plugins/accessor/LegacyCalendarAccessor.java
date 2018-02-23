@@ -85,9 +85,9 @@ public class LegacyCalendarAccessor extends AbstractCalendarAccessor {
   }
 
   @Override
-  public boolean deleteEvent(Uri eventsUri, long startFrom, long startTo, String title, String location) {
+  public boolean deleteEvent(Uri eventsUri, long startFrom, long startTo, String title, String location, String notes) {
     eventsUri = eventsUri == null ? Uri.parse(CONTENT_PROVIDER_PRE_FROYO + CONTENT_PROVIDER_PATH_EVENTS) : eventsUri;
-    return super.deleteEvent(eventsUri, startFrom, startTo, title, location);
+    return super.deleteEvent(eventsUri, startFrom, startTo, title, location, notes);
   }
 
   @Override

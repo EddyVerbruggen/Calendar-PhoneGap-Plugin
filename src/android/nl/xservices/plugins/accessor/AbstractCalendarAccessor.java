@@ -495,9 +495,9 @@ public abstract class AbstractCalendarAccessor {
         return result;
     }
 
-    public boolean deleteEvent(Uri eventsUri, long startFrom, long startTo, String title, String location) {
+    public boolean deleteEvent(Uri eventsUri, long startFrom, long startTo, String title, String location, String notes) {
         ContentResolver resolver = this.cordova.getActivity().getApplicationContext().getContentResolver();
-        Event[] events = fetchEventInstances(null, title, location, "", startFrom, startTo);
+        Event[] events = fetchEventInstances(null, title, location, notes, startFrom, startTo);
         int nrDeletedRecords = 0;
         if (events != null) {
             for (Event event : events) {

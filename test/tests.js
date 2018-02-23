@@ -87,9 +87,9 @@ exports.defineAutoTests = function() {
         });
     });
 
-    itP('should support delete by title or date or location', function () {
+    itP('should support delete by title/date/location/notes', function () {
       var title = 'DF event' + runTag + ' ';
-      var first, bytitle, bydate, bylocation, last;
+      var first, bytitle, bydate, bylocation, bynotes, last;
 
       var expectedIds;
       var removeExpectedId = function (id) {
@@ -115,13 +115,17 @@ exports.defineAutoTests = function() {
         })
         .then(function (id) {
           bylocation = id;
-          return createEventP(title + 'last', null, null, newDate(1, 16), newDate(1, 17));
+          return createEventP(title, null, 'bynotes', newDate(1, 16), newDate(1, 17));
+        })
+        .then(function (id) {
+          bynotes = id;
+          return createEventP(title + 'last', null, null, newDate(1, 18), newDate(1, 19));
         })
         .then(function (id) {
           last = id;
 
           // find
-          expectedIds = [first, bytitle, bydate, bylocation, last];
+          expectedIds = [first, bytitle, bydate, bylocation, bynotes, last];
           return findEventP(title, null, null, newDate(1, 0), newDate(2, 0));
         })
         .then(function (events) {
@@ -152,6 +156,17 @@ exports.defineAutoTests = function() {
           // delete by location
           removeExpectedId(bylocation);
           return deleteEventP(null, 'bylocation', null, newDate(1, 0), newDate(2, 0));
+        })
+        .then(function () {
+          // find
+          return findEventP(title, null, null, newDate(1, 0), newDate(2, 0));
+        })
+        .then(function (events) {
+          expectIds(events);
+
+          // delete by notes
+          removeExpectedId(bynotes);
+          return deleteEventP(null, null, 'bynotes', newDate(1, 0), newDate(2, 0));
         })
         .then(function () {
           // find
