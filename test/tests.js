@@ -1,13 +1,50 @@
 exports.defineAutoTests = function() {
   
-  var fail = function (done) {
-    expect(true).toBe(false);
-    done();
-  },
-  succeed = function (done) {
-    expect(true).toBe(true);
-    done();
+  var itP = function (description, fn, timeout) {
+    it(description, function (done) {
+      Promise.resolve(fn())
+        .catch(fail)
+        .then(done, done);
+    }, timeout);
   };
+
+  var runTime = new Date();
+  var runId = Math.floor((runTime - new Date(runTime).setHours(0, 0, 0, 0)) / 1000);
+  var runTag = ' [cpctZQX' + runId + ']';
+
+  var promisifyScbEcb = function (func) {
+    if (typeof(func) != 'function')
+      throw 'not a function: ' + func;
+    return function () {
+      var args = arguments;
+      return new Promise(function (resolve, reject) {
+        func.apply(null, Array.prototype.slice.call(args).concat(resolve, reject));
+      });
+    };
+  };
+  var deleteEventP = promisifyScbEcb(plugins.calendar.deleteEvent);
+  var findEventP = promisifyScbEcb(plugins.calendar.findEvent);
+  var createEventP = promisifyScbEcb(plugins.calendar.createEvent);
+  var parseEventDate = plugins.calendar.parseEventDate;
+
+  var newDate = function (dd, hh, mm) {
+    return new Date(2018, 0, 21 + dd, hh || 0, mm || 0);
+  };
+
+
+  beforeEach(function (done) {
+    /* clean up autotest data */
+    return deleteEventP('[cpctZQX', null, null, newDate(1), newDate(8))
+      .then(function () {
+        return findEventP(runTag, null, null, newDate(1), newDate(8));
+      })
+      .then(function (events) {
+        expect(events.length).toBe(0, 'if test data was cleaned up');
+      })
+      .catch(fail)
+      .then(done, done);
+  });
+
 
   describe('Plugin availability', function () {
     it("window.plugins.calendar should exist", function() {
@@ -21,16 +58,86 @@ exports.defineAutoTests = function() {
     });
   });
 
-  /*
-  TODO extend - this is a copy-paste example of Toast
-  describe('Invalid usage', function () {
-    it("should fail due to an invalid position", function(done) {
-     window.plugins.toast.show('hi', 'short', 'nowhere', fail.bind(null, done), succeed.bind(null, done));
+  describe('createEvent / findEvent / deleteEvent', function () {
+    itP('should create, find, then delete an event', function () {
+      var title = 'CFD event' + runTag;
+
+      // create
+      return createEventP(title, null, null, newDate(2, 18), newDate(2, 19))
+        .then(function (id) {
+          // find
+          return findEventP(title, null, null, newDate(2, 17), newDate(2, 20))
+            .then(function (events) {
+              expect(events.length).toBe(1);
+              expect(events[0].title).toBe(title);
+              expect(parseEventDate(events[0].startDate)).toEqual(newDate(2, 18));
+              expect(parseEventDate(events[0].endDate)).toEqual(newDate(2, 19));
+              expect(events[0].id).toBe(id);
+            });
+        })
+        .then(function () {
+          // delete
+          return deleteEventP(title, null, null, newDate(2, 17), newDate(2, 20))
+            .then(function () {
+              return findEventP(title, null, null, newDate(2, 17), newDate(2, 20))
+                .then(function (events) {
+                  expect(events.length).toBe(0);
+                });
+            });
+        });
     });
 
-    it("should fail due to an invalid duration", function(done) {
-     window.plugins.toast.show('hi', 'medium', 'top', fail.bind(null, done), succeed.bind(null, done));
+    itP('should support delete by title or date', function () {
+      var title = 'DF event' + runTag + ' ';
+      var first, bytitle, bydate, last;
+
+      // create
+      return createEventP(title + 'first', null, null, newDate(1, 7), newDate(1, 8))
+        .then(function (id) {
+          first = id;
+          return createEventP(title + 'bytitle', null, null, newDate(1, 9), newDate(1, 10));
+        })
+        .then(function (id) {
+          bytitle = id;
+          return createEventP(title + 'bydate', null, null, newDate(1, 11), newDate(1, 13));
+        })
+        .then(function (id) {
+          bydate = id;
+          return createEventP(title + 'last', null, null, newDate(1, 14), newDate(1, 15));
+        })
+        .then(function (id) {
+          last = id;
+
+          // find
+          return findEventP(title, null, null, newDate(1, 0), newDate(2, 0));
+        })
+        .then(function (events) {
+          expect(events.length).toBe(4);
+
+          // delete by title
+          return deleteEventP(title + 'bytitle', null, null, newDate(1, 0), newDate(2, 0));
+        })
+        .then(function () {
+          // find
+          return findEventP(title, null, null, newDate(1, 0), newDate(2, 0));
+        })
+        .then(function (events) {
+          expect(events.map(function (e) { return e.id; })).toEqual([first, bydate, last]);
+
+          // delete by date
+          return deleteEventP(null, null, null, newDate(1, 11), newDate(1, 13));
+        })
+        .then(function () {
+          // find
+          return findEventP(title, null, null, newDate(1, 0), newDate(2, 0));
+        })
+        .then(function (events) {
+          expect(events.map(function (e) { return e.id; })).toEqual([first, last]);
+
+          // delete the rest
+          return deleteEventP(title, null, null, newDate(1, 0), newDate(2, 0));
+        });
     });
   });
-  */
+
 };
