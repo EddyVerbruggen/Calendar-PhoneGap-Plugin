@@ -47,6 +47,7 @@
         <string>nl</string>
         <string>fr</string>
         <string>it</string>
+        <string>pt-BR</string>
       </array>
     </config-file>
     <!-- Usage description of the Calendar for iOS 6+, mandatory since iOS 10 -->
@@ -79,7 +80,7 @@
     <source-file src="src/android/nl/xservices/plugins/accessor/LegacyCalendarAccessor.java"
                  target-dir="src/nl/xservices/plugins/accessor"/>
   </platform>
-  
+
   <!-- windows -->
   <platform name="windows">
     <js-module src="src/windows/appointment.js" name="appointment">
