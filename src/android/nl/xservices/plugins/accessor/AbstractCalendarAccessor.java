@@ -16,7 +16,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
 
 import static android.provider.CalendarContract.Events;
 
@@ -130,6 +137,7 @@ public abstract class AbstractCalendarAccessor {
 
     protected enum KeyIndex {
         CALENDARS_ID,
+        IS_PRIMARY,
         CALENDARS_NAME,
         CALENDARS_VISIBLE,
         CALENDARS_DISPLAY_NAME,
@@ -271,7 +279,8 @@ public abstract class AbstractCalendarAccessor {
                 new String[]{
                         this.getKey(KeyIndex.CALENDARS_ID),
                         this.getKey(KeyIndex.CALENDARS_NAME),
-                        this.getKey(KeyIndex.CALENDARS_DISPLAY_NAME)
+                        this.getKey(KeyIndex.CALENDARS_DISPLAY_NAME),
+                        this.getKey(KeyIndex.IS_PRIMARY)
                 },
                 this.getKey(KeyIndex.CALENDARS_VISIBLE) + "=1", null, null
         );
@@ -285,6 +294,7 @@ public abstract class AbstractCalendarAccessor {
                 calendar.put("id", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_ID))));
                 calendar.put("name", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_NAME))));
                 calendar.put("displayname", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_DISPLAY_NAME))));
+                calendar.put("isprimary", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.IS_PRIMARY))));
                 calendarsWrapper.put(calendar);
             } while (cursor.moveToNext());
             cursor.close();
@@ -301,17 +311,17 @@ public abstract class AbstractCalendarAccessor {
 
         List<String> calendarsToSearch;
 
-        if(calendarId!=null){
+        if (calendarId != null) {
             calendarsToSearch = new ArrayList<String>();
-            if(activeCalendarIds.contains(calendarId)){
+            if (activeCalendarIds.contains(calendarId)) {
                 calendarsToSearch.add(calendarId);
             }
 
-        }else{
+        } else {
             calendarsToSearch = activeCalendarIds;
         }
 
-        if(calendarsToSearch.isEmpty()){
+        if (calendarsToSearch.isEmpty()) {
             return null;
         }
 
@@ -337,8 +347,8 @@ public abstract class AbstractCalendarAccessor {
         select.append(") AND " + this.getKey(KeyIndex.EVENTS_CALENDAR_ID) +
                 " IN (");
 
-        String prefix ="";
-        for (String calendarToFilterId:calendarsToSearch) {
+        String prefix = "";
+        for (String calendarToFilterId : calendarsToSearch) {
             select.append(prefix);
             prefix = ",";
             select.append(calendarToFilterId);
@@ -610,8 +620,8 @@ public abstract class AbstractCalendarAccessor {
                 cv.put(CalendarContract.Calendars.CALENDAR_COLOR, Color.parseColor(calendarColor));
             }
             cv.put(CalendarContract.Calendars.VISIBLE, 1);
-			cv.put(CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL, CalendarContract.Calendars.CAL_ACCESS_OWNER);
-			cv.put(CalendarContract.Calendars.OWNER_ACCOUNT, "AccountName" );
+            cv.put(CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL, CalendarContract.Calendars.CAL_ACCESS_OWNER);
+            cv.put(CalendarContract.Calendars.OWNER_ACCOUNT, "AccountName");
             cv.put(CalendarContract.Calendars.SYNC_EVENTS, 0);
 
             calUri = calUri.buildUpon()
