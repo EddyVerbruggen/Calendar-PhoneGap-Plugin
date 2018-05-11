@@ -1,37 +1,37 @@
 {
-  "name": "cordova-plugin-calendar",
-  "version": "5.0.0",
-  "description": "This plugin allows you to manipulate the native calendar.",
-  "cordova": {
-    "id": "cordova-plugin-calendar",
-    "platforms": [
-      "ios",
-      "android"
-    ]
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin.git"
-  },
-  "keywords": [
-    "Calendar",
-    "Agenda",
-    "Event",
-    "ecosystem:cordova",
-    "cordova-ios",
-    "cordova-android"
-  ],
-  "engines": {
-    "cordovaDependencies": {
-      "3.0.0": {
-        "cordova-android": ">=6.3.0"
-      }
-    }
-  },
-  "author": "Eddy Verbruggen <eddyverbruggen@gmail.com> (https://github.com/EddyVerbruggen)",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin/issues"
-  },
-  "homepage": "https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#readme"
+    "name": "cordova-plugin-calendar",
+    "version": "5.0.0",
+    "description": "This plugin allows you to manipulate the native calendar.",
+    "cordova": {
+        "id": "cordova-plugin-calendar",
+        "platforms": [
+            "ios",
+            "android"
+        ]
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/kohlia/Calendar-PhoneGap-Plugin.git"
+    },
+    "keywords": [
+        "Calendar",
+        "Agenda",
+        "Event",
+        "ecosystem:cordova",
+        "cordova-ios",
+        "cordova-android"
+    ],
+    "engines": {
+        "cordovaDependencies": {
+            "3.0.0": {
+                "cordova-android": ">=6.3.0"
+            }
+        }
+    },
+    "author": "Eddy Verbruggen <eddyverbruggen@gmail.com> (https://github.com/EddyVerbruggen)",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/kohlia/Calendar-PhoneGap-Plugin/issues"
+    },
+    "homepage": "https://github.com/kohlia/Calendar-PhoneGap-Plugin#readme"
 }
