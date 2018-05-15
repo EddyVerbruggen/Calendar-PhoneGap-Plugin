@@ -281,7 +281,7 @@ public class Calendar extends CordovaPlugin {
     }
 
     if (!calendarPermissionGranted(Manifest.permission.WRITE_CALENDAR, Manifest.permission.READ_CALENDAR)) {
-      requestReadWritePermission(PERMISSION_REQCODE_CREATE_EVENT);
+      requestReadWritePermission(PERMISSION_REQCODE_CREATE_CALENDAR);
       return;
     }
 
@@ -314,7 +314,7 @@ public class Calendar extends CordovaPlugin {
     }
 
     if (!calendarPermissionGranted(Manifest.permission.WRITE_CALENDAR, Manifest.permission.READ_CALENDAR)) {
-      requestReadWritePermission(PERMISSION_REQCODE_CREATE_EVENT);
+      requestReadWritePermission(PERMISSION_REQCODE_DELETE_CALENDAR);
       return;
     }
 
@@ -437,7 +437,7 @@ public class Calendar extends CordovaPlugin {
     // note that if the dev didn't call requestWritePermission before calling this method and calendarPermissionGranted returns false,
     // the app will ask permission and this method needs to be invoked again (done for backward compat).
     if (!calendarPermissionGranted(Manifest.permission.WRITE_CALENDAR, Manifest.permission.READ_CALENDAR)) {
-      requestReadWritePermission(PERMISSION_REQCODE_CREATE_EVENT);
+      requestReadWritePermission(PERMISSION_REQCODE_DELETE_EVENT);
       return;
     }
 
