@@ -280,8 +280,8 @@ public class Calendar extends CordovaPlugin {
       return;
     }
 
-    if (!calendarPermissionGranted(Manifest.permission.WRITE_CALENDAR)) {
-      requestWritePermission(PERMISSION_REQCODE_CREATE_CALENDAR);
+    if (!calendarPermissionGranted(Manifest.permission.WRITE_CALENDAR, Manifest.permission.READ_CALENDAR)) {
+      requestReadWritePermission(PERMISSION_REQCODE_CREATE_EVENT);
       return;
     }
 
@@ -313,8 +313,8 @@ public class Calendar extends CordovaPlugin {
       return;
     }
 
-    if (!calendarPermissionGranted(Manifest.permission.WRITE_CALENDAR)) {
-      requestWritePermission(PERMISSION_REQCODE_DELETE_CALENDAR);
+    if (!calendarPermissionGranted(Manifest.permission.WRITE_CALENDAR, Manifest.permission.READ_CALENDAR)) {
+      requestReadWritePermission(PERMISSION_REQCODE_CREATE_EVENT);
       return;
     }
 
@@ -436,8 +436,8 @@ public class Calendar extends CordovaPlugin {
 
     // note that if the dev didn't call requestWritePermission before calling this method and calendarPermissionGranted returns false,
     // the app will ask permission and this method needs to be invoked again (done for backward compat).
-    if (!calendarPermissionGranted(Manifest.permission.WRITE_CALENDAR)) {
-      requestWritePermission(PERMISSION_REQCODE_DELETE_EVENT);
+    if (!calendarPermissionGranted(Manifest.permission.WRITE_CALENDAR, Manifest.permission.READ_CALENDAR)) {
+      requestReadWritePermission(PERMISSION_REQCODE_CREATE_EVENT);
       return;
     }
 
@@ -506,8 +506,8 @@ public class Calendar extends CordovaPlugin {
   private void createEvent(JSONArray args) {
     // note that if the dev didn't call requestWritePermission before calling this method and calendarPermissionGranted returns false,
     // the app will ask permission and this method needs to be invoked again (done for backward compat).
-    if (!calendarPermissionGranted(Manifest.permission.WRITE_CALENDAR)) {
-      requestWritePermission(PERMISSION_REQCODE_CREATE_EVENT);
+    if (!calendarPermissionGranted(Manifest.permission.WRITE_CALENDAR, Manifest.permission.READ_CALENDAR)) {
+      requestReadWritePermission(PERMISSION_REQCODE_CREATE_EVENT);
       return;
     }
 
