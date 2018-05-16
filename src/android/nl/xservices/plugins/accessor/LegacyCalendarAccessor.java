@@ -92,6 +92,12 @@ public class LegacyCalendarAccessor extends AbstractCalendarAccessor {
   }
 
   @Override
+  public boolean deleteEventById(Uri eventsUri, long id, long fromDate) {
+    eventsUri = eventsUri == null ? Uri.parse(CONTENT_PROVIDER_PRE_FROYO + CONTENT_PROVIDER_PATH_EVENTS) : eventsUri;
+    return super.deleteEventById(eventsUri, id, fromDate);
+  }
+
+  @Override
   public String createEvent(Uri eventsUri, String title, long startTime, long endTime,
                             String description, String location, Long firstReminderMinutes, Long secondReminderMinutes,
                             String recurrence, int recurrenceInterval, String recurrenceWeekstart,
