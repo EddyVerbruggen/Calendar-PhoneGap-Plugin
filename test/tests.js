@@ -87,9 +87,17 @@ exports.defineAutoTests = function() {
         });
     });
 
-    itP('should support delete by title or date', function () {
+    itP('should support delete by title/date/location/notes', function () {
       var title = 'DF event' + runTag + ' ';
-      var first, bytitle, bydate, last;
+      var first, bytitle, bydate, bylocation, bynotes, last;
+
+      var expectedIds;
+      var removeExpectedId = function (id) {
+        expectedIds = expectedIds.filter(function (x) { return x != id; });
+      };
+      var expectIds = function (events) {
+        expect(events.map(function (e) { return e.id; })).toEqual(expectedIds);
+      };
 
       // create
       return createEventP(title + 'first', null, null, newDate(1, 7), newDate(1, 8))
@@ -103,18 +111,28 @@ exports.defineAutoTests = function() {
         })
         .then(function (id) {
           bydate = id;
-          return createEventP(title + 'last', null, null, newDate(1, 14), newDate(1, 15));
+          return createEventP(title, 'bylocation', null, newDate(1, 14), newDate(1, 15));
+        })
+        .then(function (id) {
+          bylocation = id;
+          return createEventP(title, null, 'bynotes', newDate(1, 16), newDate(1, 17));
+        })
+        .then(function (id) {
+          bynotes = id;
+          return createEventP(title + 'last', null, null, newDate(1, 18), newDate(1, 19));
         })
         .then(function (id) {
           last = id;
 
           // find
+          expectedIds = [first, bytitle, bydate, bylocation, bynotes, last];
           return findEventP(title, null, null, newDate(1, 0), newDate(2, 0));
         })
         .then(function (events) {
-          expect(events.length).toBe(4);
+          expectIds(events);
 
           // delete by title
+          removeExpectedId(bytitle);
           return deleteEventP(title + 'bytitle', null, null, newDate(1, 0), newDate(2, 0));
         })
         .then(function () {
@@ -122,9 +140,10 @@ exports.defineAutoTests = function() {
           return findEventP(title, null, null, newDate(1, 0), newDate(2, 0));
         })
         .then(function (events) {
-          expect(events.map(function (e) { return e.id; })).toEqual([first, bydate, last]);
+          expectIds(events);
 
           // delete by date
+          removeExpectedId(bydate);
           return deleteEventP(null, null, null, newDate(1, 11), newDate(1, 13));
         })
         .then(function () {
@@ -132,7 +151,29 @@ exports.defineAutoTests = function() {
           return findEventP(title, null, null, newDate(1, 0), newDate(2, 0));
         })
         .then(function (events) {
-          expect(events.map(function (e) { return e.id; })).toEqual([first, last]);
+          expectIds(events);
+
+          // delete by location
+          removeExpectedId(bylocation);
+          return deleteEventP(null, 'bylocation', null, newDate(1, 0), newDate(2, 0));
+        })
+        .then(function () {
+          // find
+          return findEventP(title, null, null, newDate(1, 0), newDate(2, 0));
+        })
+        .then(function (events) {
+          expectIds(events);
+
+          // delete by notes
+          removeExpectedId(bynotes);
+          return deleteEventP(null, null, 'bynotes', newDate(1, 0), newDate(2, 0));
+        })
+        .then(function () {
+          // find
+          return findEventP(title, null, null, newDate(1, 0), newDate(2, 0));
+        })
+        .then(function (events) {
+          expectIds(events);
 
           // delete the rest
           return deleteEventP(title, null, null, newDate(1, 0), newDate(2, 0));
