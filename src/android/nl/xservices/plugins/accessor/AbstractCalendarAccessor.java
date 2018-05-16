@@ -130,6 +130,7 @@ public abstract class AbstractCalendarAccessor {
 
     protected enum KeyIndex {
         CALENDARS_ID,
+        IS_PRIMARY,
         CALENDARS_NAME,
         CALENDARS_VISIBLE,
         CALENDARS_DISPLAY_NAME,
@@ -271,7 +272,8 @@ public abstract class AbstractCalendarAccessor {
                 new String[]{
                         this.getKey(KeyIndex.CALENDARS_ID),
                         this.getKey(KeyIndex.CALENDARS_NAME),
-                        this.getKey(KeyIndex.CALENDARS_DISPLAY_NAME)
+                        this.getKey(KeyIndex.CALENDARS_DISPLAY_NAME),
+                        this.getKey(KeyIndex.IS_PRIMARY)
                 },
                 this.getKey(KeyIndex.CALENDARS_VISIBLE) + "=1", null, null
         );
@@ -285,6 +287,7 @@ public abstract class AbstractCalendarAccessor {
                 calendar.put("id", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_ID))));
                 calendar.put("name", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_NAME))));
                 calendar.put("displayname", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_DISPLAY_NAME))));
+                calendar.put("isPrimary", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.IS_PRIMARY))));
                 calendarsWrapper.put(calendar);
             } while (cursor.moveToNext());
             cursor.close();
