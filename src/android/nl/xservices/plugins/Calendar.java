@@ -84,7 +84,6 @@ public class Calendar extends CordovaPlugin {
       return true;
     } else if (ACTION_CREATE_EVENT_WITH_OPTIONS.equals(action)) {
       if (hasLimitedSupport) {
-        // TODO investigate this option some day: http://stackoverflow.com/questions/3721963/how-to-add-calendar-events-in-android
         createEventInteractively(args);
       } else {
         createEvent(args);
