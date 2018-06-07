@@ -273,9 +273,12 @@ public class Calendar extends CordovaPlugin {
           }
           callback.sendPluginResult(new PluginResult(PluginResult.Status.OK, activeCalendars));
         } catch (JSONException e) {
-          System.err.println("Exception: " + e.getMessage());
+          System.err.println("JSONException: " + e.getMessage());
           callback.error(e.getMessage());
-        }
+        } catch (Exception ex) {
+           System.err.println("Exception: " + ex.getMessage());
+           callback.error(ex.getMessage());
+         }
       }
     });
   }

@@ -288,7 +288,12 @@ public abstract class AbstractCalendarAccessor {
                 calendar.put("id", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_ID))));
                 calendar.put("name", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_NAME))));
                 calendar.put("displayname", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_DISPLAY_NAME))));
-                calendar.put("isPrimary", "1".equals(cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.IS_PRIMARY)))));
+                int unReliableIsPrimaryIndex = cursor.getColumnIndex(this.getKey(KeyIndex.IS_PRIMARY));
+                if(unReliableIsPrimaryIndex >= 0){
+                    calendar.put("isPrimary", "1".equals(cursor.getString(unReliableIsPrimaryIndex)));
+                } else {
+                    calendar.put("isPrimary", false);
+                }
                 calendarsWrapper.put(calendar);
             } while (cursor.moveToNext());
             cursor.close();
