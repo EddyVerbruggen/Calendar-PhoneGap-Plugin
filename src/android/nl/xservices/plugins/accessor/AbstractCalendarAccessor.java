@@ -282,18 +282,18 @@ public abstract class AbstractCalendarAccessor {
             return null;
         }
         JSONArray calendarsWrapper = new JSONArray();
+        int primaryColumnIndex;
         if (cursor.moveToFirst()) {
             do {
                 JSONObject calendar = new JSONObject();
                 calendar.put("id", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_ID))));
                 calendar.put("name", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_NAME))));
                 calendar.put("displayname", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_DISPLAY_NAME))));
-                int unReliableIsPrimaryIndex = cursor.getColumnIndex(this.getKey(KeyIndex.IS_PRIMARY));
-                if(unReliableIsPrimaryIndex >= 0){
-                    calendar.put("isPrimary", "1".equals(cursor.getString(unReliableIsPrimaryIndex)));
-                } else {
-                    calendar.put("isPrimary", false);
+                primaryColumnIndex = cursor.getColumnIndex(this.getKey((KeyIndex.IS_PRIMARY)));
+                if (primaryColumnIndex == -1) {
+                    primaryColumnIndex = cursor.getColumnIndex("COALESCE(isPrimary, ownerAccount = account_name)");
                 }
+                calendar.put("isPrimary", "1".equals(cursor.getString(primaryColumnIndex)));
                 calendarsWrapper.put(calendar);
             } while (cursor.moveToNext());
             cursor.close();
