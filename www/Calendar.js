@@ -9,28 +9,28 @@ Calendar.prototype.getCreateCalendarOptions = function () {
   };
 };
 
-Calendar.prototype.hasReadPermission = function (callback) {
-  cordova.exec(callback, null, "Calendar", "hasReadPermission", []);
+Calendar.prototype.hasReadPermission = function (successCallback, errorCallback) {
+  cordova.exec(successCallback, errorCallback, "Calendar", "hasReadPermission", []);
 };
 
-Calendar.prototype.requestReadPermission = function (callback) {
-  cordova.exec(callback, null, "Calendar", "requestReadPermission", []);
+Calendar.prototype.requestReadPermission = function (successCallback, errorCallback) {
+  cordova.exec(successCallback, errorCallback, "Calendar", "requestReadPermission", []);
 };
 
-Calendar.prototype.hasWritePermission = function (callback) {
-  cordova.exec(callback, null, "Calendar", "hasWritePermission", []);
+Calendar.prototype.hasWritePermission = function (successCallback, errorCallback) {
+  cordova.exec(successCallback, errorCallback, "Calendar", "hasWritePermission", []);
 };
 
-Calendar.prototype.requestWritePermission = function (callback) {
-  cordova.exec(callback, null, "Calendar", "requestWritePermission", []);
+Calendar.prototype.requestWritePermission = function (successCallback, errorCallback) {
+  cordova.exec(successCallback, errorCallback, "Calendar", "requestWritePermission", []);
 };
 
-Calendar.prototype.hasReadWritePermission = function (callback) {
-  cordova.exec(callback, null, "Calendar", "hasReadWritePermission", []);
+Calendar.prototype.hasReadWritePermission = function (successCallback, errorCallback) {
+  cordova.exec(successCallback, errorCallback, "Calendar", "hasReadWritePermission", []);
 };
 
-Calendar.prototype.requestReadWritePermission = function (callback) {
-  cordova.exec(callback, null, "Calendar", "requestReadWritePermission", []);
+Calendar.prototype.requestReadWritePermission = function (successCallback, errorCallback) {
+  cordova.exec(successCallback, errorCallback, "Calendar", "requestReadWritePermission", []);
 };
 
 Calendar.prototype.createCalendar = function (calendarNameOrOptionsObject, successCallback, errorCallback) {
