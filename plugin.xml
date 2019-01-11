@@ -3,7 +3,7 @@
     xmlns="http://apache.org/cordova/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="cordova-plugin-calendar"
-    version="5.1.3">
+    version="5.1.4">
 
   <name>Calendar</name>
 
@@ -55,7 +55,7 @@
     <config-file target="*-Info.plist" parent="NSCalendarsUsageDescription">
       <string>$CALENDAR_USAGE_DESCRIPTION</string>
     </config-file>
-    <!-- Usage description for Contacts needed in some iOS versions when searching 
+    <!-- Usage description for Contacts needed in some iOS versions when searching
       for locations and invitees using the interactive mode  -->
     <preference name="CONTACTS_USAGE_DESCRIPTION" default=" " />
     <config-file target="*-Info.plist" parent="NSContactsUsageDescription">
