@@ -1,6 +1,16 @@
 # PhoneGap Calendar plugin
 
-for iOS and Android, by [Eddy Verbruggen](http://www.x-services.nl)
+[![NPM version][npm-image]][npm-url]
+[![Downloads][downloads-image]][npm-url]
+[![TotalDownloads][total-downloads-image]][npm-url]
+[![Twitter Follow][twitter-image]][twitter-url]
+
+[npm-image]:http://img.shields.io/npm/v/cordova-plugin-calendar.svg
+[npm-url]:https://npmjs.org/package/cordova-plugin-calendar
+[downloads-image]:http://img.shields.io/npm/dm/cordova-plugin-calendar.svg
+[total-downloads-image]:http://img.shields.io/npm/dt/cordova-plugin-calendar.svg?label=total%20downloads
+[twitter-image]:https://img.shields.io/twitter/follow/eddyverbruggen.svg?style=social&label=Follow%20me
+[twitter-url]:https://twitter.com/eddyverbruggen
 
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=eddyverbruggen%40gmail%2ecom&lc=US&item_name=cordova%2dplugin%2dcalendar&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
