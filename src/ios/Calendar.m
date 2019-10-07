@@ -560,8 +560,12 @@
     NSTimeInterval _endInterval = [endTime doubleValue] / 1000; // strip millis
 
     myEvent.title = title;
-    myEvent.location = location;
-    myEvent.notes = notes;
+    if (location != (id)[NSNull null]) {
+      myEvent.location = location;
+    }
+    if (notes != (id)[NSNull null]) {
+      myEvent.notes = notes;
+    }
     myEvent.startDate = myStartDate;
 
     int duration = _endInterval - _startInterval;
