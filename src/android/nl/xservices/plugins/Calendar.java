@@ -66,13 +66,15 @@ public class Calendar extends CordovaPlugin {
   private static final Integer RESULT_CODE_OPENCAL = 1;
 
   private JSONArray requestArgs;
-  private CallbackContext callback;
+  private CallbackContext instanceCallbackContext;
 
   private static final String LOG_TAG = AbstractCalendarAccessor.LOG_TAG;
 
   @Override
   public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-    this.callback = callbackContext;
+    // Keep a copy of the callbackContext for use with non-reentrant functions that use startActivityForResult()
+    // which will cause onActivityResult() to be called asynchonously
+    instanceCallbackContext = callbackContext;
     this.requestArgs = args;
 
     final boolean hasLimitedSupport = Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH;
@@ -88,32 +90,32 @@ public class Calendar extends CordovaPlugin {
       if (hasLimitedSupport) {
         createEventInteractively(args);
       } else {
-        createEvent(args);
+        createEvent(args, callbackContext);
       }
       return true;
     } else if (ACTION_CREATE_EVENT_INTERACTIVELY.equals(action)) {
       createEventInteractively(args);
       return true;
     } else if (ACTION_LIST_EVENTS_IN_RANGE.equals(action)) {
-      listEventsInRange(args);
+      listEventsInRange(args, callbackContext);
       return true;
     } else if (!hasLimitedSupport && ACTION_FIND_EVENT_WITH_OPTIONS.equals(action)) {
-      findEvents(args);
+      findEvents(args, callbackContext);
       return true;
     } else if (!hasLimitedSupport && ACTION_DELETE_EVENT.equals(action)) {
-      deleteEvent(args);
+      deleteEvent(args, callbackContext);
       return true;
     } else if (!hasLimitedSupport && ACTION_DELETE_EVENT_BY_ID.equals(action)) {
-      deleteEventById(args);
+      deleteEventById(args, callbackContext);
       return true;
     } else if (ACTION_LIST_CALENDARS.equals(action)) {
-      listCalendars();
+      listCalendars(callbackContext);
       return true;
     } else if (!hasLimitedSupport && ACTION_CREATE_CALENDAR.equals(action)) {
-      createCalendar(args);
+      createCalendar(args, callbackContext);
       return true;
     } else if (!hasLimitedSupport && ACTION_DELETE_CALENDAR.equals(action)) {
-      deleteCalendar(args);
+      deleteCalendar(args, callbackContext);
       return true;
     } else if (HAS_READ_PERMISSION.equals(action)) {
       hasReadPermission();
@@ -138,17 +140,17 @@ public class Calendar extends CordovaPlugin {
   }
 
   private void hasReadPermission() {
-    this.callback.sendPluginResult(new PluginResult(PluginResult.Status.OK,
+    this.instanceCallbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK,
             calendarPermissionGranted(Manifest.permission.READ_CALENDAR)));
   }
 
   private void hasWritePermission() {
-    this.callback.sendPluginResult(new PluginResult(PluginResult.Status.OK,
+    this.instanceCallbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK,
             calendarPermissionGranted(Manifest.permission.WRITE_CALENDAR)));
   }
 
   private void hasReadWritePermission() {
-    this.callback.sendPluginResult(new PluginResult(PluginResult.Status.OK,
+    this.instanceCallbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK,
             calendarPermissionGranted(Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR)));
   }
 
@@ -186,28 +188,28 @@ public class Calendar extends CordovaPlugin {
     for (int r : grantResults) {
       if (r == PackageManager.PERMISSION_DENIED) {
         Log.d(LOG_TAG, "Permission Denied!");
-        this.callback.error("Please allow access to the Calendar and try again.");
+        this.instanceCallbackContext.error("Please allow access to the Calendar and try again.");
         return;
       }
     }
 
     // now call the originally requested actions
     if (requestCode == PERMISSION_REQCODE_CREATE_CALENDAR) {
-      createCalendar(requestArgs);
+      createCalendar(requestArgs, instanceCallbackContext);
     } else if (requestCode == PERMISSION_REQCODE_DELETE_CALENDAR) {
-      deleteCalendar(requestArgs);
+      deleteCalendar(requestArgs, instanceCallbackContext);
     } else if (requestCode == PERMISSION_REQCODE_CREATE_EVENT) {
-      createEvent(requestArgs);
+      createEvent(requestArgs, instanceCallbackContext);
     } else if (requestCode == PERMISSION_REQCODE_DELETE_EVENT) {
-      deleteEvent(requestArgs);
+      deleteEvent(requestArgs, instanceCallbackContext);
     } else if (requestCode == PERMISSION_REQCODE_DELETE_EVENT_BY_ID) {
-      deleteEventById(requestArgs);
+      deleteEventById(requestArgs, instanceCallbackContext);
     } else if (requestCode == PERMISSION_REQCODE_FIND_EVENTS) {
-      findEvents(requestArgs);
+      findEvents(requestArgs, instanceCallbackContext);
     } else if (requestCode == PERMISSION_REQCODE_LIST_CALENDARS) {
-      listCalendars();
+      listCalendars(instanceCallbackContext);
     } else if (requestCode == PERMISSION_REQCODE_LIST_EVENTS_IN_RANGE) {
-      listEventsInRange(requestArgs);
+      listEventsInRange(requestArgs, instanceCallbackContext);
     }
   }
 
@@ -224,12 +226,12 @@ public class Calendar extends CordovaPlugin {
           calendarIntent.setClassName("com.android.calendar", "com.android.calendar.AgendaActivity");
           Calendar.this.cordova.startActivityForResult(Calendar.this, calendarIntent, RESULT_CODE_OPENCAL);
 
-          callback.success();
+          instanceCallbackContext.success();
         }
       });
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
-      callback.error(e.getMessage());
+      instanceCallbackContext.error(e.getMessage());
     }
   }
 
@@ -247,16 +249,16 @@ public class Calendar extends CordovaPlugin {
           final Intent intent = new Intent(Intent.ACTION_VIEW).setData(builder.build());
           Calendar.this.cordova.startActivityForResult(Calendar.this, intent, RESULT_CODE_OPENCAL);
 
-          callback.success();
+          instanceCallbackContext.success();
         }
       });
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
-      callback.error(e.getMessage());
+      instanceCallbackContext.error(e.getMessage());
     }
   }
 
-  private void listCalendars() {
+  private void listCalendars(final CallbackContext callbackContext) {
     // note that if the dev didn't call requestReadPermission before calling this method and calendarPermissionGranted returns false,
     // the app will ask permission and this method needs to be invoked again (done for backward compat).
     if (!calendarPermissionGranted(Manifest.permission.READ_CALENDAR)) {
@@ -271,19 +273,19 @@ public class Calendar extends CordovaPlugin {
           if (activeCalendars == null) {
             activeCalendars = new JSONArray();
           }
-          callback.sendPluginResult(new PluginResult(PluginResult.Status.OK, activeCalendars));
+          callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, activeCalendars));
         } catch (JSONException e) {
           System.err.println("JSONException: " + e.getMessage());
-          callback.error(e.getMessage());
+          callbackContext.error(e.getMessage());
         } catch (Exception ex) {
            System.err.println("Exception: " + ex.getMessage());
-           callback.error(ex.getMessage());
+           callbackContext.error(ex.getMessage());
          }
       }
     });
   }
 
-  private void createCalendar(JSONArray args) {
+  private void createCalendar(JSONArray args, final CallbackContext callbackContext) {
     if (args.length() == 0) {
       System.err.println("Exception: No Arguments passed");
       return;
@@ -299,7 +301,7 @@ public class Calendar extends CordovaPlugin {
       final String calendarColor = getPossibleNullString("calendarColor", jsonFilter);
       final String calendarName = getPossibleNullString("calendarName", jsonFilter);
       if (calendarName == null) {
-        callback.error("calendarName is mandatory");
+        callbackContext.error("calendarName is mandatory");
         return;
       }
 
@@ -307,16 +309,16 @@ public class Calendar extends CordovaPlugin {
         @Override
         public void run() {
           String createdId = getCalendarAccessor().createCalendar(calendarName, calendarColor);
-          callback.sendPluginResult(new PluginResult(PluginResult.Status.OK, createdId));
+          callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, createdId));
         }
       });
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
-      callback.error(e.getMessage());
+      callbackContext.error(e.getMessage());
     }
   }
 
-  private void deleteCalendar(JSONArray args) {
+  private void deleteCalendar(JSONArray args, final CallbackContext callbackContext) {
     if (args.length() == 0) {
       System.err.println("Exception: No Arguments passed");
       return;
@@ -331,7 +333,7 @@ public class Calendar extends CordovaPlugin {
       final JSONObject jsonFilter = args.getJSONObject(0);
       final String calendarName = getPossibleNullString("calendarName", jsonFilter);
       if (calendarName == null) {
-        callback.error("calendarName is mandatory");
+        callbackContext.error("calendarName is mandatory");
         return;
       }
 
@@ -340,16 +342,16 @@ public class Calendar extends CordovaPlugin {
         public void run() {
           try {
             getCalendarAccessor().deleteCalendar(calendarName);
-            callback.sendPluginResult(new PluginResult(PluginResult.Status.OK, "yes"));
+            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, "yes"));
           } catch (Exception e) {
             System.err.println("Exception: " + e.getMessage());
-            callback.error(e.getMessage());
+            callbackContext.error(e.getMessage());
           }
         }
       });
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
-      callback.error(e.getMessage());
+      callbackContext.error(e.getMessage());
     }
   }
 
@@ -422,7 +424,7 @@ public class Calendar extends CordovaPlugin {
       });
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
-      callback.error(e.getMessage());
+      instanceCallbackContext.error(e.getMessage());
     }
   }
 
@@ -442,7 +444,7 @@ public class Calendar extends CordovaPlugin {
     return this.calendarAccessor;
   }
 
-  private void deleteEvent(JSONArray args) {
+  private void deleteEvent(JSONArray args, final CallbackContext callbackContext) {
     if (args.length() == 0) {
       System.err.println("Exception: No Arguments passed");
       return;
@@ -470,16 +472,16 @@ public class Calendar extends CordovaPlugin {
                   getPossibleNullString("location", jsonFilter),
                   getPossibleNullString("notes", jsonFilter));
 
-          callback.sendPluginResult(new PluginResult(PluginResult.Status.OK, deleteResult));
+          callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, deleteResult));
         }
       });
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
-      callback.error(e.getMessage());
+      callbackContext.error(e.getMessage());
     }
   }
 
-  private void deleteEventById(final JSONArray args) {
+  private void deleteEventById(final JSONArray args, final CallbackContext callbackContext) {
 
     // note that if the dev didn't call requestWritePermission before calling this method and calendarPermissionGranted returns false,
     // the app will ask permission and this method needs to be invoked again (done for backward compat).
@@ -496,15 +498,15 @@ public class Calendar extends CordovaPlugin {
 
         boolean deleteResult = getCalendarAccessor().deleteEventById(null, id, fromTime);
 
-        callback.sendPluginResult(new PluginResult(PluginResult.Status.OK, deleteResult));
+        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, deleteResult));
       } catch (Exception e) {
         System.err.println("Exception: " + e.getMessage());
-        callback.error(e.getMessage());
+        callbackContext.error(e.getMessage());
       }
     }});
   }
 
-  private void findEvents(JSONArray args) {
+  private void findEvents(JSONArray args, final CallbackContext callbackContext) {
     if (args.length() == 0) {
       System.err.println("Exception: No Arguments passed");
       return;
@@ -534,16 +536,16 @@ public class Calendar extends CordovaPlugin {
                   getPossibleNullString("calendarId", argOptionsObject))
           ;
 
-          callback.sendPluginResult(new PluginResult(PluginResult.Status.OK, jsonEvents));
+          callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, jsonEvents));
         }
       });
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
-      callback.error(e.getMessage());
+      callbackContext.error(e.getMessage());
     }
   }
 
-  private void createEvent(JSONArray args) {
+  private void createEvent(JSONArray args, final CallbackContext callbackContext) {
     // note that if the dev didn't call requestWritePermission before calling this method and calendarPermissionGranted returns false,
     // the app will ask permission and this method needs to be invoked again (done for backward compat).
     if (!calendarPermissionGranted(Manifest.permission.WRITE_CALENDAR, Manifest.permission.READ_CALENDAR)) {
@@ -579,9 +581,9 @@ public class Calendar extends CordovaPlugin {
                     argOptionsObject.optInt("calendarId", 1),
                     getPossibleNullString("url", argOptionsObject));
             if (createdEventID != null) {
-              callback.success(createdEventID);
+              callbackContext.success(createdEventID);
             } else {
-              callback.error("Fail to create an event");
+              callbackContext.error("Fail to create an event");
             }
           } catch (JSONException e) {
             e.printStackTrace();
@@ -590,7 +592,7 @@ public class Calendar extends CordovaPlugin {
       });
     } catch (Exception e) {
       Log.e(LOG_TAG, "Error creating event. Invoking error callback.", e);
-      callback.error(e.getMessage());
+      callbackContext.error(e.getMessage());
     }
   }
 
@@ -598,7 +600,7 @@ public class Calendar extends CordovaPlugin {
     return from.isNull(param) || "null".equals(from.optString(param)) ? null : from.optString(param);
   }
 
-  private void listEventsInRange(JSONArray args) {
+  private void listEventsInRange(JSONArray args, final CallbackContext callbackContext) {
     // note that if the dev didn't call requestReadPermission before calling this method and calendarPermissionGranted returns false,
     // the app will ask permission and this method needs to be invoked again (done for backward compat).
     if (!calendarPermissionGranted(Manifest.permission.READ_CALENDAR)) {
@@ -680,12 +682,12 @@ public class Calendar extends CordovaPlugin {
             cursor.close();
           }
 
-          callback.sendPluginResult(new PluginResult(PluginResult.Status.OK, result));
+          callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, result));
         }
       });
     } catch (JSONException e) {
       System.err.println("Exception: " + e.getMessage());
-      callback.error(e.getMessage());
+      callbackContext.error(e.getMessage());
     }
   }
 
@@ -694,18 +696,18 @@ public class Calendar extends CordovaPlugin {
       if (resultCode == Activity.RESULT_OK || resultCode == Activity.RESULT_CANCELED) {
         // resultCode may be 0 (RESULT_CANCELED) even when it was created, so passing nothing is the clearest option here
         Log.d(LOG_TAG, "onActivityResult resultcode: " + resultCode);
-        callback.success();
+        instanceCallbackContext.success();
       } else {
         // odd case
         Log.d(LOG_TAG, "onActivityResult weird resultcode: " + resultCode);
-        callback.success();
+        instanceCallbackContext.success();
       }
     } else if (requestCode == RESULT_CODE_OPENCAL) {
       Log.d(LOG_TAG, "onActivityResult requestCode: " + RESULT_CODE_OPENCAL);
-      callback.success();
+      instanceCallbackContext.success();
     } else {
       Log.d(LOG_TAG, "onActivityResult error, resultcode: " + resultCode);
-      callback.error("Unable to add event (" + resultCode + ").");
+      instanceCallbackContext.error("Unable to add event (" + resultCode + ").");
     }
   }
 
