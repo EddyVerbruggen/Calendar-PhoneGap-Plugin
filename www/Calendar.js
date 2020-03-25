@@ -5,7 +5,8 @@ function Calendar() {
 Calendar.prototype.getCreateCalendarOptions = function () {
   return {
     calendarName: null,
-    calendarColor: null // optional, the OS will choose one if left empty, example: pass "#FF0000" for red
+    calendarColor: null, // optional, the OS will choose one if left empty, example: pass "#FF0000" for red
+    accountName: null
   };
 };
 
