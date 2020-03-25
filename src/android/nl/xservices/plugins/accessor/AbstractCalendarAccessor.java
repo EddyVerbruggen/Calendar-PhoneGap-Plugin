@@ -665,7 +665,7 @@ public abstract class AbstractCalendarAccessor {
     }
 
     @SuppressWarnings("MissingPermission") // already requested in calling method
-    public String createCalendar(String calendarName, String calendarColor) {
+    public String createCalendar(String calendarName, String calendarColor, String accountName) {
         try {
             // don't create if it already exists
             Uri evuri = CalendarContract.Calendars.CONTENT_URI;
@@ -684,7 +684,7 @@ public abstract class AbstractCalendarAccessor {
             // doesn't exist yet, so create
             Uri calUri = CalendarContract.Calendars.CONTENT_URI;
             ContentValues cv = new ContentValues();
-            cv.put(CalendarContract.Calendars.ACCOUNT_NAME, "AccountName");
+            cv.put(CalendarContract.Calendars.ACCOUNT_NAME, accountName != null ? accountName : "AccountName");
             cv.put(CalendarContract.Calendars.ACCOUNT_TYPE, CalendarContract.ACCOUNT_TYPE_LOCAL);
             cv.put(CalendarContract.Calendars.NAME, calendarName);
             cv.put(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME, calendarName);
@@ -693,12 +693,12 @@ public abstract class AbstractCalendarAccessor {
             }
             cv.put(CalendarContract.Calendars.VISIBLE, 1);
 			cv.put(CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL, CalendarContract.Calendars.CAL_ACCESS_OWNER);
-			cv.put(CalendarContract.Calendars.OWNER_ACCOUNT, "AccountName" );
+            cv.put(CalendarContract.Calendars.OWNER_ACCOUNT, accountName != null ? accountName : "AccountName" );
             cv.put(CalendarContract.Calendars.SYNC_EVENTS, 0);
 
             calUri = calUri.buildUpon()
                     .appendQueryParameter(CalendarContract.CALLER_IS_SYNCADAPTER, "true")
-                    .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_NAME, "AccountName")
+                    .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_NAME, accountName != null ? accountName : "AccountName" )
                     .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, CalendarContract.ACCOUNT_TYPE_LOCAL)
                     .build();
 

@@ -304,11 +304,12 @@ public class Calendar extends CordovaPlugin {
         callbackContext.error("calendarName is mandatory");
         return;
       }
+      String accountName = getPossibleNullString("accountName", jsonFilter);
 
       cordova.getThreadPool().execute(new Runnable() {
         @Override
         public void run() {
-          String createdId = getCalendarAccessor().createCalendar(calendarName, calendarColor);
+          String createdId = getCalendarAccessor().createCalendar(calendarName, calendarColor, accountName);
           callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, createdId));
         }
       });
