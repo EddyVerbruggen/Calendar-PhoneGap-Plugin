@@ -269,18 +269,18 @@ public class Calendar extends CordovaPlugin {
       @Override
       public void run() {
         try {
-          JSONArray activeCalendars = Calendar.this.getCalendarAccessor().getActiveCalendars();
-          if (activeCalendars == null) {
-            activeCalendars = new JSONArray();
+          JSONArray calendars = Calendar.this.getCalendarAccessor().getCalendars();
+          if (calendars == null) {
+            calendars = new JSONArray();
           }
-          callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, activeCalendars));
+          callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, calendars));
         } catch (JSONException e) {
           System.err.println("JSONException: " + e.getMessage());
           callbackContext.error(e.getMessage());
         } catch (Exception ex) {
-           System.err.println("Exception: " + ex.getMessage());
-           callbackContext.error(ex.getMessage());
-         }
+          System.err.println("Exception: " + ex.getMessage());
+          callbackContext.error(ex.getMessage());
+        }
       }
     });
   }
@@ -371,20 +371,20 @@ public class Calendar extends CordovaPlugin {
             isAllDayEvent = Boolean.parseBoolean(allDayOption);
           } else {
             isAllDayEvent = AbstractCalendarAccessor.isAllDayEvent(new Date(jsonFilter.optLong("startTime")),
-                new Date(jsonFilter.optLong("endTime")));
+                    new Date(jsonFilter.optLong("endTime")));
           }
           final Intent calIntent = new Intent(Intent.ACTION_EDIT).setType("vnd.android.cursor.item/event")
-              .putExtra("title", getPossibleNullString("title", jsonFilter)).putExtra("hasAlarm", 1);
+                  .putExtra("title", getPossibleNullString("title", jsonFilter)).putExtra("hasAlarm", 1);
           if (isAllDayEvent) {
             calIntent.putExtra("allDay", isAllDayEvent)
-                .putExtra("beginTime",
-                    jsonFilter.optLong("startTime") + TimeZone.getDefault().getOffset(jsonFilter.optLong("startTime")))
-                .putExtra("endTime",
-                    jsonFilter.optLong("endTime") + TimeZone.getDefault().getOffset(jsonFilter.optLong("endTime")))
-                .putExtra("eventTimezone", "TIMEZONE_UTC");
+                    .putExtra("beginTime",
+                            jsonFilter.optLong("startTime") + TimeZone.getDefault().getOffset(jsonFilter.optLong("startTime")))
+                    .putExtra("endTime",
+                            jsonFilter.optLong("endTime") + TimeZone.getDefault().getOffset(jsonFilter.optLong("endTime")))
+                    .putExtra("eventTimezone", "TIMEZONE_UTC");
           } else {
             calIntent.putExtra("beginTime", jsonFilter.optLong("startTime")).putExtra("endTime",
-                jsonFilter.optLong("endTime"));
+                    jsonFilter.optLong("endTime"));
           }
 
           // TODO can we pass a reminder here?
@@ -535,7 +535,7 @@ public class Calendar extends CordovaPlugin {
                   jsonFilter.optLong("startTime"),
                   jsonFilter.optLong("endTime"),
                   getPossibleNullString("calendarId", argOptionsObject))
-          ;
+                  ;
 
           callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, jsonEvents));
         }

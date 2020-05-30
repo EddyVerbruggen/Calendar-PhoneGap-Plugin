@@ -249,11 +249,11 @@ public abstract class AbstractCalendarAccessor {
         }
     }
 
-    private String[] getActiveCalendarIds() {
+    private String[] getCalendarIds() {
         Cursor cursor = queryCalendars(new String[]{
                         this.getKey(KeyIndex.CALENDARS_ID)
                 },
-                this.getKey(KeyIndex.CALENDARS_VISIBLE) + "=1", null, null);
+                null, null, null);
         String[] calendarIds = null;
         if (cursor.moveToFirst()) {
             calendarIds = new String[cursor.getCount()];
@@ -268,7 +268,7 @@ public abstract class AbstractCalendarAccessor {
         return calendarIds;
     }
 
-    public final JSONArray getActiveCalendars() throws JSONException {
+    public final JSONArray getCalendars() throws JSONException {
         Cursor cursor = queryCalendars(
                 new String[]{
                         this.getKey(KeyIndex.CALENDARS_ID),
@@ -276,7 +276,7 @@ public abstract class AbstractCalendarAccessor {
                         this.getKey(KeyIndex.CALENDARS_DISPLAY_NAME),
                         this.getKey(KeyIndex.IS_PRIMARY)
                 },
-                this.getKey(KeyIndex.CALENDARS_VISIBLE) + "=1", null, null
+                null, null, null
         );
         if (cursor == null) {
             return null;
@@ -303,8 +303,8 @@ public abstract class AbstractCalendarAccessor {
 
     private Map<String, Event> fetchEventsAsMap(Event[] instances, String calendarId) {
         // Only selecting from active calendars, no active calendars = no events.
-        List<String> activeCalendarIds = Arrays.asList(getActiveCalendarIds());
-        if (activeCalendarIds.isEmpty()) {
+        List<String> calendarIds = Arrays.asList(getCalendarIds());
+        if (calendarIds.isEmpty()) {
             return null;
         }
 
@@ -312,12 +312,12 @@ public abstract class AbstractCalendarAccessor {
 
         if(calendarId!=null){
             calendarsToSearch = new ArrayList<String>();
-            if(activeCalendarIds.contains(calendarId)){
+            if(calendarIds.contains(calendarId)){
                 calendarsToSearch.add(calendarId);
             }
 
         }else{
-            calendarsToSearch = activeCalendarIds;
+            calendarsToSearch = calendarIds;
         }
 
         if(calendarsToSearch.isEmpty()){
@@ -526,9 +526,9 @@ public abstract class AbstractCalendarAccessor {
         String evRRule = null;
         {
             Cursor cur = queryEvents(new String[] { Events.DTSTART, Events.RRULE },
-                                     Events._ID + " = ?",
-                                     new String[] { Long.toString(id) },
-                                     Events.DTSTART);
+                    Events._ID + " = ?",
+                    new String[] { Long.toString(id) },
+                    Events.DTSTART);
             if (cur.moveToNext()) {
                 evDtStart = cur.getLong(0);
                 evRRule = cur.getString(1);
@@ -542,7 +542,7 @@ public abstract class AbstractCalendarAccessor {
         if (fromTime == -1 || evDtStart >= fromTime) {
             ContentResolver resolver = this.cordova.getActivity().getContentResolver();
             int deleted = this.cordova.getActivity().getContentResolver()
-                              .delete(ContentUris.withAppendedId(eventsUri, id), null, null);
+                    .delete(ContentUris.withAppendedId(eventsUri, id), null, null);
             return deleted > 0;
         }
 
@@ -552,11 +552,11 @@ public abstract class AbstractCalendarAccessor {
             // Scans just over a year.
             // Not using a wider range because it can corrupt the Calendar Storage state! https://issuetracker.google.com/issues/36980229
             Cursor cur = queryEventInstances(fromTime,
-                                             fromTime + 1000L * 60L * 60L * 24L * 367L,
-                                             new String[] { Instances.DTSTART },
-                                             Instances.EVENT_ID + " = ?",
-                                             new String[] { Long.toString(id) },
-                                             Instances.DTSTART);
+                    fromTime + 1000L * 60L * 60L * 24L * 367L,
+                    new String[] { Instances.DTSTART },
+                    Instances.EVENT_ID + " = ?",
+                    new String[] { Long.toString(id) },
+                    Instances.DTSTART);
             if (cur.moveToNext()) {
                 targDtStart = cur.getLong(0);
             }
@@ -587,7 +587,7 @@ public abstract class AbstractCalendarAccessor {
         ContentValues values = new ContentValues();
         values.put(Events.RRULE, evRRule);
         int updated = this.cordova.getActivity().getContentResolver()
-                          .update(ContentUris.withAppendedId(eventsUri, id), values, null, null);
+                .update(ContentUris.withAppendedId(eventsUri, id), values, null, null);
 
         return updated > 0;
     }
@@ -692,7 +692,7 @@ public abstract class AbstractCalendarAccessor {
                 cv.put(CalendarContract.Calendars.CALENDAR_COLOR, Color.parseColor(calendarColor));
             }
             cv.put(CalendarContract.Calendars.VISIBLE, 1);
-			cv.put(CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL, CalendarContract.Calendars.CAL_ACCESS_OWNER);
+            cv.put(CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL, CalendarContract.Calendars.CAL_ACCESS_OWNER);
             cv.put(CalendarContract.Calendars.OWNER_ACCOUNT, accountName != null ? accountName : "AccountName" );
             cv.put(CalendarContract.Calendars.SYNC_EVENTS, 0);
 
