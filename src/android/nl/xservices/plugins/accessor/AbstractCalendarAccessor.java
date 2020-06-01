@@ -517,7 +517,7 @@ public abstract class AbstractCalendarAccessor {
         return nrDeletedRecords > 0;
     }
 
-    public boolean deleteEventById(Uri eventsUri, long id, long fromTime) {
+    public boolean deleteEventById(Uri eventsUri, long id, String calendarName, long fromTime) {
         if (id == -1)
             throw new IllegalArgumentException("Event id not specified.");
 
@@ -526,8 +526,8 @@ public abstract class AbstractCalendarAccessor {
         String evRRule = null;
         {
             Cursor cur = queryEvents(new String[] { Events.DTSTART, Events.RRULE },
-                    Events._ID + " = ?",
-                    new String[] { Long.toString(id) },
+                    Events._ID + " = ? AND " + Events.CALENDAR_DISPLAY_NAME + " = ?",
+                    new String[] { Long.toString(id), calendarName },
                     Events.DTSTART);
             if (cur.moveToNext()) {
                 evDtStart = cur.getLong(0);
@@ -618,7 +618,7 @@ public abstract class AbstractCalendarAccessor {
             if (description == null) {
                 description = url;
             } else {
-                description += " " + url;
+                description += "\n\n" + url;
             }
         }
         values.put(Events.DESCRIPTION, description);

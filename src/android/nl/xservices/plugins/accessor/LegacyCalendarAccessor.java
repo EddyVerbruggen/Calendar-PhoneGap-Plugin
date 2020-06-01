@@ -20,7 +20,7 @@ public class LegacyCalendarAccessor extends AbstractCalendarAccessor {
     keys.put(KeyIndex.CALENDARS_ID, "_id");
     keys.put(KeyIndex.IS_PRIMARY, "isPrimary");
     keys.put(KeyIndex.CALENDARS_NAME, "name");
-	  keys.put(KeyIndex.CALENDARS_DISPLAY_NAME, "displayname");
+    keys.put(KeyIndex.CALENDARS_DISPLAY_NAME, "displayname");
     keys.put(KeyIndex.CALENDARS_VISIBLE, "selected");
     keys.put(KeyIndex.EVENTS_ID, "_id");
     keys.put(KeyIndex.EVENTS_CALENDAR_ID, "calendar_id");
@@ -92,9 +92,9 @@ public class LegacyCalendarAccessor extends AbstractCalendarAccessor {
   }
 
   @Override
-  public boolean deleteEventById(Uri eventsUri, long id, long fromDate) {
+  public boolean deleteEventById(Uri eventsUri, long id, String calendarName, long fromDate) {
     eventsUri = eventsUri == null ? Uri.parse(CONTENT_PROVIDER_PRE_FROYO + CONTENT_PROVIDER_PATH_EVENTS) : eventsUri;
-    return super.deleteEventById(eventsUri, id, fromDate);
+    return super.deleteEventById(eventsUri, id, calendarName, fromDate);
   }
 
   @Override

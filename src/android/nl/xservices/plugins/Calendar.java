@@ -402,7 +402,7 @@ public class Calendar extends CordovaPlugin {
             if (description == null) {
               description = argOptionsObject.optString("url");
             } else {
-              description += " " + argOptionsObject.optString("url");
+              description += "\n\n" + argOptionsObject.optString("url");
             }
           }
           calIntent.putExtra("description", description);
@@ -495,9 +495,10 @@ public class Calendar extends CordovaPlugin {
       try {
         final JSONObject opts = args.optJSONObject(0);
         final long id = opts != null ? opts.optLong("id", -1) : -1;
+        final String calendarName = opts != null ? opts.optString("calendarName", "") : "";
         final long fromTime =  opts != null ? opts.optLong("fromTime", -1) : -1;
 
-        boolean deleteResult = getCalendarAccessor().deleteEventById(null, id, fromTime);
+        boolean deleteResult = getCalendarAccessor().deleteEventById(null, id, calendarName, fromTime);
 
         callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, deleteResult));
       } catch (Exception e) {
