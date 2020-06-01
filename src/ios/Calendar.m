@@ -788,13 +788,15 @@
 - (void) deleteEventById:(CDVInvokedUrlCommand*)command {
   NSDictionary* options = [command.arguments objectAtIndex:0];
   NSString* ciid = [options objectForKey:@"id"];
+  NSString* calendarName = [options objectForKey:@"calendarName"];
   NSNumber* fromTime = [options objectForKey:@"fromTime"];
+  EKCalendar* calendar = [self findEKCalendar:calendarName];
 
   [self.commandDelegate runInBackground: ^{
 
     // Get original instance
     EKEvent* firstEvent = (EKEvent *)[eventStore eventWithIdentifier:ciid];
-    if (firstEvent == nil) {
+    if (firstEvent == nil || ![firstEvent.calendar isEqual:calendar]) {
       // Fail
       [self.commandDelegate
         sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Could not find event."]
