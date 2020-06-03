@@ -131,6 +131,7 @@ public abstract class AbstractCalendarAccessor {
 
     protected enum KeyIndex {
         CALENDARS_ID,
+        ACCOUNT_NAME,
         IS_PRIMARY,
         CALENDARS_NAME,
         CALENDARS_VISIBLE,
@@ -272,6 +273,7 @@ public abstract class AbstractCalendarAccessor {
         Cursor cursor = queryCalendars(
                 new String[]{
                         this.getKey(KeyIndex.CALENDARS_ID),
+                        this.getKey(KeyIndex.ACCOUNT_NAME),
                         this.getKey(KeyIndex.CALENDARS_NAME),
                         this.getKey(KeyIndex.CALENDARS_DISPLAY_NAME),
                         this.getKey(KeyIndex.IS_PRIMARY)
@@ -287,6 +289,7 @@ public abstract class AbstractCalendarAccessor {
             do {
                 JSONObject calendar = new JSONObject();
                 calendar.put("id", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_ID))));
+                calendar.put("accountName", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.ACCOUNT_NAME))));
                 calendar.put("name", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_NAME))));
                 calendar.put("displayname", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_DISPLAY_NAME))));
                 primaryColumnIndex = cursor.getColumnIndex(this.getKey((KeyIndex.IS_PRIMARY)));

@@ -23,6 +23,7 @@ public class CalendarProviderAccessor extends AbstractCalendarAccessor {
   protected EnumMap<KeyIndex, String> initContentProviderKeys() {
     EnumMap<KeyIndex, String> keys = new EnumMap<KeyIndex, String>(KeyIndex.class);
     keys.put(KeyIndex.CALENDARS_ID, Calendars._ID);
+    keys.put(KeyIndex.ACCOUNT_NAME, Calendars.ACCOUNT_NAME);
     keys.put(KeyIndex.IS_PRIMARY, Calendars.IS_PRIMARY);
     keys.put(KeyIndex.CALENDARS_NAME, Calendars.NAME);
     keys.put(KeyIndex.CALENDARS_DISPLAY_NAME, Calendars.CALENDAR_DISPLAY_NAME);

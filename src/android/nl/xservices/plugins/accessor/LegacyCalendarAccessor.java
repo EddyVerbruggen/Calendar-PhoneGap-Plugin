@@ -18,6 +18,7 @@ public class LegacyCalendarAccessor extends AbstractCalendarAccessor {
   protected EnumMap<KeyIndex, String> initContentProviderKeys() {
     EnumMap<KeyIndex, String> keys = new EnumMap<KeyIndex, String>(KeyIndex.class);
     keys.put(KeyIndex.CALENDARS_ID, "_id");
+    keys.put(KeyIndex.ACCOUNT_NAME, "accountName");
     keys.put(KeyIndex.IS_PRIMARY, "isPrimary");
     keys.put(KeyIndex.CALENDARS_NAME, "name");
     keys.put(KeyIndex.CALENDARS_DISPLAY_NAME, "displayname");
