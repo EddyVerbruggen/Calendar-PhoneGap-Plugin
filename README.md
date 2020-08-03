@@ -152,7 +152,7 @@ createEventInteractively            | interactive | yes | yes     | yes **  |
 createEventInteractivelyWithOptions | interactive | yes | yes     | yes **  |
 findEvent                           |             | yes | yes     |         |
 findEventWithOptions                |             | yes | yes     |         |
-listEventsInRange                   |             |     | yes     |         |
+listEventsInRange                   |             | yes | yes     |         |
 listCalendars                       |             | yes | yes     |         |
 findAllEventsInNamedCalendars       |             | yes |         |         |
 modifyEvent                         |             | yes |         |         |
