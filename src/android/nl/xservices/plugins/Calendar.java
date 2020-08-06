@@ -405,6 +405,12 @@ public class Calendar extends CordovaPlugin {
           calIntent.putExtra("description", description);
           calIntent.putExtra("calendar_id", argOptionsObject.optInt("calendarId", 1));
 
+          String[] attendees = getPossibleNullArray("attendees", argOptionsObject);
+
+          if (attendees != null) {
+            calIntent
+              .putExtra("android.intent.extra.EMAIL", attendees);
+          }
           //set recurrence
           String recurrence = getPossibleNullString("recurrence", argOptionsObject);
           Long recurrenceEndTime = argOptionsObject.isNull("recurrenceEndTime") ? null : argOptionsObject.optLong("recurrenceEndTime");
@@ -577,7 +583,8 @@ public class Calendar extends CordovaPlugin {
                     argOptionsObject.optLong("recurrenceCount", -1),
                     getPossibleNullString("allday", argOptionsObject),
                     argOptionsObject.optInt("calendarId", 1),
-                    getPossibleNullString("url", argOptionsObject));
+                    getPossibleNullString("url", argOptionsObject),
+                    getPossibleNullArray("attendees", argOptionsObject));
             if (createdEventID != null) {
               callback.success(createdEventID);
             } else {
@@ -596,6 +603,23 @@ public class Calendar extends CordovaPlugin {
 
   private static String getPossibleNullString(String param, JSONObject from) {
     return from.isNull(param) || "null".equals(from.optString(param)) ? null : from.optString(param);
+  }
+
+  private static String[] getPossibleNullArray(String param, JSONObject from) {
+    String[] arr = null;
+
+    try {
+      JSONArray arrJson = from.getJSONArray(param);
+      arr = new String[arrJson.length()];
+
+      for(int i = 0; i < arrJson.length(); i++) {
+        arr[i] = arrJson.getString(i);
+      }
+    } catch (JSONException e) {
+      System.err.println("Exception: " + e.getMessage());
+    }
+
+    return arr;
   }
 
   private void listEventsInRange(JSONArray args) {

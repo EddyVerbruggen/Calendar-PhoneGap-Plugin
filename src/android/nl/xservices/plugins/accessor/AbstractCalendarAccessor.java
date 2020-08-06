@@ -597,7 +597,7 @@ public abstract class AbstractCalendarAccessor {
                               String recurrence, int recurrenceInterval, String recurrenceWeekstart,
                               String recurrenceByDay, String recurrenceByMonthDay, Long recurrenceEndTime, Long recurrenceCount,
                               String allday,
-                              Integer calendarId, String url) {
+                              Integer calendarId, String url, String[] attendees) {
         ContentResolver cr = this.cordova.getActivity().getContentResolver();
         ContentValues values = new ContentValues();
         final boolean allDayEvent = "true".equals(allday) && isAllDayEvent(new Date(startTime), new Date(endTime));
@@ -638,8 +638,10 @@ public abstract class AbstractCalendarAccessor {
         }
 
         String createdEventID = null;
+        Uri  uri = null;
+
         try {
-            Uri uri = cr.insert(eventsUri, values);
+            uri = cr.insert(eventsUri, values);
             createdEventID = uri.getLastPathSegment();
             Log.d(LOG_TAG, "Created event with ID " + createdEventID);
 
@@ -661,6 +663,26 @@ public abstract class AbstractCalendarAccessor {
         } catch (Exception e) {
             Log.e(LOG_TAG, "Creating reminders failed, ignoring since the event was created.", e);
         }
+
+        try {
+            if (attendees != null) {
+                int i;
+
+                for (i = 0 ; i < attendees.length ; i++) {
+                    ContentValues attendeesValues = new ContentValues();
+                    attendeesValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
+                    attendeesValues.put("attendeeEmail", attendees[i]);
+                    attendeesValues.put("attendeeRelationship", 0x00000000);
+                    attendeesValues.put("attendeeStatus", 0x00000000);
+                    attendeesValues.put("attendeeType", 0x00000000);
+
+                    cr.insert(Uri.parse(CONTENT_PROVIDER + CONTENT_PROVIDER_PATH_ATTENDEES), attendeesValues);
+                }
+            }
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Creating attendees failed, ignoring since the event was created.", e);
+        }
+
         return createdEventID;
     }
 

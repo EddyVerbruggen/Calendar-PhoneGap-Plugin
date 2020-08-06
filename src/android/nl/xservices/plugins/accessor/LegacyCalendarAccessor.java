@@ -102,11 +102,11 @@ public class LegacyCalendarAccessor extends AbstractCalendarAccessor {
                             String description, String location, Long firstReminderMinutes, Long secondReminderMinutes,
                             String recurrence, int recurrenceInterval, String recurrenceWeekstart,
                             String recurrenceByDay, String recurrenceByMonthDay, Long recurrenceEndTime, Long recurrenceCount,
-                            String allday, Integer calendarId, String url) {
+                            String allday, Integer calendarId, String url, String[] attendees) {
     eventsUri = eventsUri == null ? Uri.parse(CONTENT_PROVIDER_PRE_FROYO + CONTENT_PROVIDER_PATH_EVENTS) : eventsUri;
     return super.createEvent(eventsUri, title, startTime, endTime, description, location,
             firstReminderMinutes, secondReminderMinutes, recurrence, recurrenceInterval, recurrenceWeekstart,
-            recurrenceByDay, recurrenceByMonthDay, recurrenceEndTime, recurrenceCount, allday, calendarId, url);
+            recurrenceByDay, recurrenceByMonthDay, recurrenceEndTime, recurrenceCount, allday, calendarId, url, attendees);
   }
 
 }

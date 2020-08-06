@@ -207,6 +207,9 @@ Basic operations, you'll want to copy-paste this for testing purposes:
   // And the URL can be passed since 4.3.2 (will be appended to the notes on Android as there doesn't seem to be a sep field)
   calOptions.url = "https://www.google.com";
 
+  // Accepts an array containing the participants e-mails, like this:
+  calOptions.attendees = ["example@example.com", "example1@example1.com", "example2@example2.com"];
+
   // on iOS the success handler receives the event ID (since 4.3.6)
   window.plugins.calendar.createEventWithOptions(title,eventLocation,notes,startDate,endDate,calOptions,success,error);
 
