@@ -444,6 +444,65 @@
           break;
         }
 
+        if (rule.daysOfTheWeek != nil) {
+            NSMutableArray * daysOfTheWeek = [[NSMutableArray alloc] init];
+            for (EKRecurrenceDayOfWeek * item in rule.daysOfTheWeek) {
+                
+                NSMutableDictionary *dayofweek = [[NSMutableDictionary alloc] init];
+                
+                // objectAtIndex starts at 0, but 'item.dayOfTheWeek' starts at 1
+                NSString *valOfDayOfWeek = [[NSArray arrayWithObjects:@"Unknown", @"Sunday", @"Monday", @"Tuesday", @"Wednesday", @"Thursday", @"Friday", @"Saturday", nil] objectAtIndex:item.dayOfTheWeek];
+                [dayofweek setObject:valOfDayOfWeek forKey:@"dayOfTheWeek"];
+                
+                NSNumber *valOfWeekNumber = [NSNumber numberWithInteger:item.weekNumber];
+                [dayofweek setObject:valOfWeekNumber forKey:@"weekNumber"];
+                
+                [daysOfTheWeek addObject:dayofweek];
+                
+            }
+            [rrule setObject:daysOfTheWeek forKey:@"daysOfTheWeek"];
+        }
+
+        if (rule.daysOfTheMonth != nil) {
+            NSMutableArray * daysOfTheMonth = [[NSMutableArray alloc] init];
+            for (NSNumber * item in rule.daysOfTheMonth) {
+                [daysOfTheMonth addObject:item];
+            }
+            [rrule setObject:daysOfTheMonth forKey:@"daysOfTheMonth"];
+        }
+
+        if (rule.daysOfTheYear != nil) {
+            NSMutableArray * daysOfTheYear = [[NSMutableArray alloc] init];
+            for (NSNumber * item in rule.daysOfTheYear) {
+                [daysOfTheYear addObject:item];
+            }
+            [rrule setObject:daysOfTheYear forKey:@"daysOfTheYear"];
+        }
+        
+        if (rule.weeksOfTheYear != nil) {
+            NSMutableArray * weeksOfTheYear = [[NSMutableArray alloc] init];
+            for (NSNumber * item in rule.weeksOfTheYear) {
+                [weeksOfTheYear addObject:item];
+            }
+            [rrule setObject:weeksOfTheYear forKey:@"weeksOfTheYear"];
+        }
+
+        if (rule.monthsOfTheYear != nil) {
+            NSMutableArray * monthsOfTheYear = [[NSMutableArray alloc] init];
+            for (NSNumber * item in rule.monthsOfTheYear) {
+                [monthsOfTheYear addObject:item];
+            }
+            [rrule setObject:monthsOfTheYear forKey:@"monthsOfTheYear"];
+        }
+
+        if (rule.setPositions != nil) {
+            NSMutableArray * setPositions = [[NSMutableArray alloc] init];
+            for (NSNumber * item in rule.setPositions) {
+                [setPositions addObject:item];
+            }
+            [rrule setObject:setPositions forKey:@"setPositions"];
+        }
+
         NSNumber *interval = [NSNumber numberWithInteger: rule.interval];
         [rrule setObject:interval forKey:@"interval"];
 
