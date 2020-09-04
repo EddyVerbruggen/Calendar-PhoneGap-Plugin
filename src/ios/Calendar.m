@@ -1007,7 +1007,7 @@
 
   switch (action) {
     case EKEventEditViewActionCanceled:
-      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_NO_RESULT];
+      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Canceled"];
       break;
 
     case EKEventEditViewActionSaved:
