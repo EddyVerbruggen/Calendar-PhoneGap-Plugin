@@ -1,7 +1,7 @@
 # PhoneGap Calendar plugin FORK
 
 This fork adds some functions to batch-process local calendar event inserts on Android
-The code is hacked at the moment, but may be optimized in the future
+The code is hacked at the moment, error/exceptions handling is a mess (not existing).
 
 # License
 
