@@ -40,6 +40,9 @@ public class Calendar extends CordovaPlugin {
   private static final String REQUEST_READWRITE_PERMISSION = "requestReadWritePermission";
 
   private static final String ACTION_OPEN_CALENDAR = "openCalendar";
+  private static final String ACTION_START_BATCH = "startBatchForCreateEvents";
+  private static final String ACTION_CANCEL_BATCH = "cancelBatchForCreateEvents";
+  private static final String ACTION_COMMIT_BATCH = "commitBatchForCreateEvents";
   private static final String ACTION_CREATE_EVENT_WITH_OPTIONS = "createEventWithOptions";
   private static final String ACTION_CREATE_EVENT_INTERACTIVELY = "createEventInteractively";
   private static final String ACTION_DELETE_EVENT = "deleteEvent";
@@ -83,6 +86,15 @@ public class Calendar extends CordovaPlugin {
       } else {
         openCalendar(args);
       }
+      return true;
+    } else if (ACTION_START_BATCH.equals(action)) {
+      startBatchForCreateEvents();
+      return true;
+    } else if (ACTION_CANCEL_BATCH.equals(action)) {
+      cancelBatchForCreateEvents();
+      return true;
+    } else if (ACTION_COMMIT_BATCH.equals(action)) {
+      commitBatchForCreateEvents();
       return true;
     } else if (ACTION_CREATE_EVENT_WITH_OPTIONS.equals(action)) {
       if (hasLimitedSupport) {
@@ -275,6 +287,50 @@ public class Calendar extends CordovaPlugin {
         } catch (JSONException e) {
           System.err.println("JSONException: " + e.getMessage());
           callback.error(e.getMessage());
+        } catch (Exception ex) {
+           System.err.println("Exception: " + ex.getMessage());
+           callback.error(ex.getMessage());
+         }
+      }
+    });
+  }
+
+  private void startBatchForCreateEvents() {
+    cordova.getThreadPool().execute(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          Calendar.this.getCalendarAccessor().startBatchForCreateEvents();
+          callback.sendPluginResult(new PluginResult(PluginResult.Status.OK));
+        } catch (Exception ex) {
+           System.err.println("Exception: " + ex.getMessage());
+           callback.error(ex.getMessage());
+         }
+      }
+    });
+  }
+
+  private void cancelBatchForCreateEvents() {
+    cordova.getThreadPool().execute(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          Calendar.this.getCalendarAccessor().cancelBatchForCreateEvents();
+          callback.sendPluginResult(new PluginResult(PluginResult.Status.OK));
+        } catch (Exception ex) {
+           System.err.println("Exception: " + ex.getMessage());
+           callback.error(ex.getMessage());
+         }
+      }
+    });
+  }
+  private void commitBatchForCreateEvents() {
+    cordova.getThreadPool().execute(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          Calendar.this.getCalendarAccessor().commitBatchForCreateEvents();
+          callback.sendPluginResult(new PluginResult(PluginResult.Status.OK));
         } catch (Exception ex) {
            System.err.println("Exception: " + ex.getMessage());
            callback.error(ex.getMessage());

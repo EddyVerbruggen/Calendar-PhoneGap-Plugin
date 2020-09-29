@@ -11,13 +11,13 @@
     This plugin allows you to manipulate the native calendar.
   </description>
 
-  <author>Eddy Verbruggen</author>
+  <author>Eddy Verbruggen+Misch82</author>
 
   <license>MIT</license>
 
   <keywords>Calendar, Agenda, Event</keywords>
 
-  <repo>https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin.git</repo>
+  <repo>https://github.com/Misch82/Calendar-PhoneGap-Plugin.git</repo>
 
   <issue>https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin/issues</issue>
 

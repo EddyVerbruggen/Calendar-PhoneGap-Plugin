@@ -9,6 +9,17 @@ Calendar.prototype.getCreateCalendarOptions = function () {
   };
 };
 
+Calendar.prototype.startBatchForCreateEvents = function (successCallback, errorCallback) {
+  cordova.exec(successCallback, errorCallback, "Calendar", "startBatchForCreateEvents", []);
+};
+
+Calendar.prototype.cancelBatchForCreateEvents = function (successCallback, errorCallback) {
+  cordova.exec(successCallback, errorCallback, "Calendar", "cancelBatchForCreateEvents", []);
+};
+Calendar.prototype.commitBatchForCreateEvents = function (successCallback, errorCallback) {
+  cordova.exec(successCallback, errorCallback, "Calendar", "commitBatchForCreateEvents", []);
+};
+
 Calendar.prototype.hasReadPermission = function (successCallback, errorCallback) {
   cordova.exec(successCallback, errorCallback, "Calendar", "hasReadPermission", []);
 };

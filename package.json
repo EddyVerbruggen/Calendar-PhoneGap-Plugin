@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin.git"
+    "url": "git+https://github.com/Misch82/Calendar-PhoneGap-Plugin.git"
   },
   "keywords": [
     "Calendar",
@@ -28,7 +28,7 @@
       }
     }
   },
-  "author": "Eddy Verbruggen <eddyverbruggen@gmail.com> (https://github.com/EddyVerbruggen)",
+  "author": "Eddy Verbruggen <eddyverbruggen@gmail.com> (https://github.com/EddyVerbruggen) + Misch82",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin/issues"
