@@ -633,14 +633,24 @@
       [myEvent addRecurrenceRule:rule];
     }
 
-    NSError *error = nil;
-    [self.eventStore saveEvent:myEvent span:EKSpanThisEvent error:&error];
+    NSString *errorDescription = nil;
 
-    if (error) {
-      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.userInfo.description];
+    @try {
+      NSError *error = nil;
+      [self.eventStore saveEvent:myEvent span:EKSpanThisEvent error:&error];
+      if (error) {
+          errorDescription = error.userInfo.description;
+      }
+    } @catch (NSException *exception) {
+      errorDescription = exception.userInfo.description;
+    }
+
+    if (errorDescription) {
+      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorDescription];
     } else {
       pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:myEvent.eventIdentifier];
     }
+
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
   }];
 }
