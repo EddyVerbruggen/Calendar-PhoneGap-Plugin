@@ -920,23 +920,30 @@
       }
     }
 
-    // Find matches
-    EKCalendarItem *theEvent = nil;
-    if (calEventID != nil) {
-      theEvent = [self.eventStore eventWithIdentifier:calEventID];
+    @try {
+
+      // Find matches
+      EKCalendarItem *theEvent = nil;
+      if (calEventID != nil) {
+        theEvent = [self.eventStore eventWithIdentifier:calEventID];
+      }
+
+      NSArray *matchingEvents;
+
+      if (theEvent == nil) {
+        matchingEvents = [self findEKEventsWithTitle:title location:location notes:notes startDate:myStartDate endDate:myEndDate calendars:calendars];
+      } else {
+        matchingEvents = [NSArray arrayWithObject:theEvent];
+      }
+
+      NSMutableArray * eventsDataArray = [self eventsToDataArray:matchingEvents];
+      CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:eventsDataArray];
+      [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+
+    } @catch (NSException *exception) {
+      CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:exception.userInfo.description];
+      [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }
-
-    NSArray *matchingEvents;
-
-    if (theEvent == nil) {
-      matchingEvents = [self findEKEventsWithTitle:title location:location notes:notes startDate:myStartDate endDate:myEndDate calendars:calendars];
-    } else {
-      matchingEvents = [NSArray arrayWithObject:theEvent];
-    }
-
-    NSMutableArray * eventsDataArray = [self eventsToDataArray:matchingEvents];
-    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:eventsDataArray];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
   }];
 }
 
