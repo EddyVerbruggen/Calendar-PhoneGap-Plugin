@@ -3,6 +3,8 @@ package nl.xservices.plugins.accessor;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
@@ -124,9 +126,12 @@ public abstract class AbstractCalendarAccessor {
 
     private EnumMap<KeyIndex, String> calendarKeys;
 
+    private ArrayList<ContentProviderOperation> batchInsertOps = null;
+
     public AbstractCalendarAccessor(CordovaInterface cordova) {
         this.cordova = cordova;
         this.calendarKeys = initContentProviderKeys();
+        this.batchInsertOps = null;
     }
 
     protected enum KeyIndex {
@@ -592,6 +597,51 @@ public abstract class AbstractCalendarAccessor {
         return updated > 0;
     }
 
+    public void startBatchForCreateEvents()
+    {
+      try {
+        if (this.batchInsertOps != null) this.batchInsertOps=null;
+        this.batchInsertOps = new ArrayList<ContentProviderOperation>();
+      } catch (Exception e) {
+          Log.e(LOG_TAG, "Start BATCH failed, ignoring.", e);
+      }
+    }
+
+    public void commitBatchForCreateEvents()
+    {
+      if (this.batchInsertOps == null)
+        return; // do nothing
+
+      try {
+        if (this.batchInsertOps.size() > 0)
+        {
+          ContentResolver cr = this.cordova.getActivity().getContentResolver();
+          ContentProviderResult[] results = cr.applyBatch(CalendarContract.AUTHORITY, this.batchInsertOps);
+          for (ContentProviderResult result : results) {
+            Log.v(LOG_TAG, "addBatchEvent: " + result.uri.toString());
+          }
+        }
+        else
+        {
+          Log.w(LOG_TAG, "No batch operations found! Do nothing");
+        }
+
+        this.batchInsertOps = null;
+      } catch (Exception e) {
+          Log.e(LOG_TAG, "Commit BATCH failed, ignoring.", e);
+      }
+    }
+
+    public void cancelBatchForCreateEvents()
+    {
+      try {
+        this.batchInsertOps = new ArrayList<ContentProviderOperation>();
+      } catch (Exception e) {
+          Log.e(LOG_TAG, "Cancel BATCH failed, ignoring.", e);
+      }
+    }
+
+
     public String createEvent(Uri eventsUri, String title, long startTime, long endTime, String description,
                               String location, Long firstReminderMinutes, Long secondReminderMinutes,
                               String recurrence, int recurrenceInterval, String recurrenceWeekstart,
@@ -637,6 +687,42 @@ public abstract class AbstractCalendarAccessor {
             values.put(Events.RRULE, rrule);
         }
 
+        if (this.batchInsertOps != null)  // batch mode
+        {
+          try {
+            this.batchInsertOps.add(
+              ContentProviderOperation.newInsert(eventsUri)
+                .withValues(values)
+                .build());
+
+            if (firstReminderMinutes > -1) {
+                ContentValues reminderValues = new ContentValues();
+                reminderValues.put("minutes", firstReminderMinutes);
+                reminderValues.put("method", 1);
+
+                this.batchInsertOps.add(
+                  ContentProviderOperation.newInsert(Uri.parse(CONTENT_PROVIDER + CONTENT_PROVIDER_PATH_REMINDERS))
+                    .withValues(reminderValues)
+                    .withValueBackReference ("event_id", this.batchInsertOps.size()-1)
+                    .build());
+            }
+
+            if (secondReminderMinutes > -1) {
+                ContentValues reminderValues = new ContentValues();
+                reminderValues.put("minutes", secondReminderMinutes);
+                reminderValues.put("method", 1);
+                this.batchInsertOps.add(
+                  ContentProviderOperation.newInsert(Uri.parse(CONTENT_PROVIDER + CONTENT_PROVIDER_PATH_REMINDERS))
+                    .withValues(reminderValues)
+                    .withValueBackReference ("event_id", this.batchInsertOps.size()-1)
+                    .build());
+            }
+          } catch (Exception e) {
+              Log.e(LOG_TAG, "Creating BATCH events failed, ignoring.", e);
+          }
+          return "batch added";
+        }
+        // normal mode (no batch)
         String createdEventID = null;
         try {
             Uri uri = cr.insert(eventsUri, values);
