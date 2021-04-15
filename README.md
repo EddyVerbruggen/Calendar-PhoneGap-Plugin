@@ -294,6 +294,7 @@ recurrence: null,
 recurrenceEndDate: null,
 recurrenceCount: 10,
 recurrenceInterval: 1,
+recurrenceExDates: "20211006T100000Z",
 secondReminderMinutes: null,
 url: null
 }

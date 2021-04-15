@@ -31,6 +31,7 @@ public class LegacyCalendarAccessor extends AbstractCalendarAccessor {
     keys.put(KeyIndex.EVENTS_START, "dtstart");
     keys.put(KeyIndex.EVENTS_END, "dtend");
     keys.put(KeyIndex.EVENTS_RRULE, "rrule");
+    keys.put(KeyIndex.EVENTS_EXDATE, "exdate");
     keys.put(KeyIndex.EVENTS_ALL_DAY, "allDay");
     keys.put(KeyIndex.INSTANCES_ID, "_id");
     keys.put(KeyIndex.INSTANCES_EVENT_ID, "event_id");
@@ -103,11 +104,11 @@ public class LegacyCalendarAccessor extends AbstractCalendarAccessor {
                             String description, String location, Long firstReminderMinutes, Long secondReminderMinutes,
                             String recurrence, int recurrenceInterval, String recurrenceWeekstart,
                             String recurrenceByDay, String recurrenceByMonthDay, Long recurrenceEndTime, int recurrenceCount,
-                            String allday, Integer calendarId, String url) {
+                            String recurrenceExDates, String allday, Integer calendarId, String url) {
     eventsUri = eventsUri == null ? Uri.parse(CONTENT_PROVIDER_PRE_FROYO + CONTENT_PROVIDER_PATH_EVENTS) : eventsUri;
     return super.createEvent(eventsUri, title, startTime, endTime, description, location,
             firstReminderMinutes, secondReminderMinutes, recurrence, recurrenceInterval, recurrenceWeekstart,
-            recurrenceByDay, recurrenceByMonthDay, recurrenceEndTime, recurrenceCount, allday, calendarId, url);
+            recurrenceByDay, recurrenceByMonthDay, recurrenceEndTime, recurrenceCount, recurrenceExDates, allday, calendarId, url);
   }
 
 }

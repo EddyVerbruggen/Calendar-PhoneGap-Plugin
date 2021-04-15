@@ -411,17 +411,22 @@ public class Calendar extends CordovaPlugin {
           //set recurrence
           String recurrence = getPossibleNullString("recurrence", argOptionsObject);
           Long recurrenceEndTime = argOptionsObject.isNull("recurrenceEndTime") ? null : argOptionsObject.optLong("recurrenceEndTime");
-          int recurrenceCount = argOptionsObject.isNull("recurrenceCount") ? null : argOptionsObject.optInt("recurrenceCount");
+          int recurrenceCount = argOptionsObject.optInt("recurrenceCount");
           int recurrenceInterval = argOptionsObject.optInt("recurrenceInterval");
+          String recurrenceExDates = getPossibleNullString("recurrenceExDates", argOptionsObject);
           if (recurrence != null) {
             // Build RRULE. Note: COUNT and UNTIL are mutually exclusive
             if (recurrenceEndTime != null) {
               calIntent.putExtra(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";INTERVAL=" + recurrenceInterval + ";UNTIL=" + formatICalDateTime(new Date(recurrenceEndTime)));
-            } else if (recurrenceCount != null) {
+            } else if (recurrenceCount > -1) {
               calIntent.putExtra(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";INTERVAL=" + recurrenceInterval + ";COUNT=" + recurrenceCount);
             } else {
               calIntent.putExtra(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";INTERVAL=" + recurrenceInterval);
             }
+          }
+
+          if (recurrenceExDates != null) {
+            calIntent.putExtra(Events.EXDATE, recurrenceExDates);
           }
 
           Calendar.this.cordova.startActivityForResult(Calendar.this, calIntent, RESULT_CODE_CREATE);
@@ -583,6 +588,7 @@ public class Calendar extends CordovaPlugin {
                     getPossibleNullString("recurrenceByMonthDay", argOptionsObject),
                     argOptionsObject.optLong("recurrenceEndTime", -1),
                     argOptionsObject.optInt("recurrenceCount", -1),
+                    getPossibleNullString("recurrenceExDates", argOptionsObject),
                     getPossibleNullString("allday", argOptionsObject),
                     argOptionsObject.optInt("calendarId", 1),
                     getPossibleNullString("url", argOptionsObject));

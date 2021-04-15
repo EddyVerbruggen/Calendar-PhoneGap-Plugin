@@ -47,6 +47,7 @@ public abstract class AbstractCalendarAccessor {
         String recurrenceByMonthDay;
         String recurrenceUntil;
         String recurrenceCount;
+        String recurrenceExDates; // Format: "YYYYMMDDTHHMMSSZ,YYYYMMDDTHHMMSSZ"
         //attribute DOMString status;
         // attribute DOMString transparency;
         // attribute CalendarRepeatRule recurrence;
@@ -90,6 +91,7 @@ public abstract class AbstractCalendarAccessor {
                     objRecurrence.putOpt("bymonthday", this.recurrenceByMonthDay);
                     objRecurrence.putOpt("until", this.recurrenceUntil);
                     objRecurrence.putOpt("count", this.recurrenceCount);
+                    objRecurrence.putOpt("exdate", this.recurrenceExDates);
 
                     obj.put("recurrence", objRecurrence);
                 }
@@ -144,6 +146,7 @@ public abstract class AbstractCalendarAccessor {
         EVENTS_START,
         EVENTS_END,
         EVENTS_RRULE,
+        EVENTS_EXDATE,
         EVENTS_ALL_DAY,
         INSTANCES_ID,
         INSTANCES_EVENT_ID,
@@ -336,6 +339,7 @@ public abstract class AbstractCalendarAccessor {
                 this.getKey(KeyIndex.EVENTS_START),
                 this.getKey(KeyIndex.EVENTS_END),
                 this.getKey(KeyIndex.EVENTS_RRULE),
+                this.getKey(KeyIndex.EVENTS_EXDATE),
                 this.getKey(KeyIndex.EVENTS_ALL_DAY)
         };
         // Get all the ids at once from active calendars.
@@ -398,10 +402,14 @@ public abstract class AbstractCalendarAccessor {
                             Log.d(LOG_TAG, "Missing handler for " + rule);
                         }
                     }
+
+                    // EXDATEs
+                    event.recurrenceExDates = cursor.getString(cols[7]);
+
                 } else {
                     event.recurring = false;
                 }
-                event.allDay = cursor.getInt(cols[7]) != 0;
+                event.allDay = cursor.getInt(cols[8]) != 0;
                 eventsMap.put(event.id, event);
             } while (cursor.moveToNext());
             cursor.close();
@@ -497,6 +505,7 @@ public abstract class AbstractCalendarAccessor {
                 instance.recurrenceByMonthDay = event.recurrenceByMonthDay;
                 instance.recurrenceUntil = event.recurrenceUntil;
                 instance.recurrenceCount = event.recurrenceCount;
+                instance.recurrenceExDates = event.recurrenceExDates;
 
                 instance.allDay = event.allDay;
                 instance.attendees = attendeeMap.get(instance.eventId);
@@ -599,7 +608,7 @@ public abstract class AbstractCalendarAccessor {
                               String location, Long firstReminderMinutes, Long secondReminderMinutes,
                               String recurrence, int recurrenceInterval, String recurrenceWeekstart,
                               String recurrenceByDay, String recurrenceByMonthDay, Long recurrenceEndTime, int recurrenceCount,
-                              String allday, Integer calendarId, String url) {
+                              String recurrenceExDates, String allday, Integer calendarId, String url) {
         ContentResolver cr = this.cordova.getActivity().getContentResolver();
         ContentValues values = new ContentValues();
         final boolean allDayEvent = "true".equals(allday) && isAllDayEvent(new Date(startTime), new Date(endTime));
@@ -637,6 +646,11 @@ public abstract class AbstractCalendarAccessor {
                     ((recurrenceEndTime > -1) ? ";UNTIL=" + nl.xservices.plugins.Calendar.formatICalDateTime(new Date(recurrenceEndTime)) : "") +
                     ((recurrenceCount > -1) ? ";COUNT=" + recurrenceCount : "");
             values.put(Events.RRULE, rrule);
+
+            // EXDATES
+            if (recurrenceExDates != null) {
+                values.put(Events.EXDATE, recurrenceExDates);
+            }
         }
 
         String createdEventID = null;
