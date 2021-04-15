@@ -411,12 +411,16 @@ public class Calendar extends CordovaPlugin {
           //set recurrence
           String recurrence = getPossibleNullString("recurrence", argOptionsObject);
           Long recurrenceEndTime = argOptionsObject.isNull("recurrenceEndTime") ? null : argOptionsObject.optLong("recurrenceEndTime");
+          int recurrenceCount = argOptionsObject.isNull("recurrenceCount") ? null : argOptionsObject.optInt("recurrenceCount");
           int recurrenceInterval = argOptionsObject.optInt("recurrenceInterval");
           if (recurrence != null) {
-            if (recurrenceEndTime == null) {
-              calIntent.putExtra(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";INTERVAL=" + recurrenceInterval);
-            } else {
+            // Build RRULE. Note: COUNT and UNTIL are mutually exclusive
+            if (recurrenceEndTime != null) {
               calIntent.putExtra(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";INTERVAL=" + recurrenceInterval + ";UNTIL=" + formatICalDateTime(new Date(recurrenceEndTime)));
+            } else if (recurrenceCount != null) {
+              calIntent.putExtra(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";INTERVAL=" + recurrenceInterval + ";COUNT=" + recurrenceCount);
+            } else {
+              calIntent.putExtra(Events.RRULE, "FREQ=" + recurrence.toUpperCase() + ";INTERVAL=" + recurrenceInterval);
             }
           }
 
@@ -578,7 +582,7 @@ public class Calendar extends CordovaPlugin {
                     getPossibleNullString("recurrenceByDay", argOptionsObject),
                     getPossibleNullString("recurrenceByMonthDay", argOptionsObject),
                     argOptionsObject.optLong("recurrenceEndTime", -1),
-                    argOptionsObject.optLong("recurrenceCount", -1),
+                    argOptionsObject.optInt("recurrenceCount", -1),
                     getPossibleNullString("allday", argOptionsObject),
                     argOptionsObject.optInt("calendarId", 1),
                     getPossibleNullString("url", argOptionsObject));

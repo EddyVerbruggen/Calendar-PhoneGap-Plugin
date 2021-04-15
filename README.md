@@ -292,6 +292,7 @@ calendarName: "calendar",
 firstReminderMinutes: 60,
 recurrence: null,
 recurrenceEndDate: null,
+recurrenceCount: 10,
 recurrenceInterval: 1,
 secondReminderMinutes: null,
 url: null

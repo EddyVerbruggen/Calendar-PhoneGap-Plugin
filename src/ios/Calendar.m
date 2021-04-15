@@ -227,11 +227,14 @@
                                                                               interval: intervalAmount.integerValue
                                                                                    end: nil];
         NSString* recurrenceEndTime = [newCalOptions objectForKey:@"recurrenceEndTime"];
+        NSNumber* recurrenceCount = [newCalOptions objectForKey:@"recurrenceCount"];
         if (recurrenceEndTime != nil) {
           NSTimeInterval _recurrenceEndTimeInterval = [recurrenceEndTime doubleValue] / 1000; // strip millis
           NSDate *myRecurrenceEndDate = [NSDate dateWithTimeIntervalSince1970:_recurrenceEndTimeInterval];
           EKRecurrenceEnd *end = [EKRecurrenceEnd recurrenceEndWithEndDate:myRecurrenceEndDate];
           rule.recurrenceEnd = end;
+        } else if (recurrenceCount != (id)[NSNull null]) {
+          rule.recurrenceEnd = [EKRecurrenceEnd recurrenceEndWithOccurrenceCount:recurrenceCount.intValue];
         }
         [theEvent addRecurrenceRule:rule];
       }
@@ -530,7 +533,7 @@
       pluginResult = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsArray:eventsDataArray];
 
       [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-  }];  
+  }];
 }
 
 - (void)createEventWithOptions:(CDVInvokedUrlCommand*)command {
@@ -547,6 +550,7 @@
   NSNumber* secondReminderMinutes = [calOptions objectForKey:@"secondReminderMinutes"];
   NSString* recurrence = [calOptions objectForKey:@"recurrence"];
   NSString* recurrenceEndTime = [calOptions objectForKey:@"recurrenceEndTime"];
+  NSNumber* recurrenceCount = [calOptions objectForKey:@"recurrenceCount"];
   NSNumber* recurrenceIntervalAmount = [calOptions objectForKey:@"recurrenceInterval"];
   NSString* calendarName = [calOptions objectForKey:@"calendarName"];
   NSString* url = [calOptions objectForKey:@"url"];
@@ -629,6 +633,8 @@
         NSDate *myRecurrenceEndDate = [NSDate dateWithTimeIntervalSince1970:_recurrenceEndTimeInterval];
         EKRecurrenceEnd *end = [EKRecurrenceEnd recurrenceEndWithEndDate:myRecurrenceEndDate];
         rule.recurrenceEnd = end;
+      } else if (recurrenceCount != (id)[NSNull null]) {
+          rule.recurrenceEnd = [EKRecurrenceEnd recurrenceEndWithOccurrenceCount:recurrenceCount.intValue];
       }
       [myEvent addRecurrenceRule:rule];
     }
@@ -669,6 +675,7 @@
   NSNumber* secondReminderMinutes = [calOptions objectForKey:@"secondReminderMinutes"];
   NSString* recurrence = [calOptions objectForKey:@"recurrence"];
   NSString* recurrenceEndTime = [calOptions objectForKey:@"recurrenceEndTime"];
+  NSNumber* recurrenceCount = [calOptions objectForKey:@"recurrenceCount"];
   NSString* calendarName = [calOptions objectForKey:@"calendarName"];
   NSString* url = [calOptions objectForKey:@"url"];
   NSNumber* intervalAmount = [calOptions objectForKey:@"recurrenceInterval"];
@@ -750,6 +757,8 @@
           NSDate *myRecurrenceEndDate = [NSDate dateWithTimeIntervalSince1970:_recurrenceEndTimeInterval];
           EKRecurrenceEnd *end = [EKRecurrenceEnd recurrenceEndWithEndDate:myRecurrenceEndDate];
           rule.recurrenceEnd = end;
+        } else if (recurrenceCount != (id)[NSNull null]) {
+          rule.recurrenceEnd = [EKRecurrenceEnd recurrenceEndWithOccurrenceCount:recurrenceCount.intValue];
         }
         [myEvent addRecurrenceRule:rule];
       }];
