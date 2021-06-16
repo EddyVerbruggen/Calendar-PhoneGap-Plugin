@@ -102,6 +102,12 @@
   return EKRecurrenceFrequencyDaily;
 }
 
+- (NSString *)stringFromWeekday:(NSInteger)weekday {
+  NSDateFormatter * dateFormatter = [NSDateFormatter new];
+  dateFormatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_GB"];
+  return [[dateFormatter.shortWeekdaySymbols[weekday] substringToIndex:2] uppercaseString];
+}
+
 - (void) modifyEventWithOptions:(CDVInvokedUrlCommand*)command {
   NSDictionary* options = [command.arguments objectAtIndex:0];
   NSString* title      = [options objectForKey:@"title"];
@@ -449,6 +455,30 @@
 
         NSNumber *interval = [NSNumber numberWithInteger: rule.interval];
         [rrule setObject:interval forKey:@"interval"];
+          
+      if (rule.daysOfTheWeek != nil) {
+          NSMutableArray *daysOfWeek = [NSMutableArray arrayWithCapacity:[rule.daysOfTheWeek count]];
+          for (EKRecurrenceDayOfWeek* day in rule.daysOfTheWeek) {
+              [daysOfWeek addObject:[self stringFromWeekday:(day.dayOfTheWeek - 1)]];
+          }
+          [rrule setObject:[daysOfWeek componentsJoinedByString:@","] forKey:@"byday"];
+      }
+          
+      if (rule.daysOfTheMonth != nil) {
+          [rrule setObject:rule.daysOfTheMonth forKey:@"bymonthday"];
+      }
+          
+      if (rule.daysOfTheYear != nil) {
+          [rrule setObject:rule.daysOfTheYear forKey:@"byyearday"];
+      }
+          
+      if (rule.weeksOfTheYear != nil) {
+          [rrule setObject:rule.weeksOfTheYear forKey:@"byweek"];
+      }
+          
+      if (rule.monthsOfTheYear != nil) {
+          [rrule setObject:rule.monthsOfTheYear forKey:@"bymonth"];
+      }
 
       if (rule.recurrenceEnd != nil) {
         NSMutableDictionary *until = [[NSMutableDictionary alloc] init];
