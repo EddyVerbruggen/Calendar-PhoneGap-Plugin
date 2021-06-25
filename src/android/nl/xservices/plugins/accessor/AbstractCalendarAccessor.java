@@ -45,6 +45,7 @@ public abstract class AbstractCalendarAccessor {
         String recurrenceWeekstart;
         String recurrenceByDay;
         String recurrenceByMonthDay;
+        String recurrenceByMonth;
         String recurrenceUntil;
         String recurrenceCount;
         String recurrenceExDates; // Format: "YYYYMMDDTHHMMSSZ,YYYYMMDDTHHMMSSZ"
@@ -89,6 +90,7 @@ public abstract class AbstractCalendarAccessor {
                     objRecurrence.putOpt("wkst", this.recurrenceWeekstart);
                     objRecurrence.putOpt("byday", this.recurrenceByDay);
                     objRecurrence.putOpt("bymonthday", this.recurrenceByMonthDay);
+                    objRecurrence.putOpt("bymonth", this.recurrenceByMonth);
                     objRecurrence.putOpt("until", this.recurrenceUntil);
                     objRecurrence.putOpt("count", this.recurrenceCount);
                     objRecurrence.putOpt("exdate", this.recurrenceExDates);
@@ -394,6 +396,8 @@ public abstract class AbstractCalendarAccessor {
                             event.recurrenceByDay = rule.split("=")[1];
                         } else if (rule_type.equals("BYMONTHDAY")) {
                             event.recurrenceByMonthDay = rule.split("=")[1];
+                        } else if (rule_type.equals("BYMONTH")) {
+                            event.recurrenceByMonth = rule.split("=")[1];
                         } else if (rule_type.equals("UNTIL")) {
                             event.recurrenceUntil = rule.split("=")[1];
                         } else if (rule_type.equals("COUNT")) {
@@ -503,6 +507,7 @@ public abstract class AbstractCalendarAccessor {
                 instance.recurrenceWeekstart = event.recurrenceWeekstart;
                 instance.recurrenceByDay = event.recurrenceByDay;
                 instance.recurrenceByMonthDay = event.recurrenceByMonthDay;
+                instance.recurrenceByMonth = event.recurrenceByMonth;
                 instance.recurrenceUntil = event.recurrenceUntil;
                 instance.recurrenceCount = event.recurrenceCount;
                 instance.recurrenceExDates = event.recurrenceExDates;
@@ -607,7 +612,7 @@ public abstract class AbstractCalendarAccessor {
     public String createEvent(Uri eventsUri, String title, long startTime, long endTime, String description,
                               String location, Long firstReminderMinutes, Long secondReminderMinutes,
                               String recurrence, int recurrenceInterval, String recurrenceWeekstart,
-                              String recurrenceByDay, String recurrenceByMonthDay, Long recurrenceEndTime, int recurrenceCount,
+                              String recurrenceByDay, String recurrenceByMonthDay, String recurrenceByMonth, Long recurrenceEndTime, int recurrenceCount,
                               String recurrenceExDates, String allday, Integer calendarId, String url) {
         ContentResolver cr = this.cordova.getActivity().getContentResolver();
         ContentValues values = new ContentValues();
@@ -643,6 +648,7 @@ public abstract class AbstractCalendarAccessor {
                     ((recurrenceWeekstart != null) ? ";WKST=" + recurrenceWeekstart : "") +
                     ((recurrenceByDay != null) ? ";BYDAY=" + recurrenceByDay : "") +
                     ((recurrenceByMonthDay != null) ? ";BYMONTHDAY=" + recurrenceByMonthDay : "") +
+                    ((recurrenceByMonth != null) ? ";BYMONTH=" + recurrenceByMonth : "") +
                     ((recurrenceEndTime > -1) ? ";UNTIL=" + nl.xservices.plugins.Calendar.formatICalDateTime(new Date(recurrenceEndTime)) : "") +
                     ((recurrenceCount > -1) ? ";COUNT=" + recurrenceCount : "");
             values.put(Events.RRULE, rrule);

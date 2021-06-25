@@ -102,10 +102,26 @@
   return EKRecurrenceFrequencyDaily;
 }
 
-- (NSString *)stringFromWeekday:(NSInteger)weekday {
+- (NSString *) stringFromWeekday:(NSInteger)weekday {
   NSDateFormatter * dateFormatter = [NSDateFormatter new];
   dateFormatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_GB"];
   return [[dateFormatter.shortWeekdaySymbols[weekday] substringToIndex:2] uppercaseString];
+}
+
+// Return Weekday object from a symbol (e.g. "SU" => 1)
+- (EKRecurrenceDayOfWeek *) weekdayFromString:(NSString)weekdaySymbolStr {
+  NSDateFormatter * dateFormatter = [NSDateFormatter new];
+  dateFormatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_GB"];
+  int i;
+  for (i = 0; i < 7; i++) {
+    NSString shortDaySymbol = [dateFormatter.shortWeekdaySymbols objectAtIndex:i];
+    if ([shortDaySymbol isEqualToString:weekdaySymbolStr]) {
+      int idx = ((5 + 1) % 7) + 1;
+      return ([EKRecurrenceDayOfWeek init] EKWeekDay:idx); // Return weekday index, mapping iOS's "SU"=1 => "SU"=6
+    }
+  }
+
+  return nil;
 }
 
 - (void) modifyEventWithOptions:(CDVInvokedUrlCommand*)command {
@@ -455,7 +471,7 @@
 
         NSNumber *interval = [NSNumber numberWithInteger: rule.interval];
         [rrule setObject:interval forKey:@"interval"];
-          
+
       if (rule.daysOfTheWeek != nil) {
           NSMutableArray *daysOfWeek = [NSMutableArray arrayWithCapacity:[rule.daysOfTheWeek count]];
           for (EKRecurrenceDayOfWeek* day in rule.daysOfTheWeek) {
@@ -463,19 +479,19 @@
           }
           [rrule setObject:[daysOfWeek componentsJoinedByString:@","] forKey:@"byday"];
       }
-          
+
       if (rule.daysOfTheMonth != nil) {
           [rrule setObject:rule.daysOfTheMonth forKey:@"bymonthday"];
       }
-          
+
       if (rule.daysOfTheYear != nil) {
           [rrule setObject:rule.daysOfTheYear forKey:@"byyearday"];
       }
-          
+
       if (rule.weeksOfTheYear != nil) {
           [rrule setObject:rule.weeksOfTheYear forKey:@"byweek"];
       }
-          
+
       if (rule.monthsOfTheYear != nil) {
           [rrule setObject:rule.monthsOfTheYear forKey:@"bymonth"];
       }
@@ -582,6 +598,9 @@
   NSString* recurrenceEndTime = [calOptions objectForKey:@"recurrenceEndTime"];
   NSNumber* recurrenceCount = [calOptions objectForKey:@"recurrenceCount"];
   NSNumber* recurrenceIntervalAmount = [calOptions objectForKey:@"recurrenceInterval"];
+  NSNumber* recurrenceByDay = [calOptions objectForKey:@"recurrenceByDay"];
+  NSNumber* recurrenceByMonthDay = [calOptions objectForKey:@"recurrenceByMonthDay"];
+  NSNumber* recurrenceByMonth = [calOptions objectForKey:@"recurrenceByMonth"];
   NSString* calendarName = [calOptions objectForKey:@"calendarName"];
   NSString* url = [calOptions objectForKey:@"url"];
 
@@ -664,8 +683,26 @@
         EKRecurrenceEnd *end = [EKRecurrenceEnd recurrenceEndWithEndDate:myRecurrenceEndDate];
         rule.recurrenceEnd = end;
       } else if (recurrenceCount != (id)[NSNull null]) {
-          rule.recurrenceEnd = [EKRecurrenceEnd recurrenceEndWithOccurrenceCount:recurrenceCount.intValue];
+        rule.recurrenceEnd = [EKRecurrenceEnd recurrenceEndWithOccurrenceCount:recurrenceCount.intValue];
       }
+
+      if (recurrenceByDay != (id)[NSNull null]) {
+        NSArray *shortDaySymbolStrs = [recurrenceByDay componentsSeparatedByString:@","];
+        NSMutableArray *daysOfWeek = [NSMutableArray arrayWithCapacity:[shortDaySymbolStrs count]];
+        for (NSString in shortDaySymbolStrs) {
+          daysOfWeek addObject:[self weekdayFromString:shortDaySymbolStr];
+        }
+        rule.daysOfTheWeek = daysOfWeek;
+      }
+
+      if (recurrenceByMonthDay != (id)[NSNull null]) {
+        rule.daysOfTheMonth = recurrenceByMonthDay;
+      }
+
+      if (recurrenceByMonth != (id)[NSNull null]) {
+        rule.monthsOfTheYear = recurrenceByMonth;
+      }
+
       [myEvent addRecurrenceRule:rule];
     }
 
@@ -706,6 +743,9 @@
   NSString* recurrence = [calOptions objectForKey:@"recurrence"];
   NSString* recurrenceEndTime = [calOptions objectForKey:@"recurrenceEndTime"];
   NSNumber* recurrenceCount = [calOptions objectForKey:@"recurrenceCount"];
+  NSNumber* recurrenceByDay = [calOptions objectForKey:@"recurrenceByDay"];
+  NSNumber* recurrenceByMonthDay = [calOptions objectForKey:@"recurrenceByMonthDay"];
+  NSNumber* recurrenceByMonth = [calOptions objectForKey:@"recurrenceByMonth"];
   NSString* calendarName = [calOptions objectForKey:@"calendarName"];
   NSString* url = [calOptions objectForKey:@"url"];
   NSNumber* intervalAmount = [calOptions objectForKey:@"recurrenceInterval"];
@@ -790,6 +830,24 @@
         } else if (recurrenceCount != (id)[NSNull null]) {
           rule.recurrenceEnd = [EKRecurrenceEnd recurrenceEndWithOccurrenceCount:recurrenceCount.intValue];
         }
+
+        if (recurrenceByDay != (id)[NSNull null]) {
+          NSArray *shortDaySymbolStrs = [recurrenceByDay componentsSeparatedByString:@","];
+          NSMutableArray *daysOfWeek = [NSMutableArray arrayWithCapacity:[shortDaySymbolStrs count]];
+          for (NSString in shortDaySymbolStrs) {
+            daysOfWeek addObject:[self weekdayFromString:shortDaySymbolStr];
+          }
+          rule.daysOfTheWeek = daysOfWeek;
+        }
+
+        if (recurrenceByMonthDay != (id)[NSNull null]) {
+          rule.daysOfTheMonth = recurrenceByMonthDay;
+        }
+
+        if (recurrenceByMonth != (id)[NSNull null]) {
+          rule.monthsOfTheYear = recurrenceByMonth;
+        }
+
         [myEvent addRecurrenceRule:rule];
       }];
     }
