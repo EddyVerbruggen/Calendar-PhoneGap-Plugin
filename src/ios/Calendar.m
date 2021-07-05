@@ -1078,7 +1078,8 @@
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:cal.calendarIdentifier];
       } else {
         NSLog(@"could not create calendar, error: %@", error.description);
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Calendar could not be created. Is access to the Calendar blocked for this app?"];
+        NSString *errMsg = [NSString stringWithFormat:@"Calendar could not be created. Error: %@", error.description];
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errMsg];
       }
     } else {
       // ok, it already exists
