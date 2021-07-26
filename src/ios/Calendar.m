@@ -471,42 +471,42 @@
         NSNumber *interval = [NSNumber numberWithInteger: rule.interval];
         [rrule setObject:interval forKey:@"interval"];
 
-      if (rule.daysOfTheWeek != nil) {
-          NSMutableArray *daysOfWeek = [NSMutableArray arrayWithCapacity:[rule.daysOfTheWeek count]];
-          for (EKRecurrenceDayOfWeek* day in rule.daysOfTheWeek) {
-              [daysOfWeek addObject:[self stringFromWeekday:(day.dayOfTheWeek - 1)]];
-          }
-          [rrule setObject:[daysOfWeek componentsJoinedByString:@","] forKey:@"byday"];
-      }
-
-      if (rule.daysOfTheMonth != nil) {
-          [rrule setObject:rule.daysOfTheMonth forKey:@"bymonthday"];
-      }
-
-      if (rule.daysOfTheYear != nil) {
-          [rrule setObject:rule.daysOfTheYear forKey:@"byyearday"];
-      }
-
-      if (rule.weeksOfTheYear != nil) {
-          [rrule setObject:rule.weeksOfTheYear forKey:@"byweek"];
-      }
-
-      if (rule.monthsOfTheYear != nil) {
-          [rrule setObject:rule.monthsOfTheYear forKey:@"bymonth"];
-      }
-
-      if (rule.recurrenceEnd != nil) {
-        NSMutableDictionary *until = [[NSMutableDictionary alloc] init];
-
-        if (rule.recurrenceEnd.endDate != nil) {
-          [until setObject:[df stringFromDate:rule.recurrenceEnd.endDate] forKey:@"date"];
+        if (rule.daysOfTheWeek != nil) {
+            NSMutableArray *daysOfWeek = [NSMutableArray arrayWithCapacity:[rule.daysOfTheWeek count]];
+            for (EKRecurrenceDayOfWeek* day in rule.daysOfTheWeek) {
+                [daysOfWeek addObject:[self stringFromWeekday:(day.dayOfTheWeek - 1)]];
+            }
+            [rrule setObject:[daysOfWeek componentsJoinedByString:@","] forKey:@"byday"];
         }
 
-      NSNumber *count = [NSNumber numberWithInteger: rule.recurrenceEnd.occurrenceCount];
-      [until setObject:count forKey:@"count"];
+        if (rule.daysOfTheMonth != nil) {
+            [rrule setObject:rule.daysOfTheMonth forKey:@"bymonthday"];
+        }
 
-        [rrule setObject:until forKey:@"until"];
-      }
+        if (rule.daysOfTheYear != nil) {
+            [rrule setObject:rule.daysOfTheYear forKey:@"byyearday"];
+        }
+
+        if (rule.weeksOfTheYear != nil) {
+            [rrule setObject:rule.weeksOfTheYear forKey:@"byweek"];
+        }
+
+        if (rule.monthsOfTheYear != nil) {
+            [rrule setObject:rule.monthsOfTheYear forKey:@"bymonth"];
+        }
+
+        if (rule.recurrenceEnd != nil) {
+          NSMutableDictionary *until = [[NSMutableDictionary alloc] init];
+
+          if (rule.recurrenceEnd.endDate != nil) {
+            [until setObject:[df stringFromDate:rule.recurrenceEnd.endDate] forKey:@"date"];
+          }
+
+          NSNumber *count = [NSNumber numberWithInteger: rule.recurrenceEnd.occurrenceCount];
+          [until setObject:count forKey:@"count"];
+
+          [rrule setObject:until forKey:@"until"];
+        }
 
         [entry setObject:rrule forKey:@"rrule"];
       }
@@ -598,8 +598,8 @@
   NSNumber* recurrenceCount = [calOptions objectForKey:@"recurrenceCount"];
   NSNumber* recurrenceIntervalAmount = [calOptions objectForKey:@"recurrenceInterval"];
   NSString* recurrenceByDay = [calOptions objectForKey:@"recurrenceByDay"];
-  NSNumber* recurrenceByMonthDay = [calOptions objectForKey:@"recurrenceByMonthDay"];
-  NSNumber* recurrenceByMonth = [calOptions objectForKey:@"recurrenceByMonth"];
+  NSString* recurrenceByMonthDay = [calOptions objectForKey:@"recurrenceByMonthDay"];
+  NSString* recurrenceByMonth = [calOptions objectForKey:@"recurrenceByMonth"];
   NSString* calendarName = [calOptions objectForKey:@"calendarName"];
   NSString* url = [calOptions objectForKey:@"url"];
 
@@ -690,21 +690,35 @@
         if ([shortDaySymbolStrs count] <= 1) {
           NSMutableArray *daysOfWeek = [NSMutableArray arrayWithCapacity:[shortDaySymbolStrs count]];
           for (NSString *shortDaySymbolStr in shortDaySymbolStrs) {
-              EKRecurrenceDayOfWeek *dayOfWeek = [self weekdayFromString:shortDaySymbolStr];
-              if (dayOfWeek != nil) {
+            EKRecurrenceDayOfWeek *dayOfWeek = [self weekdayFromString:shortDaySymbolStr];
+            if (dayOfWeek != nil) {
               [daysOfWeek addObject:dayOfWeek];
-              }
+            }
           }
           [rule setValue:daysOfWeek forKey:@"daysOfTheWeek"];
         }
       }
 
       if (recurrenceByMonthDay != (id)[NSNull null]) {
-        [rule setValue:recurrenceByMonthDay forKey:@"daysOfTheMonth"];
+        NSArray *monthDays = [recurrenceByMonthDay componentsSeparatedByString:@","];
+        NSMutableArray *daysOfMonth = [NSMutableArray arrayWithCapacity:[monthDays count]];
+        for (NSString* monthDay in monthDays) {
+          NSNumberFormatter *num = [[NSNumberFormatter alloc] init];
+          num.numberStyle = NSNumberFormatterDecimalStyle;
+          [daysOfMonth addObject:[num numberFromString:monthDay]];
+        }
+        [rule setValue:daysOfMonth forKey:@"daysOfTheMonth"];
       }
 
       if (recurrenceByMonth != (id)[NSNull null]) {
-        [rule setValue:recurrenceByMonth forKey:@"monthsOfTheYear"];
+        NSArray *months = [recurrenceByMonth componentsSeparatedByString:@","];
+        NSMutableArray *monthsOfYear = [NSMutableArray arrayWithCapacity:[months count]];
+        for (NSString* month in months) {
+          NSNumberFormatter *num = [[NSNumberFormatter alloc] init];
+          num.numberStyle = NSNumberFormatterDecimalStyle;
+          [monthsOfYear addObject:[num numberFromString:month]];
+        }
+        [rule setValue:monthsOfYear forKey:@"monthsOfTheYear"];
       }
 
       [myEvent addRecurrenceRule:rule];
@@ -748,8 +762,8 @@
   NSString* recurrenceEndTime = [calOptions objectForKey:@"recurrenceEndTime"];
   NSNumber* recurrenceCount = [calOptions objectForKey:@"recurrenceCount"];
   NSString* recurrenceByDay = [calOptions objectForKey:@"recurrenceByDay"];
-  NSNumber* recurrenceByMonthDay = [calOptions objectForKey:@"recurrenceByMonthDay"];
-  NSNumber* recurrenceByMonth = [calOptions objectForKey:@"recurrenceByMonth"];
+  NSString* recurrenceByMonthDay = [calOptions objectForKey:@"recurrenceByMonthDay"];
+  NSString* recurrenceByMonth = [calOptions objectForKey:@"recurrenceByMonth"];
   NSString* calendarName = [calOptions objectForKey:@"calendarName"];
   NSString* url = [calOptions objectForKey:@"url"];
   NSNumber* intervalAmount = [calOptions objectForKey:@"recurrenceInterval"];
@@ -837,22 +851,38 @@
 
         if (recurrenceByDay != (id)[NSNull null]) {
           NSArray *shortDaySymbolStrs = [recurrenceByDay componentsSeparatedByString:@","];
-          NSMutableArray *daysOfWeek = [NSMutableArray arrayWithCapacity:[shortDaySymbolStrs count]];
-          for (NSString *shortDaySymbolStr in shortDaySymbolStrs) {
-            EKRecurrenceDayOfWeek *dayOfWeek = [self weekdayFromString:shortDaySymbolStr];
-            if (dayOfWeek != nil) {
-              [daysOfWeek addObject:dayOfWeek];
+          if ([shortDaySymbolStrs count] <= 1) {
+            NSMutableArray *daysOfWeek = [NSMutableArray arrayWithCapacity:[shortDaySymbolStrs count]];
+            for (NSString *shortDaySymbolStr in shortDaySymbolStrs) {
+              EKRecurrenceDayOfWeek *dayOfWeek = [self weekdayFromString:shortDaySymbolStr];
+              if (dayOfWeek != nil) {
+                [daysOfWeek addObject:dayOfWeek];
+              }
             }
-          }
             [rule setValue:daysOfWeek forKey:@"daysOfTheWeek"];
+          }
         }
 
         if (recurrenceByMonthDay != (id)[NSNull null]) {
-          [rule setValue:recurrenceByMonthDay forKey:@"daysOfTheMonth"];
+          NSArray *monthDays = [recurrenceByMonthDay componentsSeparatedByString:@","];
+          NSMutableArray *daysOfMonth = [NSMutableArray arrayWithCapacity:[monthDays count]];
+          for (NSString* monthDay in monthDays) {
+            NSNumberFormatter *num = [[NSNumberFormatter alloc] init];
+            num.numberStyle = NSNumberFormatterDecimalStyle;
+            [daysOfMonth addObject:[num numberFromString:monthDay]];
+          }
+          [rule setValue:daysOfMonth forKey:@"daysOfTheMonth"];
         }
 
         if (recurrenceByMonth != (id)[NSNull null]) {
-          [rule setValue:recurrenceByMonth forKey:@"monthsOfTheYear"];
+          NSArray *months = [recurrenceByMonth componentsSeparatedByString:@","];
+          NSMutableArray *monthsOfYear = [NSMutableArray arrayWithCapacity:[months count]];
+          for (NSString* month in months) {
+            NSNumberFormatter *num = [[NSNumberFormatter alloc] init];
+            num.numberStyle = NSNumberFormatterDecimalStyle;
+            [monthsOfYear addObject:[num numberFromString:month]];
+          }
+          [rule setValue:monthsOfYear forKey:@"monthsOfTheYear"];
         }
 
         [myEvent addRecurrenceRule:rule];
