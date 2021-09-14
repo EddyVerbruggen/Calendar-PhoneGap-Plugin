@@ -140,6 +140,7 @@ public abstract class AbstractCalendarAccessor {
         CALENDARS_NAME,
         CALENDARS_VISIBLE,
         CALENDARS_DISPLAY_NAME,
+        CALENDARS_SYNC_EVENTS,
         EVENTS_ID,
         EVENTS_CALENDAR_ID,
         EVENTS_DESCRIPTION,
@@ -199,7 +200,7 @@ public abstract class AbstractCalendarAccessor {
             selection += CalendarContract.Instances.EVENT_ID + " = ?";
             selectionList.add(eventId);
         } else {
-            if (title != null) {
+            if (title != null && !title.equals("")) {
                 //selection += Events.TITLE + "=?";
                 selection += Events.TITLE + " LIKE ?";
                 selectionList.add("%" + title + "%");
@@ -281,7 +282,8 @@ public abstract class AbstractCalendarAccessor {
                         this.getKey(KeyIndex.ACCOUNT_NAME),
                         this.getKey(KeyIndex.CALENDARS_NAME),
                         this.getKey(KeyIndex.CALENDARS_DISPLAY_NAME),
-                        this.getKey(KeyIndex.IS_PRIMARY)
+                        this.getKey(KeyIndex.IS_PRIMARY),
+                        this.getKey(KeyIndex.CALENDARS_SYNC_EVENTS)
                 },
                 null, null, null
         );
@@ -297,6 +299,7 @@ public abstract class AbstractCalendarAccessor {
                 calendar.put("accountName", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.ACCOUNT_NAME))));
                 calendar.put("name", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_NAME))));
                 calendar.put("displayname", cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_DISPLAY_NAME))));
+                calendar.put("syncEvents", "1".equals(cursor.getString(cursor.getColumnIndex(this.getKey(KeyIndex.CALENDARS_SYNC_EVENTS)))));
                 primaryColumnIndex = cursor.getColumnIndex(this.getKey((KeyIndex.IS_PRIMARY)));
                 if (primaryColumnIndex == -1) {
                     primaryColumnIndex = cursor.getColumnIndex("COALESCE(isPrimary, ownerAccount = account_name)");
@@ -716,7 +719,7 @@ public abstract class AbstractCalendarAccessor {
             cv.put(CalendarContract.Calendars.VISIBLE, 1);
             cv.put(CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL, CalendarContract.Calendars.CAL_ACCESS_OWNER);
             cv.put(CalendarContract.Calendars.OWNER_ACCOUNT, accountName != null ? accountName : "AccountName" );
-            cv.put(CalendarContract.Calendars.SYNC_EVENTS, 0);
+            cv.put(CalendarContract.Calendars.SYNC_EVENTS, 1); // if this isn't '1' then all events are removed when deleting a recurring event ¯\_(ツ)_/¯
 
             calUri = calUri.buildUpon()
                     .appendQueryParameter(CalendarContract.CALLER_IS_SYNCADAPTER, "true")
