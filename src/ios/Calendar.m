@@ -296,7 +296,6 @@
   NSNumber* startTime  = [options objectForKey:@"startTime"];
   NSNumber* endTime    = [options objectForKey:@"endTime"];
 
-  [self.commandDelegate runInBackground: ^{
     NSTimeInterval _startInterval = [startTime doubleValue] / 1000; // strip millis
     NSDate *myStartDate = [NSDate dateWithTimeIntervalSince1970:_startInterval];
 
@@ -320,7 +319,7 @@
     }
 
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-  }];
+  //}];
 }
 
 - (NSArray*) findEKEventsWithTitle: (NSString *)title
@@ -414,6 +413,9 @@
                                   [df stringFromDate:event.endDate], @"endDate",
                                   [df stringFromDate:event.lastModifiedDate], @"lastModifiedDate",
                                   nil];
+      
+    [entry setObject:@(event.allDay) forKey:@"allday"];
+      
     // optional fields
     if (event.location != nil) {
       [entry setObject:event.location forKey:@"location"];
@@ -959,7 +961,7 @@
       if (fromTime != nil && fromTime != (id)NSNull.null) {
         // Find target instance
         NSDate* fromDate = [NSDate dateWithTimeIntervalSince1970:(fromTime.doubleValue / 1000)]; // strip millis
-        NSArray<EKEvent*>* toDelete = [eventStore eventsMatchingPredicate:[eventStore predicateForEventsWithStartDate:fromDate endDate:NSDate.distantFuture calendars:@[firstEvent.calendar]]];
+        NSArray<EKEvent*>* toDelete = [self.eventStore eventsMatchingPredicate:[self.eventStore predicateForEventsWithStartDate:fromDate endDate:NSDate.distantFuture calendars:@[firstEvent.calendar]]];
         if (toDelete.count < 1) {
           // Nothing to delete
           [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
@@ -974,7 +976,7 @@
 
       // Delete
       NSError *error = nil;
-      [eventStore removeEvent:instance span:EKSpanFutureEvents error:&error];
+      [self.eventStore removeEvent:instance span:EKSpanFutureEvents error:&error];
       if (error != nil) {
         // Fail
         [self.commandDelegate
