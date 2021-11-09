@@ -545,6 +545,7 @@
       NSMutableDictionary *entry = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                     thisCalendar.calendarIdentifier, @"id",
                                     thisCalendar.title, @"name",
+                                    thisCalendar.source.title, @"accountName",
                                     type, @"type",
                                     nil];
       [finalResults addObject:entry];
@@ -1025,6 +1026,7 @@
   // actually the only option we're currently using is calendarName
   NSDictionary* calOptions = [options objectForKey:@"options"];
   NSString* calEventID = [calOptions objectForKey:@"id"];
+  NSString* calendarID = [calOptions objectForKey:@"calendarId"];
   NSString* calendarName = [calOptions objectForKey:@"calendarName"];
 
   [self.commandDelegate runInBackground: ^{
@@ -1046,7 +1048,8 @@
 
     NSArray* calendars = nil;
 
-    if (calendarName == (id)[NSNull null]) {
+    if (calendarName == (id)[NSNull null] && calendarID == (id)[NSNull null]) {
+        // Get the default calendar
         calendars = [self.eventStore calendarsForEntityType:EKEntityTypeEvent];
       if (calendars.count == 0) {
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No default calendar found. Is access to the Calendar blocked for this app?"];
@@ -1054,7 +1057,14 @@
         return;
       }
     } else {
-      EKCalendar * calendar = [self findEKCalendar:calendarName];
+      EKCalendar * calendar = nil;
+      if (calendarID != (id)[NSNull null]) {
+        // Get the calendar by ID
+        calendar = [self.eventStore calendarWithIdentifier:calendarID];
+      } else {
+        // Get the calendar by name
+        calendar = [self findEKCalendar:calendarName];
+      }
 
       if (calendar == nil) {
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Could not find calendar"];
