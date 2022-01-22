@@ -81,7 +81,8 @@ Calendar.prototype.getCalendarOptions = function () {
     recurrenceCount: null,
     calendarName: null,
     calendarId: null,
-    url: null
+    url: null,
+    attendees: null
   };
 };
 
