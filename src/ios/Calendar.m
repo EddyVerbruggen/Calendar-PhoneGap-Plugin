@@ -390,6 +390,13 @@
     }
   }
 
+  // not found... so look for an Exchange calendar
+  for (EKSource *source in self.eventStore.sources) {
+    if (source.sourceType == EKSourceTypeExchange) {
+      return source;
+    }
+  }
+
   // ok, not found.. so it's a local calendar
   for (EKSource *source in self.eventStore.sources) {
     if (source.sourceType == EKSourceTypeLocal) {
