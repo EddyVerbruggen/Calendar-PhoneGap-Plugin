@@ -1,43 +1,101 @@
-"use strict";
-function Calendar() {
-}
+'use strict';
+function Calendar() {}
 
 Calendar.prototype.getCreateCalendarOptions = function () {
   return {
+    accountName: 'AccountName',
     calendarName: null,
-    calendarColor: null // optional, the OS will choose one if left empty, example: pass "#FF0000" for red
+    calendarColor: null, // optional, the OS will choose one if left empty, example: pass "#FF0000" for red
   };
 };
 
-Calendar.prototype.hasReadPermission = function (successCallback, errorCallback) {
-  cordova.exec(successCallback, errorCallback, "Calendar", "hasReadPermission", []);
+Calendar.prototype.hasReadPermission = function (
+  successCallback,
+  errorCallback
+) {
+  cordova.exec(
+    successCallback,
+    errorCallback,
+    'Calendar',
+    'hasReadPermission',
+    []
+  );
 };
 
-Calendar.prototype.requestReadPermission = function (successCallback, errorCallback) {
-  cordova.exec(successCallback, errorCallback, "Calendar", "requestReadPermission", []);
+Calendar.prototype.requestReadPermission = function (
+  successCallback,
+  errorCallback
+) {
+  cordova.exec(
+    successCallback,
+    errorCallback,
+    'Calendar',
+    'requestReadPermission',
+    []
+  );
 };
 
-Calendar.prototype.hasWritePermission = function (successCallback, errorCallback) {
-  cordova.exec(successCallback, errorCallback, "Calendar", "hasWritePermission", []);
+Calendar.prototype.hasWritePermission = function (
+  successCallback,
+  errorCallback
+) {
+  cordova.exec(
+    successCallback,
+    errorCallback,
+    'Calendar',
+    'hasWritePermission',
+    []
+  );
 };
 
-Calendar.prototype.requestWritePermission = function (successCallback, errorCallback) {
-  cordova.exec(successCallback, errorCallback, "Calendar", "requestWritePermission", []);
+Calendar.prototype.requestWritePermission = function (
+  successCallback,
+  errorCallback
+) {
+  cordova.exec(
+    successCallback,
+    errorCallback,
+    'Calendar',
+    'requestWritePermission',
+    []
+  );
 };
 
-Calendar.prototype.hasReadWritePermission = function (successCallback, errorCallback) {
-  cordova.exec(successCallback, errorCallback, "Calendar", "hasReadWritePermission", []);
+Calendar.prototype.hasReadWritePermission = function (
+  successCallback,
+  errorCallback
+) {
+  cordova.exec(
+    successCallback,
+    errorCallback,
+    'Calendar',
+    'hasReadWritePermission',
+    []
+  );
 };
 
-Calendar.prototype.requestReadWritePermission = function (successCallback, errorCallback) {
-  cordova.exec(successCallback, errorCallback, "Calendar", "requestReadWritePermission", []);
+Calendar.prototype.requestReadWritePermission = function (
+  successCallback,
+  errorCallback
+) {
+  cordova.exec(
+    successCallback,
+    errorCallback,
+    'Calendar',
+    'requestReadWritePermission',
+    []
+  );
 };
 
-Calendar.prototype.createCalendar = function (calendarNameOrOptionsObject, successCallback, errorCallback) {
+Calendar.prototype.createCalendar = function (
+  calendarNameOrOptionsObject,
+  successCallback,
+  errorCallback
+) {
   var options;
-  if (typeof calendarNameOrOptionsObject == "string") {
+  if (typeof calendarNameOrOptionsObject == 'string') {
     options = {
-      "calendarName": calendarNameOrOptionsObject
+      calendarName: calendarNameOrOptionsObject,
     };
   } else {
     options = calendarNameOrOptionsObject;
@@ -49,23 +107,37 @@ Calendar.prototype.createCalendar = function (calendarNameOrOptionsObject, succe
       mergedOptions[val] = options[val];
     }
   }
-  cordova.exec(successCallback, errorCallback, "Calendar", "createCalendar", [mergedOptions]);
+  cordova.exec(successCallback, errorCallback, 'Calendar', 'createCalendar', [
+    mergedOptions,
+  ]);
 };
 
-Calendar.prototype.deleteCalendar = function (calendarName, successCallback, errorCallback) {
-  cordova.exec(successCallback, errorCallback, "Calendar", "deleteCalendar", [{
-    "calendarName": calendarName
-  }]);
+Calendar.prototype.deleteCalendar = function (
+  calendarName,
+  successCallback,
+  errorCallback
+) {
+  cordova.exec(successCallback, errorCallback, 'Calendar', 'deleteCalendar', [
+    {
+      calendarName: calendarName,
+    },
+  ]);
 };
 
-Calendar.prototype.openCalendar = function (date, successCallback, errorCallback) {
+Calendar.prototype.openCalendar = function (
+  date,
+  successCallback,
+  errorCallback
+) {
   // default: today
   if (!(date instanceof Date)) {
     date = new Date();
   }
-  cordova.exec(successCallback, errorCallback, "Calendar", "openCalendar", [{
-    "date": date.getTime()
-  }]);
+  cordova.exec(successCallback, errorCallback, 'Calendar', 'openCalendar', [
+    {
+      date: date.getTime(),
+    },
+  ]);
 };
 
 Calendar.prototype.getCalendarOptions = function () {
@@ -74,14 +146,14 @@ Calendar.prototype.getCalendarOptions = function () {
     secondReminderMinutes: null,
     recurrence: null, // options are: 'daily', 'weekly', 'monthly', 'yearly'
     recurrenceInterval: 1, // only used when recurrence is set
-    recurrenceWeekstart: "MO",
+    recurrenceWeekstart: 'MO',
     recurrenceByDay: null,
     recurrenceByMonthDay: null,
     recurrenceEndDate: null,
     recurrenceCount: null,
     calendarName: null,
     calendarId: null,
-    url: null
+    url: null,
   };
 };
 
@@ -91,9 +163,18 @@ Calendar.prototype.getCalendarOptions = function () {
  *   var options = window.plugins.calendar.getCalendarOptions();
  *   options.firstReminderMinutes = 150;
  */
-Calendar.prototype.createEventWithOptions = function (title, location, notes, startDate, endDate, options, successCallback, errorCallback) {
+Calendar.prototype.createEventWithOptions = function (
+  title,
+  location,
+  notes,
+  startDate,
+  endDate,
+  options,
+  successCallback,
+  errorCallback
+) {
   if (!(startDate instanceof Date && endDate instanceof Date)) {
-    errorCallback("startDate and endDate must be JavaScript Date Objects");
+    errorCallback('startDate and endDate must be JavaScript Date Objects');
     return;
   }
 
@@ -107,32 +188,101 @@ Calendar.prototype.createEventWithOptions = function (title, location, notes, st
   if (options.recurrenceEndDate != null) {
     mergedOptions.recurrenceEndTime = options.recurrenceEndDate.getTime();
   }
-  cordova.exec(successCallback, errorCallback, "Calendar", "createEventWithOptions", [{
-    "title": title,
-    "location": location,
-    "notes": notes,
-    "startTime": startDate instanceof Date ? startDate.getTime() : null,
-    "endTime": endDate instanceof Date ? endDate.getTime() : null,
-    "options": mergedOptions
-  }]);
+  cordova.exec(
+    successCallback,
+    errorCallback,
+    'Calendar',
+    'createEventWithOptions',
+    [
+      {
+        title: title,
+        location: location,
+        notes: notes,
+        startTime: startDate instanceof Date ? startDate.getTime() : null,
+        endTime: endDate instanceof Date ? endDate.getTime() : null,
+        options: mergedOptions,
+      },
+    ]
+  );
 };
 
 /**
  * @deprecated use createEventWithOptions instead
  */
-Calendar.prototype.createEventInNamedCalendar = function (title, location, notes, startDate, endDate, calendarName, successCallback, errorCallback) {
-  Calendar.prototype.createEventWithOptions(title, location, notes, startDate, endDate, {calendarName:calendarName}, successCallback, errorCallback);
+Calendar.prototype.createEventInNamedCalendar = function (
+  title,
+  location,
+  notes,
+  startDate,
+  endDate,
+  calendarName,
+  successCallback,
+  errorCallback
+) {
+  Calendar.prototype.createEventWithOptions(
+    title,
+    location,
+    notes,
+    startDate,
+    endDate,
+    { calendarName: calendarName },
+    successCallback,
+    errorCallback
+  );
 };
 
-Calendar.prototype.createEvent = function (title, location, notes, startDate, endDate, successCallback, errorCallback) {
-  Calendar.prototype.createEventWithOptions(title, location, notes, startDate, endDate, {}, successCallback, errorCallback);
+Calendar.prototype.createEvent = function (
+  title,
+  location,
+  notes,
+  startDate,
+  endDate,
+  successCallback,
+  errorCallback
+) {
+  Calendar.prototype.createEventWithOptions(
+    title,
+    location,
+    notes,
+    startDate,
+    endDate,
+    {},
+    successCallback,
+    errorCallback
+  );
 };
 
-Calendar.prototype.createEventInteractively = function (title, location, notes, startDate, endDate, successCallback, errorCallback) {
-  Calendar.prototype.createEventInteractivelyWithOptions(title, location, notes, startDate, endDate, {}, successCallback, errorCallback);
+Calendar.prototype.createEventInteractively = function (
+  title,
+  location,
+  notes,
+  startDate,
+  endDate,
+  successCallback,
+  errorCallback
+) {
+  Calendar.prototype.createEventInteractivelyWithOptions(
+    title,
+    location,
+    notes,
+    startDate,
+    endDate,
+    {},
+    successCallback,
+    errorCallback
+  );
 };
 
-Calendar.prototype.createEventInteractivelyWithOptions = function (title, location, notes, startDate, endDate, options, successCallback, errorCallback) {
+Calendar.prototype.createEventInteractivelyWithOptions = function (
+  title,
+  location,
+  notes,
+  startDate,
+  endDate,
+  options,
+  successCallback,
+  errorCallback
+) {
   // merge passed options with defaults
   var mergedOptions = Calendar.prototype.getCalendarOptions();
   for (var val in options) {
@@ -143,17 +293,34 @@ Calendar.prototype.createEventInteractivelyWithOptions = function (title, locati
   if (options.recurrenceEndDate != null) {
     mergedOptions.recurrenceEndTime = options.recurrenceEndDate.getTime();
   }
-  cordova.exec(successCallback, errorCallback, "Calendar", "createEventInteractively", [{
-    "title": title,
-    "location": location,
-    "notes": notes,
-    "startTime": startDate instanceof Date ? startDate.getTime() : null,
-    "endTime": endDate instanceof Date ? endDate.getTime() : null,
-    "options": mergedOptions
-  }])
+  cordova.exec(
+    successCallback,
+    errorCallback,
+    'Calendar',
+    'createEventInteractively',
+    [
+      {
+        title: title,
+        location: location,
+        notes: notes,
+        startTime: startDate instanceof Date ? startDate.getTime() : null,
+        endTime: endDate instanceof Date ? endDate.getTime() : null,
+        options: mergedOptions,
+      },
+    ]
+  );
 };
 
-Calendar.prototype.findEventWithOptions = function (title, location, notes, startDate, endDate, options, successCallback, errorCallback) {
+Calendar.prototype.findEventWithOptions = function (
+  title,
+  location,
+  notes,
+  startDate,
+  endDate,
+  options,
+  successCallback,
+  errorCallback
+) {
   // merge passed options with defaults
   var mergedOptions = Calendar.prototype.getCalendarOptions();
   for (var val in options) {
@@ -164,60 +331,148 @@ Calendar.prototype.findEventWithOptions = function (title, location, notes, star
   if (options.recurrenceEndDate != null) {
     mergedOptions.recurrenceEndTime = options.recurrenceEndDate.getTime();
   }
-  cordova.exec(successCallback, errorCallback, "Calendar", "findEventWithOptions", [{
-    "title": title,
-    "location": location,
-    "notes": notes,
-    "startTime": startDate instanceof Date ? startDate.getTime() : null,
-    "endTime": endDate instanceof Date ? endDate.getTime() : null,
-    "options": mergedOptions
-  }])
+  cordova.exec(
+    successCallback,
+    errorCallback,
+    'Calendar',
+    'findEventWithOptions',
+    [
+      {
+        title: title,
+        location: location,
+        notes: notes,
+        startTime: startDate instanceof Date ? startDate.getTime() : null,
+        endTime: endDate instanceof Date ? endDate.getTime() : null,
+        options: mergedOptions,
+      },
+    ]
+  );
 };
 
-Calendar.prototype.findEvent = function (title, location, notes, startDate, endDate, successCallback, errorCallback) {
-  Calendar.prototype.findEventWithOptions(title, location, notes, startDate, endDate, {}, successCallback, errorCallback);
+Calendar.prototype.findEvent = function (
+  title,
+  location,
+  notes,
+  startDate,
+  endDate,
+  successCallback,
+  errorCallback
+) {
+  Calendar.prototype.findEventWithOptions(
+    title,
+    location,
+    notes,
+    startDate,
+    endDate,
+    {},
+    successCallback,
+    errorCallback
+  );
 };
 
-Calendar.prototype.findAllEventsInNamedCalendar = function (calendarName, successCallback, errorCallback) {
-  cordova.exec(successCallback, errorCallback, "Calendar", "findAllEventsInNamedCalendar", [{
-    "calendarName": calendarName
-  }]);
+Calendar.prototype.findAllEventsInNamedCalendar = function (
+  calendarName,
+  successCallback,
+  errorCallback
+) {
+  cordova.exec(
+    successCallback,
+    errorCallback,
+    'Calendar',
+    'findAllEventsInNamedCalendar',
+    [
+      {
+        calendarName: calendarName,
+      },
+    ]
+  );
 };
 
-Calendar.prototype.deleteEvent = function (title, location, notes, startDate, endDate, successCallback, errorCallback) {
+Calendar.prototype.deleteEvent = function (
+  title,
+  location,
+  notes,
+  startDate,
+  endDate,
+  successCallback,
+  errorCallback
+) {
   if (!(startDate instanceof Date && endDate instanceof Date)) {
-    errorCallback("startDate and endDate must be JavaScript Date Objects");
+    errorCallback('startDate and endDate must be JavaScript Date Objects');
   }
-  cordova.exec(successCallback, errorCallback, "Calendar", "deleteEvent", [{
-    "title": title,
-    "location": location,
-    "notes": notes,
-    "startTime": startDate instanceof Date ? startDate.getTime() : null,
-    "endTime": endDate instanceof Date ? endDate.getTime() : null
-  }])
+  cordova.exec(successCallback, errorCallback, 'Calendar', 'deleteEvent', [
+    {
+      title: title,
+      location: location,
+      notes: notes,
+      startTime: startDate instanceof Date ? startDate.getTime() : null,
+      endTime: endDate instanceof Date ? endDate.getTime() : null,
+    },
+  ]);
 };
 
-Calendar.prototype.deleteEventFromNamedCalendar = function (title, location, notes, startDate, endDate, calendarName, successCallback, errorCallback) {
-  cordova.exec(successCallback, errorCallback, "Calendar", "deleteEventFromNamedCalendar", [{
-    "title": title,
-    "location": location,
-    "notes": notes,
-    "startTime": startDate instanceof Date ? startDate.getTime() : null,
-    "endTime": endDate instanceof Date ? endDate.getTime() : null,
-    "calendarName": calendarName
-  }])
+Calendar.prototype.deleteEventFromNamedCalendar = function (
+  title,
+  location,
+  notes,
+  startDate,
+  endDate,
+  calendarName,
+  successCallback,
+  errorCallback
+) {
+  cordova.exec(
+    successCallback,
+    errorCallback,
+    'Calendar',
+    'deleteEventFromNamedCalendar',
+    [
+      {
+        title: title,
+        location: location,
+        notes: notes,
+        startTime: startDate instanceof Date ? startDate.getTime() : null,
+        endTime: endDate instanceof Date ? endDate.getTime() : null,
+        calendarName: calendarName,
+      },
+    ]
+  );
 };
 
-Calendar.prototype.deleteEventById = function (id, fromDate, successCallback, errorCallback) {
-  cordova.exec(successCallback, errorCallback, "Calendar", "deleteEventById", [{
-    "id": id,
-    "fromTime": fromDate instanceof Date ? fromDate.getTime() : null
-  }]);
+Calendar.prototype.deleteEventById = function (
+  id,
+  fromDate,
+  successCallback,
+  errorCallback
+) {
+  cordova.exec(successCallback, errorCallback, 'Calendar', 'deleteEventById', [
+    {
+      id: id,
+      fromTime: fromDate instanceof Date ? fromDate.getTime() : null,
+    },
+  ]);
 };
 
-Calendar.prototype.modifyEventWithOptions = function (title, location, notes, startDate, endDate, newTitle, newLocation, newNotes, newStartDate, newEndDate, options, newOptions, successCallback, errorCallback) {
+Calendar.prototype.modifyEventWithOptions = function (
+  title,
+  location,
+  notes,
+  startDate,
+  endDate,
+  newTitle,
+  newLocation,
+  newNotes,
+  newStartDate,
+  newEndDate,
+  options,
+  newOptions,
+  successCallback,
+  errorCallback
+) {
   if (!(newStartDate instanceof Date && newEndDate instanceof Date)) {
-    errorCallback("newStartDate and newEndDate must be JavaScript Date Objects");
+    errorCallback(
+      'newStartDate and newEndDate must be JavaScript Date Objects'
+    );
     return;
   }
   // merge passed options with defaults
@@ -240,41 +495,118 @@ Calendar.prototype.modifyEventWithOptions = function (title, location, notes, st
   if (newOptions.recurrenceEndDate != null) {
     newMergedOptions.recurrenceEndTime = newOptions.recurrenceEndDate.getTime();
   }
-  cordova.exec(successCallback, errorCallback, "Calendar", "modifyEventWithOptions", [{
-    "title": title,
-    "location": location,
-    "notes": notes,
-    "startTime": startDate instanceof Date ? startDate.getTime() : null,
-    "endTime": endDate instanceof Date ? endDate.getTime() : null,
-    "newTitle": newTitle,
-    "newLocation": newLocation,
-    "newNotes": newNotes,
-    "newStartTime": newStartDate instanceof Date ? newStartDate.getTime() : null,
-    "newEndTime": newEndDate instanceof Date ? newEndDate.getTime() : null,
-    "options": mergedOptions,
-    "newOptions": newMergedOptions
-  }])
+  cordova.exec(
+    successCallback,
+    errorCallback,
+    'Calendar',
+    'modifyEventWithOptions',
+    [
+      {
+        title: title,
+        location: location,
+        notes: notes,
+        startTime: startDate instanceof Date ? startDate.getTime() : null,
+        endTime: endDate instanceof Date ? endDate.getTime() : null,
+        newTitle: newTitle,
+        newLocation: newLocation,
+        newNotes: newNotes,
+        newStartTime:
+          newStartDate instanceof Date ? newStartDate.getTime() : null,
+        newEndTime: newEndDate instanceof Date ? newEndDate.getTime() : null,
+        options: mergedOptions,
+        newOptions: newMergedOptions,
+      },
+    ]
+  );
 };
 
-Calendar.prototype.modifyEvent = function (title, location, notes, startDate, endDate, newTitle, newLocation, newNotes, newStartDate, newEndDate, successCallback, errorCallback) {
-  Calendar.prototype.modifyEventWithOptions(title, location, notes, startDate, endDate, newTitle, newLocation, newNotes, newStartDate, newEndDate, {}, successCallback, errorCallback);
+Calendar.prototype.modifyEvent = function (
+  title,
+  location,
+  notes,
+  startDate,
+  endDate,
+  newTitle,
+  newLocation,
+  newNotes,
+  newStartDate,
+  newEndDate,
+  successCallback,
+  errorCallback
+) {
+  Calendar.prototype.modifyEventWithOptions(
+    title,
+    location,
+    notes,
+    startDate,
+    endDate,
+    newTitle,
+    newLocation,
+    newNotes,
+    newStartDate,
+    newEndDate,
+    {},
+    successCallback,
+    errorCallback
+  );
 };
 
-Calendar.prototype.modifyEventInNamedCalendar = function (title, location, notes, startDate, endDate, newTitle, newLocation, newNotes, newStartDate, newEndDate, calendarName, successCallback, errorCallback) {
+Calendar.prototype.modifyEventInNamedCalendar = function (
+  title,
+  location,
+  notes,
+  startDate,
+  endDate,
+  newTitle,
+  newLocation,
+  newNotes,
+  newStartDate,
+  newEndDate,
+  calendarName,
+  successCallback,
+  errorCallback
+) {
   var options = Calendar.prototype.getCalendarOptions();
   options.calendarName = calendarName;
-  Calendar.prototype.modifyEventWithOptions(title, location, notes, startDate, endDate, newTitle, newLocation, newNotes, newStartDate, newEndDate, options, successCallback, errorCallback);
+  Calendar.prototype.modifyEventWithOptions(
+    title,
+    location,
+    notes,
+    startDate,
+    endDate,
+    newTitle,
+    newLocation,
+    newNotes,
+    newStartDate,
+    newEndDate,
+    options,
+    successCallback,
+    errorCallback
+  );
 };
 
-Calendar.prototype.listEventsInRange = function (startDate, endDate, successCallback, errorCallback) {
-  cordova.exec(successCallback, errorCallback, "Calendar", "listEventsInRange", [{
-    "startTime": startDate instanceof Date ? startDate.getTime() : null,
-    "endTime": endDate instanceof Date ? endDate.getTime() : null
-  }])
+Calendar.prototype.listEventsInRange = function (
+  startDate,
+  endDate,
+  successCallback,
+  errorCallback
+) {
+  cordova.exec(
+    successCallback,
+    errorCallback,
+    'Calendar',
+    'listEventsInRange',
+    [
+      {
+        startTime: startDate instanceof Date ? startDate.getTime() : null,
+        endTime: endDate instanceof Date ? endDate.getTime() : null,
+      },
+    ]
+  );
 };
 
 Calendar.prototype.listCalendars = function (successCallback, errorCallback) {
-  cordova.exec(successCallback, errorCallback, "Calendar", "listCalendars", []);
+  cordova.exec(successCallback, errorCallback, 'Calendar', 'listCalendars', []);
 };
 
 Calendar.prototype.parseEventDate = function (dateStr) {
@@ -285,9 +617,14 @@ Calendar.prototype.parseEventDate = function (dateStr) {
 
   var spl;
   // Handle yyyy-MM-dd HH:mm:ss format returned by AbstractCalendarAccessor.java L66 and Calendar.m L378, and yyyyMMddTHHmmss iCalendar local format, and similar
-  return (spl = /^\s*(\d{4})\D?(\d{2})\D?(\d{2})\D?(\d{2})\D?(\d{2})\D?(\d{2})\s*$/.exec(dateStr))
-    && new Date(spl[1], spl[2] - 1, spl[3], spl[4], spl[5], spl[6])
-    || new Date(dateStr);
+  return (
+    ((spl =
+      /^\s*(\d{4})\D?(\d{2})\D?(\d{2})\D?(\d{2})\D?(\d{2})\D?(\d{2})\s*$/.exec(
+        dateStr
+      )) &&
+      new Date(spl[1], spl[2] - 1, spl[3], spl[4], spl[5], spl[6])) ||
+    new Date(dateStr)
+  );
 };
 
 Calendar.install = function () {
