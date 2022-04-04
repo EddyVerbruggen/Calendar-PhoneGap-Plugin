@@ -333,10 +333,12 @@
   NSMutableArray *predicateStrings = [NSMutableArray arrayWithCapacity:3];
   if (title != (id)[NSNull null] && title.length > 0) {
     title = [title stringByReplacingOccurrencesOfString:@"'" withString:@"\\'"];
+    title = [title stringByReplacingOccurrencesOfString:@"\n" withString:@"\\n"];
     [predicateStrings addObject:[NSString stringWithFormat:@"title contains[c] '%@'", title]];
   }
   if (location != (id)[NSNull null] && location.length > 0) {
     location = [location stringByReplacingOccurrencesOfString:@"'" withString:@"\\'"];
+    location = [location stringByReplacingOccurrencesOfString:@"\n" withString:@"\\n"];
     [predicateStrings addObject:[NSString stringWithFormat:@"location contains[c] '%@'", location]];
   }
   if (notes != (id)[NSNull null] && notes.length > 0) {
