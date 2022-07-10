@@ -155,13 +155,24 @@
 
       EKEvent *theEvent = nil;
 
-      // Find matches
-      if (calEventID != nil) {
-          theEvent = (EKEvent *)[self.eventStore eventWithIdentifier:calEventID];
+    if (theEvent != nil && theEvent.occurrenceDate != nil) {
+      NSPredicate *predicate =
+          [self.eventStore predicateForEventsWithStartDate:myStartDate
+                                                   endDate:myEndDate
+                                                 calendars:calendars];
+      NSArray *results = [self.eventStore eventsMatchingPredicate:predicate];
+      for (int i = 0; i < results.count; i++) {
+        EKEvent *event = [results objectAtIndex:i];
+        if ([event.eventIdentifier isEqualToString:calEventID]) {
+          theEvent = event;
+          break;
+        }
+        theEvent = nil;
       }
-
-    if (theEvent == nil) {
-      NSArray *matchingEvents = [self findEKEventsWithTitle:title location:location notes:notes startDate:myStartDate endDate:myEndDate calendars:calendars];
+    }
+    // Find matches
+    if (calEventID == nil) {
+      NSArray *matchingEvents = [self findEKEventsWithTitle:title location:location notes:notes startDate:myStartDate endDate:myEndDate calendars:calendars ];
 
       if (matchingEvents.count == 1) {
 
