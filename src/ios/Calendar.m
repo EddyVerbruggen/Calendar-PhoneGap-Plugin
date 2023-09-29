@@ -18,14 +18,32 @@
 - (void) initEventStoreWithCalendarCapabilities {
 	EKEventStore* eventStoreCandidate = [[EKEventStore alloc] init];
 
-	[eventStoreCandidate requestFullAccessToEventsWithCompletion:^(BOOL granted, NSError *error) {
-		if (granted) {
-			self.eventStore = eventStoreCandidate;
-			NSLog(@"Full access to the event store granted and eventStore initialized.");
-		} else {
-			NSLog(@"Access to the event store not granted. Error: %@", error.localizedDescription);
+    if (@available(iOS 17.0, *)) {
+		[eventStoreCandidate requestFullAccessToEventsWithCompletion:^(BOOL granted, NSError *error) {
+			if (granted) {
+				self.eventStore = eventStoreCandidate;
+				NSLog(@"Full access to the event store granted and eventStore initialized.");
+			} else {
+				NSLog(@"Access to the event store not granted. Error: %@", error.localizedDescription);
+			}
+		}];
+	} else {
+		__block BOOL accessGranted = NO;
+		EKEventStore* eventStoreCandidate = [[EKEventStore alloc] init];
+		if([eventStoreCandidate respondsToSelector:@selector(requestAccessToEntityType:completion:)]) {
+			dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+			[eventStoreCandidate requestAccessToEntityType:EKEntityTypeEvent completion:^(BOOL granted, NSError *error) {
+				accessGranted = granted;
+				dispatch_semaphore_signal(sema);
+			}];
+			dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+		} else { // we're on iOS 5 or older
+			accessGranted = YES;
 		}
-	}];
+		if (accessGranted) {
+			self.eventStore = eventStoreCandidate;
+		}
+	}
 }
 
 #pragma mark Helper Functions
