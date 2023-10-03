@@ -12,38 +12,103 @@
 #pragma mark Initialization functions
 
 - (void) pluginInitialize {
-    [self initEventStoreWithCalendarCapabilities];
 }
 
-- (void) initEventStoreWithCalendarCapabilities {
-	EKEventStore* eventStoreCandidate = [[EKEventStore alloc] init];
+/**
+ * Init event store with read and write capabilities.
+ *
+ * Note: This will overwrite the existing event store.
+ */
+- (void) initEventStoreWithFullCalendarCapabilities {
+  NSLog(@"Initialising calendar event store with full access.");
 
-    if (@available(iOS 17.0, *)) {
-		[eventStoreCandidate requestFullAccessToEventsWithCompletion:^(BOOL granted, NSError *error) {
-			if (granted) {
-				self.eventStore = eventStoreCandidate;
-				NSLog(@"Full access to the event store granted and eventStore initialized.");
-			} else {
-				NSLog(@"Access to the event store not granted. Error: %@", error.localizedDescription);
-			}
-		}];
-	} else {
-		__block BOOL accessGranted = NO;
-		EKEventStore* eventStoreCandidate = [[EKEventStore alloc] init];
-		if([eventStoreCandidate respondsToSelector:@selector(requestAccessToEntityType:completion:)]) {
-			dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-			[eventStoreCandidate requestAccessToEntityType:EKEntityTypeEvent completion:^(BOOL granted, NSError *error) {
-				accessGranted = granted;
-				dispatch_semaphore_signal(sema);
-			}];
-			dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-		} else { // we're on iOS 5 or older
-			accessGranted = YES;
-		}
-		if (accessGranted) {
-			self.eventStore = eventStoreCandidate;
-		}
-	}
+  EKEventStore* eventStoreCandidate = [[EKEventStore alloc] init];
+  __block BOOL accessGranted = NO;
+
+  dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+  if (@available(iOS 17.0, *)) {
+    [eventStoreCandidate requestFullAccessToEventsWithCompletion:^(BOOL granted, NSError *error) {
+      accessGranted = granted;
+
+      if (!accessGranted) {
+        NSLog(@"Full access to the event store not granted. Error: %@", error.localizedDescription);
+      }
+
+      dispatch_semaphore_signal(sema);
+    }];
+  } else {
+    // iOS 16 or lower
+    if([eventStoreCandidate respondsToSelector:@selector(requestAccessToEntityType:completion:)]) {
+      [eventStoreCandidate requestAccessToEntityType:EKEntityTypeEvent completion:^(BOOL granted, NSError *error) {
+        accessGranted = granted;
+
+        if (!accessGranted) {
+          NSLog(@"Full access to the event store not granted. Error: %@", error.localizedDescription);
+        }
+
+        dispatch_semaphore_signal(sema);
+      }];
+    } else {
+      // iOS 5 or lower
+      accessGranted = YES;
+      dispatch_semaphore_signal(sema);
+    }
+  }
+  dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+
+  if (accessGranted) {
+    self.eventStore = eventStoreCandidate;
+    NSLog(@"Full access to the event store granted and eventStore initialized.");
+  }
+}
+
+/**
+ * Init event store with write capabilities only.
+ *
+ * Note: This will overwrite the existing event store, so you may not be able to read events after requesting write
+ * only permission, even if you have previously requested read and write permission.
+ */
+- (void) initEventStoreWithWriteCalendarCapabilities {
+  NSLog(@"Initialising calendar event store with write access.");
+
+  EKEventStore* eventStoreCandidate = [[EKEventStore alloc] init];
+  __block BOOL accessGranted = NO;
+
+  dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+  if (@available(iOS 17.0, *)) {
+    [eventStoreCandidate requestWriteOnlyAccessToEventsWithCompletion:^(BOOL granted, NSError *error) {
+      accessGranted = granted;
+
+      if (!accessGranted) {
+        NSLog(@"Write access to the event store not granted. Error: %@", error.localizedDescription);
+      }
+
+      dispatch_semaphore_signal(sema);
+    }];
+  } else {
+    // iOS 16 or lower
+    if([eventStoreCandidate respondsToSelector:@selector(requestAccessToEntityType:completion:)]) {
+      [eventStoreCandidate requestAccessToEntityType:EKEntityTypeEvent completion:^(BOOL granted, NSError *error) {
+        accessGranted = granted;
+
+        if (!accessGranted) {
+          NSLog(@"Write access to the event store not granted after requesting full access for iOS <= 16. Error: %@", error.localizedDescription);
+        }
+
+        dispatch_semaphore_signal(sema);
+      }];
+    } else {
+      // iOS 5 or lower
+      accessGranted = YES;
+      dispatch_semaphore_signal(sema);
+    }
+  }
+  dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+
+  if (accessGranted) {
+    self.eventStore = eventStoreCandidate;
+    NSLog(@"Write access to the event store granted and eventStore initialized.");
+  }
 }
 
 #pragma mark Helper Functions
@@ -1055,7 +1120,7 @@
 }
 
 - (void)requestReadPermission:(CDVInvokedUrlCommand*)command {
-  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:[self requestCalendarAccess]];
+  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:[self requestFullCalendarAccess]];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
@@ -1065,7 +1130,7 @@
 }
 
 - (void)requestWritePermission:(CDVInvokedUrlCommand*)command {
-  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:[self requestCalendarAccess]];
+  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:[self requestWriteCalendarAccess]];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
@@ -1075,14 +1140,18 @@
 }
 
 - (void)requestReadWritePermission:(CDVInvokedUrlCommand*)command {
-  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:[self requestCalendarAccess]];
+  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:[self requestFullCalendarAccess]];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
--(CDVCommandStatus)requestCalendarAccess{
-    [self initEventStoreWithCalendarCapabilities];
-    return (self.eventStore != nil) ? CDVCommandStatus_OK : CDVCommandStatus_ERROR;
+-(CDVCommandStatus)requestFullCalendarAccess{
+  [self initEventStoreWithFullCalendarCapabilities];
+  return (self.eventStore != nil) ? CDVCommandStatus_OK : CDVCommandStatus_ERROR;
 }
 
+-(CDVCommandStatus)requestWriteCalendarAccess{
+  [self initEventStoreWithWriteCalendarCapabilities];
+  return (self.eventStore != nil) ? CDVCommandStatus_OK : CDVCommandStatus_ERROR;
+}
 
 @end
