@@ -612,6 +612,7 @@ public abstract class AbstractCalendarAccessor {
       // accounts for daylight savings time
       values.put(Events.EVENT_TIMEZONE, "UTC");
       values.put(Events.DTSTART, startTime + TimeZone.getDefault().getOffset(startTime));
+      endTime = endTime + (24 * 60 * 60 * 1000);
       values.put(Events.DTEND, endTime + TimeZone.getDefault().getOffset(endTime));
     } else {
       values.put(Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
