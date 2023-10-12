@@ -2,3 +2,6 @@ demo/platforms
 demo/plugins
 *.ipr
 .idea/
+/bin/
+.classpath
+.project
