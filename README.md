@@ -17,13 +17,6 @@
 Every now and then kind folks ask me how they can give me all their money.
 Of course I'm happy to receive any amount but I'm just as happy if you simply 'star' this project.
 
-<table width="100%">
-  <tr>
-    <td width="100"><a href="http://plugins.telerik.com/plugin/calendar"><img src="http://www.x-services.nl/github-images/telerik-verified-plugins-marketplace.png" width="97px" height="71px" alt="Marketplace logo"/></a></td>
-    <td>For a quick demo app and easy code samples, check out the plugin page at the Verified Plugins Marketplace: http://plugins.telerik.com/plugin/calendar</td>
-  </tr>
-</table>
-
 1. [Description](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#1-description)
 2. [Installation](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#2-installation)
 	2. [Automatically](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin#automatically)
@@ -52,6 +45,11 @@ This plugin allows you to add events to the Calendar of the mobile device.
 ```
 cordova plugin add cordova-plugin-calendar --variable CALENDAR_USAGE_DESCRIPTION="This app uses your calendar"
 ```
+* On iOS 16 and below, all permission requests are identical. They all request full access.
+* On iOS 17+, the `requestReadPermission()` and `requestReadWritePermission()` both request full access. `requestWritePermission()` only requests write permission.
+  * Note: calling requestWritePermission() after calling requestReadWritePermission() may mean you lose permission to read events. You may need to call requestReadWritePermission() again.
+* On iOS 17+ you need to add `NSCalendarsFullAccessUsageDescription` and `NSCalendarsWriteOnlyAccessUsageDescription` usage strings to the `.plist` files.
+ 
 
 ### Android specifics
 * Supported methods on Android 4: `find`, `create` (silent and interactive), `delete`, ..
