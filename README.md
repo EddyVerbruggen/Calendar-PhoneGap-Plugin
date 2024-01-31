@@ -45,6 +45,11 @@ This plugin allows you to add events to the Calendar of the mobile device.
 ```
 cordova plugin add cordova-plugin-calendar --variable CALENDAR_USAGE_DESCRIPTION="This app uses your calendar"
 ```
+* On iOS 16 and below, all permission requests are identical. They all request full access.
+* On iOS 17+, the `requestReadPermission()` and `requestReadWritePermission()` both request full access. `requestWritePermission()` only requests write permission.
+  * Note: calling requestWritePermission() after calling requestReadWritePermission() may mean you lose permission to read events. You may need to call requestReadWritePermission() again.
+* On iOS 17+ you need to add `NSCalendarsFullAccessUsageDescription` and `NSCalendarsWriteOnlyAccessUsageDescription` usage strings to the `.plist` files.
+ 
 
 ### Android specifics
 * Supported methods on Android 4: `find`, `create` (silent and interactive), `delete`, ..
