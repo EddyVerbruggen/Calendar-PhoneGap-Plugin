@@ -16,22 +16,43 @@
 }
 
 - (void) initEventStoreWithCalendarCapabilities {
-  __block BOOL accessGranted = NO;
-  EKEventStore* eventStoreCandidate = [[EKEventStore alloc] init];
-  if([eventStoreCandidate respondsToSelector:@selector(requestAccessToEntityType:completion:)]) {
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    [eventStoreCandidate requestAccessToEntityType:EKEntityTypeEvent completion:^(BOOL granted, NSError *error) {
-      accessGranted = granted;
-      dispatch_semaphore_signal(sema);
-    }];
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-  } else { // we're on iOS 5 or older
-    accessGranted = YES;
-  }
+    EKEventStore *eventStoreCandidate = [[EKEventStore alloc] init];
+    __block BOOL accessGranted = NO;
 
-  if (accessGranted) {
-    self.eventStore = eventStoreCandidate;
-  }
+    [self requestAccessWithStore:eventStoreCandidate completion:^(BOOL granted, NSError *error) {
+        accessGranted = granted;
+
+        if (accessGranted) {
+            NSLog(@"Full access to the event store granted and eventStore initialized.");
+            self.eventStore = eventStoreCandidate;
+        }else{
+            NSLog(@"Access to the event store not granted. Error: %@", error.localizedDescription);
+        }
+    }];
+}
+
+- (void) requestAccessWithStore:(EKEventStore *)eventStore completion:(void (^)(BOOL granted, NSError *error))completion {
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    
+    if (@available(iOS 17.0, *)) {
+        NSLog(@"iOS 17 or later");
+        [eventStore requestFullAccessToEventsWithCompletion:^(BOOL granted, NSError *error) {
+            completion(granted, error);
+            dispatch_semaphore_signal(sema);
+        }];
+    } else if ([eventStore respondsToSelector:@selector(requestAccessToEntityType:completion:)]) {
+        NSLog(@"Lower than iOS 17");
+        [eventStore requestAccessToEntityType:EKEntityTypeEvent completion:^(BOOL granted, NSError *error) {
+            completion(granted, error);
+            dispatch_semaphore_signal(sema);
+        }];
+    } else {
+        NSLog(@"iOS 5 or older");
+        completion(YES, NULL);
+        dispatch_semaphore_signal(sema);
+    }
+
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
 }
 
 #pragma mark Helper Functions
